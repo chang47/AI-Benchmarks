@@ -1,0 +1,9 @@
+{
+  "name": "verify-06-solar-system",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "devDependencies": {
+    "playwright": "^1.61.1"
+  }
+}

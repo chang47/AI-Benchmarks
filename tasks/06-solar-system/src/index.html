@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Animated Solar System</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    background: #05070f;
+  }
+  canvas {
+    display: block;
+  }
+  #fps-hud {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    padding: 6px 10px;
+    font: 14px/1.2 Consolas, "Courier New", monospace;
+    color: #d8f0ff;
+    background: rgba(10, 16, 32, 0.72);
+    border: 1px solid rgba(140, 180, 255, 0.35);
+    border-radius: 6px;
+    z-index: 10;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+<canvas id="scene"></canvas>
+<div id="fps-hud">FPS: 60.0</div>
+<script>
+(function () {
+  "use strict";
+
+  var canvas = document.getElementById("scene");
+  var ctx = canvas.getContext("2d");
+  var hud = document.getElementById("fps-hud");
+
+  // ---- Planet definitions ----------------------------------------------
+  // displayRadius ordering (strict): Jupiter > Saturn > Uranus > Neptune >
+  // Earth > Venus > Mars > Mercury, Sun larger than Jupiter.
+  // periodSeconds strictly increasing Mercury -> Neptune (Mercury <= 20 s).
+  var SUN_RADIUS = 34;
+  var planets = [
+    { name: "Mercury", displayRadius: 4,    periodSeconds: 8,  color: "#b8b0a6", angle0: 0.6 },
+    { name: "Venus",   displayRadius: 7,    periodSeconds: 13, color: "#e6c98f", angle0: 2.1 },
+    { name: "Earth",   displayRadius: 8,    periodSeconds: 18, color: "#4f94e8", angle0: 3.9 },
+    { name: "Mars",    displayRadius: 5,    periodSeconds: 26, color: "#e0684b", angle0: 5.2 },
+    { name: "Jupiter", displayRadius: 22,   periodSeconds: 42, color: "#d9a066", angle0: 1.4 },
+    { name: "Saturn",  displayRadius: 18,   periodSeconds: 58, color: "#e8d29a", angle0: 4.6 },
+    { name: "Uranus",  displayRadius: 12.5, periodSeconds: 76, color: "#9ad6e0", angle0: 0.2 },
+    { name: "Neptune", displayRadius: 11,   periodSeconds: 95, color: "#5f7ce8", angle0: 2.9 }
+  ];
+  var TWO_PI = Math.PI * 2;
+
+  // Each planet's live orbital state.
+  planets.forEach(function (p) {
+    p.orbitRadius = 0;   // set by layout()
+    p.angle = p.angle0;  // radians, updated every frame
+  });
+
+  // ---- Layout (recomputed on resize; resize must never throw) ----------
+  var cx = 0, cy = 0;
+  var stars = [];
+
+  function layout() {
+    var w = Math.max(1, window.innerWidth || 1);
+    var h = Math.max(1, window.innerHeight || 1);
+    canvas.width = w;
+    canvas.height = h;
+    cx = w / 2;
+    cy = h / 2;
+
+    // Innermost orbit clears the Sun; outermost fits inside the canvas
+    // (outer orbit + planet disc + label stay within the smaller dimension).
+    var innerR = SUN_RADIUS + 36; // 70 at default sizes
+    var margin = 30;
+    var outerR = Math.min(w, h) / 2 - margin;
+    // Guarantee strictly increasing orbits with >= 12 px separation even
+    // in absurdly small windows.
+    var minOuter = innerR + 7 * 12;
+    if (outerR < minOuter) outerR = minOuter;
+    var step = (outerR - innerR) / 7;
+    for (var i = 0; i < planets.length; i++) {
+      planets[i].orbitRadius = innerR + step * i;
+    }
+
+    // Static starfield, regenerated per layout with a fixed seed so the
+    // background is deterministic and cheap to draw.
+    stars = [];
+    var seed = 42;
+    function rand() {
+      seed = (seed * 1103515245 + 12345) % 2147483648;
+      return seed / 2147483648;
+    }
+    var n = Math.floor((w * h) / 9000);
+    for (var s = 0; s < n; s++) {
+      stars.push({
+        x: rand() * w,
+        y: rand() * h,
+        r: 0.4 + rand() * 1.1,
+        a: 0.25 + rand() * 0.55
+      });
+    }
+  }
+
+  window.addEventListener("resize", function () {
+    try { layout(); } catch (e) { /* resizing must never throw */ }
+  });
+  layout();
+
+  // ---- Machine-readable state hook --------------------------------------
+  var state = {
+    fps: 60,
+    planets: planets.map(function (p) {
+      return {
+        name: p.name,
+        orbitRadius: p.orbitRadius,
+        displayRadius: p.displayRadius,
+        angle: p.angle,
+        periodSeconds: p.periodSeconds
+      };
+    })
+  };
+  window.solarSystem = state;
+
+  // ---- FPS measurement: sliding ~1 s window of rAF timestamps -----------
+  var frameTimes = [];
+  var fps = 60; // replaced by a real measurement within two frames
+
+  function measureFps(now) {
+    frameTimes.push(now);
+    var cutoff = now - 1000;
+    while (frameTimes.length > 0 && frameTimes[0] < cutoff) {
+      frameTimes.shift();
+    }
+    if (frameTimes.length >= 2) {
+      var span = frameTimes[frameTimes.length - 1] - frameTimes[0];
+      if (span > 0) {
+        var measured = ((frameTimes.length - 1) * 1000) / span;
+        if (isFinite(measured) && measured > 0) fps = measured;
+      }
+    }
+    // If the tab was backgrounded, the window empties down to one sample
+    // and we simply keep showing the last valid measurement.
+  }
+
+  // ---- Time-based simulation --------------------------------------------
+  var lastTs = null;
+  var simTime = 0; // seconds of animation time, background gaps clamped
+
+  function update(now) {
+    if (lastTs !== null) {
+      var dtMs = now - lastTs;
+      if (dtMs < 0) dtMs = 0;
+      if (dtMs > 100) dtMs = 100; // clamp resume-from-background jumps
+      simTime += dtMs / 1000;
+    }
+    lastTs = now;
+
+    for (var i = 0; i < planets.length; i++) {
+      var p = planets[i];
+      var a = (p.angle0 + (TWO_PI * simTime) / p.periodSeconds) % TWO_PI;
+      if (a < 0) a += TWO_PI;
+      p.angle = a;
+      var sp = state.planets[i];
+      sp.angle = a;
+      sp.orbitRadius = p.orbitRadius;
+      sp.displayRadius = p.displayRadius;
+    }
+    state.fps = fps;
+  }
+
+  // ---- Rendering ---------------------------------------------------------
+  function drawLabel(text, x, y) {
+    ctx.font = "12px 'Segoe UI', system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "rgba(5, 7, 15, 0.85)";
+    ctx.strokeText(text, x, y);
+    ctx.fillStyle = "rgba(232, 238, 248, 0.95)";
+    ctx.fillText(text, x, y);
+  }
+
+  function draw() {
+    var w = canvas.width, h = canvas.height;
+
+    // Space background
+    ctx.fillStyle = "#05070f";
+    ctx.fillRect(0, 0, w, h);
+    for (var s = 0; s < stars.length; s++) {
+      var st = stars[s];
+      ctx.globalAlpha = st.a;
+      ctx.fillStyle = "#cfe0ff";
+      ctx.beginPath();
+      ctx.arc(st.x, st.y, st.r, 0, TWO_PI);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // Orbit paths
+    ctx.strokeStyle = "rgba(120, 150, 210, 0.18)";
+    ctx.lineWidth = 1;
+    for (var i = 0; i < planets.length; i++) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, planets[i].orbitRadius, 0, TWO_PI);
+      ctx.stroke();
+    }
+
+    // Sun (center, does not orbit) with a soft glow
+    var glow = ctx.createRadialGradient(cx, cy, SUN_RADIUS * 0.3, cx, cy, SUN_RADIUS * 2.4);
+    glow.addColorStop(0, "rgba(255, 214, 92, 0.55)");
+    glow.addColorStop(1, "rgba(255, 214, 92, 0)");
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(cx, cy, SUN_RADIUS * 2.4, 0, TWO_PI);
+    ctx.fill();
+
+    ctx.fillStyle = "#ffd75e";
+    ctx.beginPath();
+    ctx.arc(cx, cy, SUN_RADIUS, 0, TWO_PI);
+    ctx.fill();
+    drawLabel("Sun", cx, cy + SUN_RADIUS + 6);
+
+    // Planets + labels (label pinned just under each disc, well within 30 px)
+    for (var j = 0; j < planets.length; j++) {
+      var p = planets[j];
+      var px = cx + p.orbitRadius * Math.cos(p.angle);
+      var py = cy + p.orbitRadius * Math.sin(p.angle);
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(px, py, p.displayRadius, 0, TWO_PI);
+      ctx.fill();
+      drawLabel(p.name, px, py + p.displayRadius + 4);
+    }
+  }
+
+  // ---- HUD ----------------------------------------------------------------
+  function updateHud() {
+    hud.textContent = "FPS: " + fps.toFixed(1);
+  }
+
+  // ---- Main loop ------------------------------------------------------------
+  function frame(now) {
+    measureFps(now);
+    update(now);
+    draw();
+    updateHud(); // every frame => far more than 4 refreshes per second
+    window.requestAnimationFrame(frame);
+  }
+  window.requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

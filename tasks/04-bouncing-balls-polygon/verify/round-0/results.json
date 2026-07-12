@@ -1,0 +1,374 @@
+{
+  "meta": {
+    "runSeconds": 315,
+    "startedAt": "2026-07-12T07:54:44.447Z",
+    "browser": "chrome-channel"
+  },
+  "raw": {
+    "early": {
+      "t": 0,
+      "r": 26.4,
+      "R": 396,
+      "cx": 640,
+      "cy": 450,
+      "balls": [
+        {
+          "n": 1,
+          "color": "#f8b862",
+          "x": 640,
+          "y": 450
+        },
+        {
+          "n": 2,
+          "color": "#f6ad49",
+          "x": 633.1867317250412,
+          "y": 456.2415523240168
+        },
+        {
+          "n": 3,
+          "color": "#f39800",
+          "x": 641.1423370005868,
+          "y": 436.98269358979786
+        },
+        {
+          "n": 4,
+          "color": "#f08300",
+          "x": 649.7376695305297,
+          "y": 462.7008106872826
+        },
+        {
+          "n": 5,
+          "color": "#ec6d51",
+          "x": 621.802453208422,
+          "y": 446.7813526492749
+        },
+        {
+          "n": 6,
+          "color": "#ee7948",
+          "x": 657.4328752847562,
+          "y": 438.9102362826732
+        },
+        {
+          "n": 7,
+          "color": "#ed6d3d",
+          "x": 634.1247252820469,
+          "y": 471.8574185801659
+        },
+        {
+          "n": 8,
+          "color": "#ec6800",
+          "x": 628.7318343432908,
+          "y": 428.3050318568347
+        },
+        {
+          "n": 9,
+          "color": "#ec6800",
+          "x": 664.5490805735029,
+          "y": 458.9645659680579
+        },
+        {
+          "n": 10,
+          "color": "#ee7800",
+          "x": 614.3774486347927,
+          "y": 460.5774884323884
+        },
+        {
+          "n": 11,
+          "color": "#eb6238",
+          "x": 652.3836902307165,
+          "y": 423.5345467397655
+        },
+        {
+          "n": 12,
+          "color": "#ea5506",
+          "x": 649.1727763434305,
+          "y": 479.24061856653174
+        },
+        {
+          "n": 13,
+          "color": "#ea5506",
+          "x": 612.3054389718543,
+          "y": 433.9518695961707
+        },
+        {
+          "n": 14,
+          "color": "#eb6101",
+          "x": 672.5379399549673,
+          "y": 442.8451929804545
+        },
+        {
+          "n": 15,
+          "color": "#e49e61",
+          "x": 620.1173784227215,
+          "y": 478.28370129977225
+        },
+        {
+          "n": 16,
+          "color": "#e45e32",
+          "x": 635.3993500819279,
+          "y": 414.51059284333786
+        },
+        {
+          "n": 17,
+          "color": "#e17b34",
+          "x": 668.262657684452,
+          "y": 473.817300027742
+        },
+        {
+          "n": 18,
+          "color": "#dd7a56",
+          "x": 601.9351237075772,
+          "y": 451.57619568662864
+        },
+        {
+          "n": 19,
+          "color": "#db8449",
+          "x": 667.7859230464857,
+          "y": 422.3460801972889
+        },
+        {
+          "n": 20,
+          "color": "#d66a35",
+          "x": 638.1420517827758,
+          "y": 490.23334970422064
+        }
+      ]
+    },
+    "rotation": {
+      "degPerSec": 72.06578619486221,
+      "fps": 60.05482182905557,
+      "simSpeedRatio": 1.0009136971508892,
+      "windowSec": 4.013
+    },
+    "monitor": {
+      "startSimT": 0.1583333333333334,
+      "frames": 18842,
+      "minCenterDist": 26.399999999999928,
+      "minGuard": -7.105427357601002e-14,
+      "containViolFrames": 0,
+      "ballCountBadFrames": 0,
+      "contactFrames": 17101,
+      "maxOverlapLate": 2.245629202101931,
+      "overlapRunFrames": 0,
+      "maxOverlapRunFrames": 1,
+      "keBucketMax": {
+        "0": 3683285.2511318605,
+        "1": 916375.472328366,
+        "2": 1056329.0295778373,
+        "3": 1006407.6415213043,
+        "4": 1019263.6622630543,
+        "5": 905386.79224043,
+        "6": 1025279.7238259361,
+        "7": 1110732.2976477772,
+        "8": 1042331.1779336544,
+        "9": 1049943.487392678,
+        "10": 997797.2679445266,
+        "11": 1148714.7747601527,
+        "12": 1110101.888530856,
+        "13": 1067173.8196646397,
+        "14": 885866.9352867205,
+        "15": 893054.6198349544,
+        "16": 995035.5838763132,
+        "17": 1050947.59718895,
+        "18": 1020973.7479787251,
+        "19": 948624.4903457252,
+        "20": 992137.011997418,
+        "21": 1135595.0028244657,
+        "22": 938869.1936747539,
+        "23": 988293.4815698836,
+        "24": 951938.3576514595,
+        "25": 985720.2828212,
+        "26": 934692.7748100606,
+        "27": 1073897.9970352305,
+        "28": 974765.0903915013,
+        "29": 958649.0767165426,
+        "30": 1029373.5861134462,
+        "31": 903984.5008357097
+      },
+      "speedMaxEarly": 880.1291249436697,
+      "speedMaxLate": 846.0065108596561,
+      "spinAbsMaxLate": 23.84502809475042,
+      "maxAscent": 415.55373242653786,
+      "ascGtR": 3399,
+      "ascTotal": 14833,
+      "meanYAccum": 225923391.7033966,
+      "meanYFrames": 341100
+    },
+    "final": {
+      "frames": 18848,
+      "simT": 314.88333333312914,
+      "ballCount": 20,
+      "numbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "colors": [
+        "#f8b862",
+        "#f6ad49",
+        "#f39800",
+        "#f08300",
+        "#ec6d51",
+        "#ee7948",
+        "#ed6d3d",
+        "#ec6800",
+        "#ec6800",
+        "#ee7800",
+        "#eb6238",
+        "#ea5506",
+        "#ea5506",
+        "#eb6101",
+        "#e49e61",
+        "#e45e32",
+        "#e17b34",
+        "#dd7a56",
+        "#db8449",
+        "#d66a35"
+      ],
+      "spins": [
+        1.4691081066707141,
+        4.527448597774273,
+        7.079742868433864,
+        2.239393602523045,
+        8.016052076784113,
+        -3.0922139342121837,
+        2.620935986504227,
+        -4.8183872141632165,
+        4.692625759677708,
+        1.5823684224200192,
+        0.3389827483609713,
+        4.436570147217215,
+        -1.9615079195027505,
+        1.5526037532440302,
+        -1.848245741327335,
+        1.6723917000764532,
+        9.00753384690436,
+        -1.9190735831666323,
+        10.102845387184242,
+        -3.780884576293362
+      ],
+      "angles": [
+        865.1702787340074,
+        836.9932703992209,
+        879.903339883536,
+        901.0963302617853,
+        957.1870464633345,
+        731.4595852317356,
+        1008.3735029458603,
+        1047.2338679418908,
+        975.0957256822371,
+        860.9291620646823,
+        906.3743955093743,
+        792.0718206165583,
+        841.5075032440753,
+        889.9936831935182,
+        980.906877477447,
+        924.590294884977,
+        1129.1216135374484,
+        1012.1307056821466,
+        1276.4962782616403,
+        1103.3185178917036
+      ],
+      "canvas": true,
+      "scrollOverflowY": 0,
+      "scrollOverflowX": 0,
+      "bodyOverflow": "hidden"
+    },
+    "stillAnimating": true,
+    "framesDeltaTail": 91,
+    "numbersRotating": true,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "networkRequests": [
+      "file:///C:/Users/iamjo/Projects/vetted-bench/tasks/04-bouncing-balls-polygon/src/index.html"
+    ]
+  },
+  "criteria": {
+    "c1_loads_no_errors_5min": {
+      "pass": true,
+      "evidence": "simT=314.9s frames=18848 consoleErrors=0 pageErrors=0 networkReqs=1"
+    },
+    "c2_rotation_72degps": {
+      "pass": true,
+      "evidence": "measured 72.07 deg/s over 4.0s (target 72 +/- 10%)"
+    },
+    "c3_20_balls_numbered_colored": {
+      "pass": true,
+      "evidence": "count=20 numbers 1-20 unique=true colors verbatim in order=true shared radius=26.40px"
+    },
+    "c4_spawn_center_drop": {
+      "pass": true,
+      "evidence": "max spawn distance from center 40.3px vs heptagon R=396px (t=0.00s)"
+    },
+    "c5_gravity_screen_down": {
+      "pass": true,
+      "evidence": "mean ball y (t>30s) = 662.3 vs center y 450.0 — balls pool BELOW center in screen space for the whole run"
+    },
+    "c6_rotating_wall_bounce": {
+      "pass": true,
+      "evidence": "walls keep stirring the pile: max ball speed after t>20s = 846.0px/s (source also applies wall-material velocity omega x r at contact — code line 109)"
+    },
+    "c7_ball_ball_collisions": {
+      "pass": true,
+      "evidence": "17101 frames (of 18842) had at least one ball-ball contact"
+    },
+    "c8_friction_and_spin": {
+      "pass": true,
+      "evidence": "max |spin| t>20s = 23.85rad/s; painted numbers rotating=true; KE damped 3683285 -> 1073898 (last minute)"
+    },
+    "c9_bounce_energy_bounded": {
+      "pass": false,
+      "evidence": "max continuous rise (t>15s) 415.6px < circumradius 396px; 3399 ascents exceeded one ball radius (26.4px) of 14833 total"
+    },
+    "c10_smooth_60fps": {
+      "pass": true,
+      "evidence": "fps=60.1; sim-time/wall-time ratio=1.001 (1.0 = real-time, no slow-motion/hyper-speed)"
+    },
+    "c11_containment_forever": {
+      "pass": true,
+      "evidence": "0 of 18842 monitored frames had a center on/outside the polygon; min center-to-wall distance 26.40px; min (dist - r) guard -0.00px"
+    },
+    "c12_ball_count_stable": {
+      "pass": true,
+      "evidence": "balls.length === 20 on all 18842 frames"
+    },
+    "c13_no_persistent_overlap": {
+      "pass": true,
+      "evidence": "max overlap depth after t>10s = 2.25px; longest consecutive run of frames with >2px overlap = 1 (<30 frames = no visible persistent interpenetration)"
+    },
+    "c14_corner_safety": {
+      "pass": true,
+      "evidence": "no escape/ejection in 5+min of corner passes; late max speed 846px/s never exceeded initial-drop max 880px/s (no energy gain)"
+    },
+    "c15_longrun_stability": {
+      "pass": true,
+      "evidence": "KE bucket maxima: drop 3683285, minute-1..2 1148715, last minute 1073898 — no blow-up; walls keep stirring (KE > 0) while friction keeps it bounded"
+    },
+    "c16_no_scroll_no_blank_never_stops": {
+      "pass": true,
+      "evidence": "scroll overflow y/x = 0/0px (body overflow=hidden); frames still advancing at end (+91 in 1.5s); screenshots non-blank (verified visually)"
+    }
+  },
+  "summary": {
+    "passed": 15,
+    "total": 16,
+    "passRate": 0.9375
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "checks": {
+    "file_exists": true,
+    "svgRendered": true
+  },
+  "consoleErrors": [],
+  "pageErrors": [],
+  "notes": {
+    "screenshotDiffBytes": 0
+  },
+  "inPage": {
+    "contract": {
+      "wellFormedXML": true,
+      "rootNamespace": true,
+      "hasViewBox": true,
+      "noScript": true,
+      "noEventHandlers": true,
+      "noSMIL": true,
+      "noCSSAnimation": true,
+      "noImageElements": true,
+      "noExternalRefs": true
+    },
+    "geom": {
+      "viewBox": {
+        "x": 0,
+        "y": 0,
+        "w": 800,
+        "h": 600
+      },
+      "wheels": [
+        {
+          "cx": 250,
+          "cy": 450,
+          "r": 95
+        },
+        {
+          "cx": 570,
+          "cy": 450,
+          "r": 95
+        }
+      ],
+      "wheelSizeRatioOK": true,
+      "wheelBottoms": [
+        545,
+        545
+      ],
+      "groundLineOK": true,
+      "frameToRearHub": 2,
+      "frameToFrontHub": 1,
+      "bottomBracket": {
+        "cx": 400,
+        "cy": 460,
+        "r": 20
+      },
+      "pedalRects": 3,
+      "crankLines": 5,
+      "overflows": [
+        {
+          "tag": "line",
+          "over": 1.5,
+          "bbox": [
+            0,
+            546,
+            800,
+            0
+          ],
+          "sw": 3
+        }
+      ],
+      "shapeCount": 51,
+      "legStrokes": [
+        {
+          "order": 9,
+          "stroke": "rgb(176, 106, 30)",
+          "d": "M 368 272 L 390 340 L 366 410"
+        },
+        {
+          "order": 55,
+          "stroke": "rgb(232, 145, 45)",
+          "d": "M 392 272 L 428 372 L 436 494"
+        }
+      ],
+      "wheelOrder": 14,
+      "body": {
+        "cx": 375,
+        "cy": 250,
+        "rx": 72,
+        "ry": 48
+      },
+      "bodyBetweenWheels": true,
+      "head": {
+        "cx": 462,
+        "cy": 150,
+        "r": 26
+      },
+      "beak": {
+        "w": 110,
+        "h": 56.41697692871094,
+        "x": 484,
+        "y": 138
+      },
+      "beakLongerThanHead": true,
+      "distinctColors": 24
+    },
+    "notes": {
+      "badAttrs": []
+    }
+  }
+}

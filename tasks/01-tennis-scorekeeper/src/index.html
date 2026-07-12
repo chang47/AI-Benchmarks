@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tennis Scorekeeper</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    max-width: 640px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+  h1 { font-size: 1.4rem; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+  th, td { border: 1px solid #8884; padding: 0.5rem 0.75rem; text-align: center; }
+  th:first-child, td:first-child { text-align: left; }
+  td.points { font-weight: 700; font-size: 1.2rem; }
+  #status { min-height: 1.5rem; font-weight: 600; margin: 0.5rem 0; }
+  #tiebreak-indicator { color: #b45309; }
+  #winner { color: #15803d; font-size: 1.1rem; }
+  .controls { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin: 1rem 0; }
+  button { font-size: 1rem; padding: 0.5rem 1rem; cursor: pointer; }
+  fieldset { margin-top: 1.5rem; }
+  fieldset label { margin-right: 1rem; }
+</style>
+</head>
+<body>
+<h1>Tennis Scorekeeper</h1>
+
+<div id="status">
+  <span id="tiebreak-indicator" hidden>Tiebreak in progress</span>
+  <span id="winner" hidden></span>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Player</th>
+      <th>Sets</th>
+      <th>Games</th>
+      <th>Points</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id="row-p1">
+      <td>Player 1</td>
+      <td id="sets-p1"></td>
+      <td id="games-p1"></td>
+      <td class="points" id="points-p1"></td>
+    </tr>
+    <tr id="row-p2">
+      <td>Player 2</td>
+      <td id="sets-p2"></td>
+      <td id="games-p2"></td>
+      <td class="points" id="points-p2"></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="controls">
+  <button id="point-p1" type="button">Point P1</button>
+  <button id="point-p2" type="button">Point P2</button>
+  <button id="new-match" type="button">New Match</button>
+</div>
+
+<fieldset>
+  <legend>New-match options</legend>
+  <label>
+    Best of
+    <select id="cfg-sets">
+      <option value="3" selected>3</option>
+      <option value="5">5</option>
+    </select>
+  </label>
+  <label><input type="checkbox" id="cfg-noad"> No-ad games</label>
+  <label><input type="checkbox" id="cfg-super"> 10-pt match tiebreak</label>
+</fieldset>
+
+<script type="module">
+  import { createMatch, pointTo, scoreboard } from "./engine.mjs";
+
+  const $ = (id) => document.getElementById(id);
+
+  function readConfig() {
+    return {
+      sets: Number($("cfg-sets").value),
+      noAd: $("cfg-noad").checked,
+      superTiebreak: $("cfg-super").checked,
+    };
+  }
+
+  let state = createMatch(readConfig());
+
+  function render() {
+    const view = scoreboard(state);
+    $("points-p1").textContent = view.points[0];
+    $("points-p2").textContent = view.points[1];
+    $("games-p1").textContent = String(view.games[0]);
+    $("games-p2").textContent = String(view.games[1]);
+    $("sets-p1").textContent = view.sets.map((s) => s[0]).join(" ");
+    $("sets-p2").textContent = view.sets.map((s) => s[1]).join(" ");
+    $("tiebreak-indicator").hidden = !view.inTiebreak;
+    const winnerEl = $("winner");
+    winnerEl.hidden = !view.over;
+    winnerEl.textContent = view.over
+      ? `Match over — ${view.winner === "p1" ? "Player 1" : "Player 2"} wins`
+      : "";
+  }
+
+  $("point-p1").addEventListener("click", () => {
+    state = pointTo(state, "p1"); // no-op once the match is over
+    render();
+  });
+  $("point-p2").addEventListener("click", () => {
+    state = pointTo(state, "p2");
+    render();
+  });
+  $("new-match").addEventListener("click", () => {
+    state = createMatch(readConfig());
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>

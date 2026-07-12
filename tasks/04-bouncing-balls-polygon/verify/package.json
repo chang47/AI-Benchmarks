@@ -1,0 +1,9 @@
+{
+  "name": "verify-04-bouncing-balls-polygon",
+  "private": true,
+  "type": "module",
+  "description": "Independent verifier harness (round 0) for the bouncing-balls-in-spinning-heptagon candidate.",
+  "devDependencies": {
+    "playwright": "^1.61.1"
+  }
+}

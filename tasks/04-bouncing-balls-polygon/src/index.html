@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>20 Bouncing Balls in a Spinning Heptagon</title>
+<style>
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #14161d; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+(function () {
+  // ---------- constants ----------
+  var TAU = Math.PI * 2;
+  var OMEGA = TAU / 5;          // heptagon spin: 360 degrees per 5 seconds (72 deg/s)
+  var N_SIDES = 7;
+  var N_BALLS = 20;
+  var G = 900;                  // gravity px/s^2, ALWAYS +y (screen-space down), never rotates
+  var H_STEP = 1 / 240;         // fixed physics substep (s)
+  var E_WALL = 0.85;            // wall restitution (bouncy but bounded)
+  var E_BALL = 0.55;            // ball-ball restitution
+  var MU_WALL = 0.35;           // wall friction coefficient
+  var MU_BALL = 0.30;           // ball-ball friction coefficient
+  var REST_THRESH = 40;         // px/s: below this relative normal speed contacts are inelastic (lets piles calm)
+  var AIR = 0.06;               // 1/s linear air drag
+  var SPIN_DRAG = 0.35;         // 1/s angular drag
+  // Ball fill colors 1-20, verbatim from the task (duplicates intentional)
+  var COLORS = ['#f8b862', '#f6ad49', '#f39800', '#f08300', '#ec6d51',
+                '#ee7948', '#ed6d3d', '#ec6800', '#ec6800', '#ee7800',
+                '#eb6238', '#ea5506', '#ea5506', '#eb6101', '#e49e61',
+                '#e45e32', '#e17b34', '#dd7a56', '#db8449', '#d66a35'];
+
+  // ---------- canvas ----------
+  var cv = document.getElementById('c');
+  var ctx = cv.getContext('2d');
+  var dpr = Math.max(1, window.devicePixelRatio || 1);
+  var W = Math.max(300, window.innerWidth);
+  var H = Math.max(300, window.innerHeight);
+  cv.width = Math.round(W * dpr);
+  cv.height = Math.round(H * dpr);
+  cv.style.width = W + 'px';
+  cv.style.height = H + 'px';
+  var CX = W / 2, CY = H / 2;
+  var R_HEP = 0.44 * Math.min(W, H);  // heptagon circumradius, fully inside the viewport
+  var RB = R_HEP / 15;                // ball radius (identical for all 20 balls)
+
+  // ---------- balls ----------
+  var balls = [];
+  for (var i = 0; i < N_BALLS; i++) {
+    // tight golden-angle cluster around the heptagon center
+    var sa = i * 2.39996;
+    var sr = 0.35 * RB * Math.sqrt(i);
+    balls.push({
+      n: i + 1,
+      color: COLORS[i],
+      x: CX + sr * Math.cos(sa),
+      y: CY + sr * Math.sin(sa),
+      vx: (Math.random() - 0.5) * 40,
+      vy: (Math.random() - 0.5) * 40,
+      w: 0,                      // angular velocity (rad/s)
+      a: Math.random() * TAU     // orientation (rad) - the painted number rotates with this
+    });
+  }
+
+  // live state handle (read-only debugging/inspection; not used by the sim consumers)
+  var sim = {
+    t: 0, wallAngle: 0, frames: 0,
+    balls: balls, r: RB, R: R_HEP, cx: CX, cy: CY,
+    verts: function () { return computeVerts(sim.wallAngle); }
+  };
+  window.__sim = sim;
+
+  // ---------- geometry ----------
+  function computeVerts(angle) {
+    var v = [];
+    for (var i = 0; i < N_SIDES; i++) {
+      var a = angle + i * TAU / N_SIDES - Math.PI / 2;
+      v.push([CX + R_HEP * Math.cos(a), CY + R_HEP * Math.sin(a)]);
+    }
+    return v;
+  }
+
+  function computeEdges(v) {
+    var es = [];
+    for (var i = 0; i < N_SIDES; i++) {
+      var A = v[i], B = v[(i + 1) % N_SIDES];
+      var nx = -(B[1] - A[1]), ny = (B[0] - A[0]);
+      var L = Math.hypot(nx, ny);
+      nx /= L; ny /= L;
+      if ((CX - A[0]) * nx + (CY - A[1]) * ny < 0) { nx = -nx; ny = -ny; } // orient inward
+      es.push({ ax: A[0], ay: A[1], nx: nx, ny: ny });
+    }
+    return es;
+  }
+
+  // ---------- collision: ball vs rotating wall ----------
+  // The heptagon interior is convex, so keeping each ball center at distance >= RB
+  // from every edge LINE (inward half-planes) is exact containment, and it handles
+  // vertices (two active half-planes) without ejection or energy gain.
+  function resolveWall(b, e) {
+    var d = (b.x - e.ax) * e.nx + (b.y - e.ay) * e.ny; // signed distance to wall line, + is inside
+    if (d >= RB) return;
+    // contact point on the wall line
+    var qx = b.x - e.nx * d, qy = b.y - e.ny * d;
+    // velocity of the rotating wall material at the contact point: omega x (q - C)
+    var wvx = -OMEGA * (qy - CY), wvy = OMEGA * (qx - CX);
+    var rvx = b.vx - wvx, rvy = b.vy - wvy;            // ball velocity relative to the moving wall
+    var vn = rvx * e.nx + rvy * e.ny;
+    if (vn < 0) {
+      var rest = vn < -REST_THRESH ? E_WALL : 0;
+      var jn = -(1 + rest) * vn;                       // normal impulse (unit mass)
+      b.vx += jn * e.nx; b.vy += jn * e.ny;
+      // friction + spin coupling (solid disc, I = 1/2 m r^2)
+      var tx = -e.ny, ty = e.nx;
+      var slip = rvx * tx + rvy * ty - b.w * RB;       // tangential slip at the contact
+      var jt = -slip / 3;                              // impulse that would stop the slip
+      var mx = MU_WALL * jn;                           // Coulomb cap
+      if (jt > mx) jt = mx; else if (jt < -mx) jt = -mx;
+      b.vx += jt * tx; b.vy += jt * ty;
+      b.w += -2 * jt / RB;
+    }
+    // positional de-penetration (velocity untouched -> no energy pumping)
+    var push = (RB - d) * 0.8;
+    b.x += e.nx * push; b.y += e.ny * push;
+  }
+
+  // ---------- collision: ball vs ball (equal masses) ----------
+  function resolvePairs() {
+    for (var i = 0; i < N_BALLS; i++) {
+      var a = balls[i];
+      for (var j = i + 1; j < N_BALLS; j++) {
+        var b = balls[j];
+        var dx = b.x - a.x, dy = b.y - a.y;
+        var d2 = dx * dx + dy * dy;
+        var minD = 2 * RB;
+        if (d2 >= minD * minD) continue;
+        var d = Math.sqrt(d2), nx, ny;
+        if (d < 1e-6) { var ra = Math.random() * TAU; nx = Math.cos(ra); ny = Math.sin(ra); d = 1e-6; }
+        else { nx = dx / d; ny = dy / d; }
+        var rvx = b.vx - a.vx, rvy = b.vy - a.vy;
+        var vn = rvx * nx + rvy * ny;
+        if (vn < 0) {
+          var rest = vn < -REST_THRESH ? E_BALL : 0;
+          var jn = -(1 + rest) * vn / 2;               // equal-mass elastic-style impulse with damping
+          a.vx -= jn * nx; a.vy -= jn * ny;
+          b.vx += jn * nx; b.vy += jn * ny;
+          var tx = -ny, ty = nx;
+          var slip = rvx * tx + rvy * ty - (a.w + b.w) * RB;
+          var jt = -slip / 6;
+          var mx = MU_BALL * jn;
+          if (jt > mx) jt = mx; else if (jt < -mx) jt = -mx;
+          a.vx -= jt * tx; a.vy -= jt * ty;
+          b.vx += jt * tx; b.vy += jt * ty;
+          a.w += -2 * jt / RB;
+          b.w += -2 * jt / RB;
+        }
+        var overlap = minD - d;
+        if (overlap > 0.05) {
+          var push = overlap * 0.3;                    // split positional correction, no velocity change
+          a.x -= nx * push; a.y -= ny * push;
+          b.x += nx * push; b.y += ny * push;
+        }
+      }
+    }
+  }
+
+  // ---------- physics step ----------
+  function step(h) {
+    sim.wallAngle += OMEGA * h;
+    sim.t += h;
+    var drag = Math.exp(-AIR * h), sdrag = Math.exp(-SPIN_DRAG * h);
+    for (var k = 0; k < N_BALLS; k++) {
+      var b = balls[k];
+      b.vy += G * h;                     // gravity: straight down in screen space
+      b.vx *= drag; b.vy *= drag;
+      b.w *= sdrag;
+      b.x += b.vx * h; b.y += b.vy * h;
+      b.a += b.w * h;                    // painted number rotates with the ball's spin
+    }
+    var edges = computeEdges(computeVerts(sim.wallAngle));
+    resolvePairs();
+    for (var it = 0; it < 2; it++) {
+      for (var k2 = 0; k2 < N_BALLS; k2++) {
+        for (var m = 0; m < N_SIDES; m++) resolveWall(balls[k2], edges[m]);
+      }
+    }
+    // hard containment clamp: after everything (including the wall having rotated
+    // into a ball this step), project every center back into the polygon eroded by RB.
+    for (var it2 = 0; it2 < 4; it2++) {
+      for (var k3 = 0; k3 < N_BALLS; k3++) {
+        var bb = balls[k3];
+        for (var m2 = 0; m2 < N_SIDES; m2++) {
+          var e = edges[m2];
+          var dd = (bb.x - e.ax) * e.nx + (bb.y - e.ay) * e.ny;
+          if (dd < RB) { bb.x += e.nx * (RB - dd); bb.y += e.ny * (RB - dd); }
+        }
+      }
+    }
+  }
+
+  // ---------- render ----------
+  function render() {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#14161d';
+    ctx.fillRect(0, 0, W, H);
+    var v = computeVerts(sim.wallAngle);
+    ctx.beginPath();
+    ctx.moveTo(v[0][0], v[0][1]);
+    for (var i = 1; i < N_SIDES; i++) ctx.lineTo(v[i][0], v[i][1]);
+    ctx.closePath();
+    ctx.fillStyle = '#1d222d';
+    ctx.fill();
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#8b97b1';
+    ctx.stroke();
+    var fs = Math.max(9, Math.round(RB * 0.95));
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (var k = 0; k < N_BALLS; k++) {
+      var b = balls[k];
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, RB, 0, TAU);
+      ctx.fillStyle = b.color;
+      ctx.fill();
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = 'rgba(0,0,0,0.28)';
+      ctx.stroke();
+      ctx.save();
+      ctx.translate(b.x, b.y);
+      ctx.rotate(b.a);
+      ctx.fillStyle = '#33200a';
+      ctx.font = '700 ' + fs + 'px system-ui, Arial, sans-serif';
+      ctx.fillText(String(b.n), 0, 0.5);
+      ctx.restore();
+    }
+  }
+
+  // ---------- main loop (fixed-step accumulator; stable across tab focus loss) ----------
+  var last = performance.now(), acc = 0;
+  function frame(now) {
+    var dt = (now - last) / 1000;
+    last = now;
+    if (dt > 0.05) dt = 0.05;   // clamp: returning from a hidden tab never explodes the sim
+    if (dt < 0) dt = 0;
+    acc += dt;
+    var n = 0;
+    while (acc >= H_STEP && n < 16) { step(H_STEP); acc -= H_STEP; n++; }
+    if (n === 16) acc = 0;
+    render();
+    sim.frames++;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

@@ -1,1 +1,3 @@
 ﻿RESEARCH: spec + frozen prompt + metadata authored from 9 external sources (Loop source, Duolingo x4, Streaks dev blog, MDN, Hinnant, RFC 3339); strict-streak + grace-for-today convention adopted, disagreements logged; NOTE base path arrived as 'undefined' (script bug) - wrote to C:/Users/iamjo/Projects/vetted-bench/tasks/02-habit-streak.
+BUILD r0: CLAIMED DONE=yes, self-checks 30/30 vitest tests pass covering all 28 spec acceptance criteria incl. TZ-subprocess purity check (Kiritimati/LA/UTC identical)
+VERIFY r0: PASS - independent 39-test suite (all 28 criteria + researched edges incl. TZ-subprocess check) 39/39, passRate 1.0, fakeConvergence=false

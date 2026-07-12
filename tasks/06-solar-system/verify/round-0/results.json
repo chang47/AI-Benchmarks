@@ -1,0 +1,492 @@
+{
+  "consoleErrors": [],
+  "pageErrors": [],
+  "s0": {
+    "t": 491.10000002384186,
+    "title": "Animated Solar System",
+    "hudText": "FPS: 24.1",
+    "hudRect": {
+      "x": 10,
+      "y": 10,
+      "width": 91.28125,
+      "height": 30.796875,
+      "top": 10,
+      "right": 101.28125,
+      "bottom": 40.796875,
+      "left": 10
+    },
+    "canvas": {
+      "w": 1280,
+      "h": 800,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1280,
+        "h": 800
+      }
+    },
+    "scroll": {
+      "sw": 1280,
+      "sh": 800,
+      "iw": 1280,
+      "ih": 800
+    },
+    "bodyBg": "rgb(5, 7, 15)",
+    "state": {
+      "fps": 24.063251976624265,
+      "fpsType": "number",
+      "planetCount": 8,
+      "planets": [
+        {
+          "name": "Mercury",
+          "orbitRadius": 70,
+          "displayRadius": 4,
+          "angle": 0.7496968899435537,
+          "periodSeconds": 8
+        },
+        {
+          "name": "Venus",
+          "orbitRadius": 112.85714285714286,
+          "displayRadius": 7,
+          "angle": 2.192121163042187,
+          "periodSeconds": 13
+        },
+        {
+          "name": "Earth",
+          "orbitRadius": 155.71428571428572,
+          "displayRadius": 8,
+          "angle": 3.966531951086024,
+          "periodSeconds": 18
+        },
+        {
+          "name": "Mars",
+          "orbitRadius": 198.57142857142856,
+          "displayRadius": 5,
+          "angle": 5.2460605815210934,
+          "periodSeconds": 26
+        },
+        {
+          "name": "Jupiter",
+          "orbitRadius": 241.42857142857142,
+          "displayRadius": 22,
+          "angle": 1.4285136933225815,
+          "periodSeconds": 42
+        },
+        {
+          "name": "Saturn",
+          "orbitRadius": 284.2857142857143,
+          "displayRadius": 18,
+          "angle": 4.620647846888765,
+          "periodSeconds": 58
+        },
+        {
+          "name": "Uranus",
+          "orbitRadius": 327.1428571428571,
+          "displayRadius": 12.5,
+          "angle": 0.21575756736247934,
+          "periodSeconds": 76
+        },
+        {
+          "name": "Neptune",
+          "orbitRadius": 370,
+          "displayRadius": 11,
+          "angle": 2.9126060538899834,
+          "periodSeconds": 95
+        }
+      ]
+    }
+  },
+  "s1": {
+    "t": 5729.600000023842,
+    "title": "Animated Solar System",
+    "hudText": "FPS: 59.9",
+    "hudRect": {
+      "x": 10,
+      "y": 10,
+      "width": 91.28125,
+      "height": 30.796875,
+      "top": 10,
+      "right": 101.28125,
+      "bottom": 40.796875,
+      "left": 10
+    },
+    "canvas": {
+      "w": 1280,
+      "h": 800,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1280,
+        "h": 800
+      }
+    },
+    "scroll": {
+      "sw": 1280,
+      "sh": 800,
+      "iw": 1280,
+      "ih": 800
+    },
+    "bodyBg": "rgb(5, 7, 15)",
+    "state": {
+      "fps": 59.947165210323114,
+      "fpsType": "number",
+      "planetCount": 8,
+      "planets": [
+        {
+          "name": "Mercury",
+          "orbitRadius": 70,
+          "displayRadius": 4,
+          "angle": 4.863298310554036,
+          "periodSeconds": 8
+        },
+        {
+          "name": "Venus",
+          "orbitRadius": 112.85714285714286,
+          "displayRadius": 7,
+          "angle": 4.723568191110177,
+          "periodSeconds": 13
+        },
+        {
+          "name": "Earth",
+          "orbitRadius": 155.71428571428572,
+          "displayRadius": 8,
+          "angle": 5.794799249135127,
+          "periodSeconds": 18
+        },
+        {
+          "name": "Mars",
+          "orbitRadius": 198.57142857142856,
+          "displayRadius": 5,
+          "angle": 0.22859878837550163,
+          "periodSeconds": 26
+        },
+        {
+          "name": "Jupiter",
+          "orbitRadius": 241.42857142857142,
+          "displayRadius": 22,
+          "angle": 2.212056821057912,
+          "periodSeconds": 42
+        },
+        {
+          "name": "Saturn",
+          "orbitRadius": 284.2857142857143,
+          "displayRadius": 18,
+          "angle": 5.188041146283315,
+          "periodSeconds": 58
+        },
+        {
+          "name": "Uranus",
+          "orbitRadius": 327.1428571428571,
+          "displayRadius": 12.5,
+          "angle": 0.6487682432162144,
+          "periodSeconds": 76
+        },
+        {
+          "name": "Neptune",
+          "orbitRadius": 370,
+          "displayRadius": 11,
+          "angle": 3.2590145945729714,
+          "periodSeconds": 95
+        }
+      ]
+    }
+  },
+  "hudSamples": [
+    {
+      "text": "FPS: 47.0",
+      "fps": 47.02388318277441
+    },
+    {
+      "text": "FPS: 59.9",
+      "fps": 59.9471652103231
+    },
+    {
+      "text": "FPS: 60.0",
+      "fps": 59.959349593495936
+    },
+    {
+      "text": "FPS: 60.0",
+      "fps": 59.95934959349592
+    },
+    {
+      "text": "FPS: 59.9",
+      "fps": 59.934985778138966
+    },
+    {
+      "text": "FPS: 59.9",
+      "fps": 59.947165210323085
+    },
+    {
+      "text": "FPS: 59.9",
+      "fps": 59.947165210323085
+    },
+    {
+      "text": "FPS: 60.0",
+      "fps": 59.95325678284725
+    },
+    {
+      "text": "FPS: 60.0",
+      "fps": 59.953256782847305
+    },
+    {
+      "text": "FPS: 59.9",
+      "fps": 59.947165210323114
+    }
+  ],
+  "pix": {
+    "planets": [
+      {
+        "name": "Mercury",
+        "x": 651,
+        "y": 331,
+        "rgba": [
+          184,
+          176,
+          166,
+          255
+        ]
+      },
+      {
+        "name": "Venus",
+        "x": 641,
+        "y": 287,
+        "rgba": [
+          230,
+          201,
+          143,
+          255
+        ]
+      },
+      {
+        "name": "Earth",
+        "x": 778,
+        "y": 327,
+        "rgba": [
+          79,
+          148,
+          232,
+          255
+        ]
+      },
+      {
+        "name": "Mars",
+        "x": 833,
+        "y": 445,
+        "rgba": [
+          224,
+          104,
+          75,
+          255
+        ]
+      },
+      {
+        "name": "Jupiter",
+        "x": 496,
+        "y": 593,
+        "rgba": [
+          217,
+          160,
+          102,
+          255
+        ]
+      },
+      {
+        "name": "Saturn",
+        "x": 770,
+        "y": 147,
+        "rgba": [
+          232,
+          210,
+          154,
+          255
+        ]
+      },
+      {
+        "name": "Uranus",
+        "x": 901,
+        "y": 598,
+        "rgba": [
+          154,
+          214,
+          224,
+          255
+        ]
+      },
+      {
+        "name": "Neptune",
+        "x": 273,
+        "y": 357,
+        "rgba": [
+          95,
+          124,
+          232,
+          255
+        ]
+      }
+    ],
+    "center": [
+      255,
+      215,
+      94,
+      255
+    ],
+    "corner": [
+      5,
+      7,
+      15,
+      255
+    ]
+  },
+  "rafProbe": {
+    "rafFps": 59.94005994005994,
+    "pageFps": 59.9837332248882
+  },
+  "hudMutations": 60,
+  "agree": {
+    "hudVal": 59.9,
+    "hookFps": 59.947165210323064,
+    "diff": 0.04716521032306531
+  },
+  "block": {
+    "preBlock": {
+      "t": 7789.899999976158,
+      "mercuryAngle": 0.19167149484968427
+    },
+    "postBlock": {
+      "t": 11002.799999952316,
+      "mercuryAngle": 0.8466150233068177,
+      "hudText": "FPS: 59.9",
+      "fps": 59.93866741009203
+    },
+    "resumeSamples": [
+      {
+        "hudText": "FPS: 59.9",
+        "fps": 59.93498577813899
+      },
+      {
+        "hudText": "FPS: 60.0",
+        "fps": 59.959349593495936
+      },
+      {
+        "hudText": "FPS: 60.0",
+        "fps": 59.959349593495936
+      }
+    ]
+  },
+  "results": [
+    {
+      "id": 1,
+      "name": "Zero console errors & uncaught exceptions over 10+ s",
+      "pass": true,
+      "evidence": "consoleErrors=0, pageErrors=0, observed 13.16s"
+    },
+    {
+      "id": 2,
+      "name": "Animation auto-starts without interaction",
+      "pass": true,
+      "evidence": "Mercury angle 0.750 -> 4.863 over ~5.2s with zero input events"
+    },
+    {
+      "id": 3,
+      "name": "Canvas visible at 1280x800 w/o scrolling; outermost orbit fits inside canvas",
+      "pass": true,
+      "evidence": "canvas 1280x800 at (0,0), scroll 1280x800 vs viewport 1280x800, maxOrbit+disc=381px vs halfMin=400px"
+    },
+    {
+      "id": 4,
+      "name": "Has <title> and dark space-like background",
+      "pass": true,
+      "evidence": "title=\"Animated Solar System\", body bg=rgb(5, 7, 15), canvas corner rgba=[5,7,15,255]"
+    },
+    {
+      "id": 5,
+      "name": "Exactly Sun + 8 correctly-named planets (hook order check; labels judged on screenshots)",
+      "pass": true,
+      "evidence": "hook planets=[Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune]"
+    },
+    {
+      "id": 6,
+      "name": "Sun at center and does not orbit",
+      "pass": true,
+      "evidence": "canvas-center pixel rgba=[255,215,94,255] (bright sun color) at t~6s; planet positions computed around canvas center"
+    },
+    {
+      "id": 7,
+      "name": "Every body labeled, labels track within ~30 px (visual check)",
+      "pass": false,
+      "evidence": "JUDGED FROM SCREENSHOTS — see VERIFY.md"
+    },
+    {
+      "id": 8,
+      "name": "All 8 planets drawn as filled discs, radius >= 2 px",
+      "pass": true,
+      "evidence": "min displayRadius=4px; pixel probe at each planet center non-background for 8/8"
+    },
+    {
+      "id": 9,
+      "name": "Orbit radii strictly increasing, distinct (>=10 px), planets not stacked at center",
+      "pass": true,
+      "evidence": "radii=[70.0, 112.9, 155.7, 198.6, 241.4, 284.3, 327.1, 370.0], min gap=42.9px"
+    },
+    {
+      "id": 10,
+      "name": "Size ordering strict (J>S>U>N>E>V>Ma>Me) and Sun > Jupiter",
+      "pass": true,
+      "evidence": "displayRadii Jupiter=22, Saturn=18, Uranus=12.5, Neptune=11, Earth=8, Venus=7, Mars=5, Mercury=4; measured Sun core radius ~33px vs Jupiter 22px"
+    },
+    {
+      "id": 11,
+      "name": "Angular speed strictly decreasing outward; Mercury <= ~20 s/rev; Neptune visibly moves",
+      "pass": true,
+      "evidence": "periods=[8, 13, 18, 26, 42, 58, 76, 95]s, Neptune moved 0.3464 rad in 5.2s"
+    },
+    {
+      "id": 12,
+      "name": "Motion computed from elapsed time (angle advance matches wall clock for all 8)",
+      "pass": true,
+      "evidence": "|observed-expected| rad over 5.2s: Mercury:0.001, Venus:0.000, Earth:0.000, Mars:0.000, Jupiter:0.000, Saturn:0.000, Uranus:0.000, Neptune:0.000"
+    },
+    {
+      "id": 13,
+      "name": "FPS readout always visible and clearly labeled",
+      "pass": true,
+      "evidence": "hud text=\"FPS: 59.9\" at (10,10) 91.28125x30.796875"
+    },
+    {
+      "id": 14,
+      "name": "FPS measured from real rAF frame timing",
+      "pass": true,
+      "evidence": "independent rAF rate=59.9, page-reported fps=60.0 (source uses sliding 1s timestamp window)"
+    },
+    {
+      "id": 15,
+      "name": "One decimal place, >=4 refreshes/s, >=2 distinct strings over 5 s",
+      "pass": true,
+      "evidence": "samples=[47.0, 59.9, 60.0, 60.0, 59.9, 59.9, 59.9, 60.0, 60.0, 59.9], distinct=3, DOM text updates in 1 s=60"
+    },
+    {
+      "id": 16,
+      "name": "FPS plausible (>0 and <=250) in all samples",
+      "pass": true,
+      "evidence": "range 47 .. 60"
+    },
+    {
+      "id": 17,
+      "name": "window.solarSystem hook: shape, per-frame updates, orderings, fps = HUD pre-rounding",
+      "pass": true,
+      "evidence": "shape=true, orderings=true, anglesLive=true, hud=59.9 vs hook=59.947 (diff 0.0472)"
+    },
+    {
+      "id": 18,
+      "name": "After a 2.5 s rAF stall: no wild teleport, no NaN/Infinity/<=0 FPS beyond one refresh",
+      "pass": true,
+      "evidence": "wall gap=3.21s, Mercury advanced 0.655 rad vs un-clamped 2.523 rad; post-stall HUD=[59.9, 59.9, 60.0, 60.0]"
+    },
+    {
+      "id": 19,
+      "name": "Window resize throws no errors",
+      "pass": true,
+      "evidence": "errors before=0 after=0 across 900x600 -> 1500x950 -> 1280x800; hook still live (8 planets, hud=\"FPS: 59.9\")"
+    }
+  ]
+}

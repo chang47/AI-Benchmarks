@@ -1,0 +1,12 @@
+{
+  "name": "verify-01-tennis-scorekeeper",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4",
+    "playwright": "^1.54.0"
+  }
+}

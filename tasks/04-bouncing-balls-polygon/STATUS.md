@@ -1,1 +1,3 @@
 RESEARCH: Froze KCORES 20-ball spinning-heptagon prompt verbatim (3 flagged HTML-contract adaptations), authored spec.md with 16 acceptance criteria traced to the KCORES 90-point rubric + community fail modes (containment/escape #1), 8 cited authorities.
+BUILD r0: CLAIMED DONE=yes, self-checks 10/10 playwright checks pass (count/numbers/colors/rotation 72.00deg-s/60fps/zero errors), containment held for 5.7min (min wall dist 21.12px = r), bounce bounds OK (max rise 85.7px << circumradius 317, 36% of wall impacts rise >1r), max overlap 0.26px.
+VERIFY r0: PASS 16/16 (passRate 1.00) - 5.25-min headless run, zero errors, containment held on all 18,842 monitored frames; c9 adjudicated PASS via free-flight bounce probe (max rise 141.8px vs R 396px); fakeConvergence=false.

@@ -1,1 +1,3 @@
 RESEARCH+SPEC: 7 external authorities collected (ITF Rules 2026 primary, Rules 5/6/7 + Appendix VI read verbatim); spec.md (27 acceptance criteria), frozen-prompt.md, metadata.json written; base resolved from literal "undefined" to C:/Users/iamjo/Projects/vetted-bench.
+BUILD r0: CLAIMED DONE=yes, self-checks 27/27 vitest engine tests pass (AC-1..26 incl. deuce cycling, no-ad, tiebreak margin-2, super-TB 1-0 convention, purity, over-no-op) + headless DOM smoke of index.html wiring (clicks render, post-match clicks frozen, new-match resets, tiebreak indicator) + both files serve 200 from a static server.
+VERIFY r0: verdict=pass — independent suite 53/53 (AC-1..26 + researched edges), UI smoke 10/10 (AC-27); passRate 1.0; fakeConvergence=false.

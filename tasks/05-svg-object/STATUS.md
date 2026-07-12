@@ -1,1 +1,3 @@
 ﻿RESEARCH: spec + frozen prompt (verbatim simonw/pelican-bicycle) + metadata written from 7 cited authorities; contamination note recorded; base resolved to Projects/vetted-bench (orchestrator BASE was undefined).
+BUILD r0: CLAIMED DONE=yes, self-checks passed (raw .svg XML-parses clean, Chrome render no console errors, screenshot visually verified: pouched pelican seated on saddle, legs on opposite sides reaching pedals, wing to handlebars, both wheels on ground line, all in-frame)
+VERIFY r0: PASS 15/15 (passRate 1.00), no console errors, static confirmed (0-byte screenshot diff), fakeConvergence=no

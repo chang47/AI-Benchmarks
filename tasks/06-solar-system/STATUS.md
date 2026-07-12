@@ -1,1 +1,3 @@
 ﻿RESEARCH+SPEC: 8 sources gathered (NASA/MDN/community one-shot comparison); spec.md, frozen-prompt.md, metadata.json written; BASE var was 'undefined' so task folder placed at Projects/vetted-bench/tasks/06-solar-system per the registry design doc.
+BUILD r0: CLAIMED DONE=yes, self-checks 15/15 pass (playwright/Chrome: zero console errors, HUD FPS 1-decimal live-varying 59.9-60.0, solarSystem hook orderings verified, resize clean, screenshot inspected)
+VERIFY r0: PASS 19/19 (independent playwright harness + screenshot review; zero console errors, all orderings hold, FPS live, no fake convergence)
