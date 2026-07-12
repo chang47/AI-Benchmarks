@@ -1,0 +1,1 @@
+RESEARCH: spec + frozen prompt authored from 8 external sources; all 7 test vectors (2 hardest-class w/ solutions, easy, 2 unsolvable, 2 multi-solution) computationally cross-verified; two-tier time bound (2s / 60s deep-unsolvable) calibrated by measurement.

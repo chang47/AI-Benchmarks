@@ -1,0 +1,17 @@
+{
+  "slug": "03-sudoku",
+  "type": "logic",
+  "difficulty": "medium",
+  "status": "candidate",
+  "created": "2026-07-12",
+  "authorities": [
+    "https://en.wikipedia.org/wiki/Sudoku",
+    "https://norvig.com/sudoku.html",
+    "https://www.sudokuwiki.org/Escargot",
+    "https://www.sudokuwiki.org/Arto_Inkala_Sudoku",
+    "https://arxiv.org/abs/1201.0749",
+    "https://abcnews.com/blogs/headlines/2012/06/can-you-solve-the-hardest-ever-sudoku",
+    "https://www.neatorama.com/2012/06/28/the-worlds-hardest-sudoku/",
+    "https://dailysudoku.com/sudoku/forums/viewtopic.php?p=28825"
+  ]
+}
