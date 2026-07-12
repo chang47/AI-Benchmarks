@@ -42,3 +42,16 @@ tasks/<slug>/
 - Tasks 04/05 use community-canonical prompts deliberately (tonight's rule is "what other people defined") — the real bench swaps in personal variants for contamination reasons.
 
 Run report: `REPORT.md`. Per-task progress: `TODO.md` + each task's `STATUS.md`.
+
+## Relocation note (2026-07-12)
+
+The overnight orchestrator had an args bug: the base path reached agents as the literal string
+`"undefined"`. Five tasks self-resolved it to the `vetted-bench` folder and one (03-sudoku)
+wrote its research to a stray `undefined/` directory. Post-run, the main thread ported the two
+run commits here via `git format-patch`/`git am` (author timestamps preserved — the
+freeze-before-build ordering is still verifiable in this repo's history), recovered the sudoku
+research, and restored `vetted-bench` to its pre-run state (backup branch
+`overnight-run-mislocated` kept there until reviewed). Paths inside agent-written files
+(`STATUS.md`, `research/RESEARCH.md`) still mention `vetted-bench` — left untouched as run
+evidence. Verify harness `node_modules` were not ported; `npm install` inside a task's
+`src/`/`verify/` dir before re-running its tests.

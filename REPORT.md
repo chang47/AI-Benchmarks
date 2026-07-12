@@ -60,7 +60,7 @@ the **verifier's first metric was wrong** and had to be adjudicated against the 
 Per task: the spec is `tasks/<slug>/spec.md`, the verbatim prompt the builder got is
 `frozen-prompt.md`, the per-criterion verdict table is `VERIFY.md`, and the three-line
 research→build→verify history is `STATUS.md`. Everything below is under
-`C:/Users/iamjo/Projects/vetted-bench/`.
+`C:/Users/iamjo/Projects/ai-benchmark/` (relocated post-run — see the addendum at the bottom).
 
 ### 01-tennis-scorekeeper (logic — the flagship task)
 - **Eyeball:** open `tasks/01-tennis-scorekeeper/src/index.html` from a local static server and
