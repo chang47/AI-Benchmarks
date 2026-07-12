@@ -10,12 +10,13 @@
 |---|---|---|---|---|---|
 | 01-tennis-scorekeeper | A (logic) | 1 | 1.00 (53/53 engine + 10/10 UI) | No | **PASS** |
 | 02-habit-streak | A (logic) | 1 | 1.00 (39/39) | No | **PASS** |
-| 03-sudoku | — | 0 | — | — | **NOT RUN** — spec never frozen (missing from `b17260b`) |
+| 03-sudoku | A (logic) | 1 | 1.00 (108/108) | No | **PASS** (post-run re-run — see addendum) |
 | 04-bouncing-balls-polygon | B (visual) | 1 | 1.00 (16/16) | No | **PASS** |
 | 05-svg-object | B (visual) | 1 | 1.00 (15/15) | No | **PASS** |
 | 06-solar-system | B (visual) | 1 | 1.00 (19/19) | No | **PASS** |
 
-**5/5 executed tasks passed independent verification on round 0. Zero fix-feedback rounds were needed.**
+**6/6 tasks passed independent verification on round 0. Zero fix-feedback rounds were needed.**
+(5 in the overnight run; 03-sudoku in a post-run re-run after its research was recovered — addendum below.)
 
 ## Notable findings
 
@@ -111,3 +112,25 @@ research→build→verify history is `STATUS.md`. Everything below is under
 - The builders' own self-check harnesses live in each `tasks/<slug>/src/` (e.g.
   `selfcheck.mjs`, `longrun-probe.mjs`) — compare against the verifier's independent harnesses in
   `tasks/<slug>/verify/` to see the two-lane design working.
+
+---
+
+## Post-run addendum (main thread, 2026-07-12)
+
+1. **Relocation.** The orchestrator passed the base path as the literal string `"undefined"`
+   (a Workflow-args serialization bug). Five tasks self-resolved into the `vetted-bench` folder;
+   the run's two commits were made there. Both commits were ported here via
+   `git format-patch`/`git am` (author timestamps preserved — the freeze-before-build ordering
+   is verifiable in this repo's history) and `vetted-bench` was restored to its pre-run state
+   (backup branch `overnight-run-mislocated` kept there until reviewed).
+2. **03-sudoku recovered + re-run.** Its researcher wrote to a stray `undefined/` folder, so it
+   missed the freeze. The research/spec were recovered intact, frozen in their own commit
+   (before any sudoku implementation existed), then built + verified through the same
+   blind-builder / independent-verifier pipeline with hardcoded paths: **PASS, 108/108
+   independent tests, round 0, no fake convergence** — including the Inkala hard puzzles, a
+   deep-unsolvable Norvig board (~20s, under the 60s bound), a deadly-rectangle 2-solution
+   board, and the 16-clue multi-solution rule. Evidence: `tasks/03-sudoku/VERIFY.md`.
+3. **Fake-convergence across the full suite: 0/6.** The builders' round-0 "done" claims all
+   survived independent verification. Caveat for the video thesis: this run's builders had
+   fix-round pressure and strong specs; the flagship video's raw-vs-loop comparison still needs
+   the *raw* lane (frozen one-shot prompts are banked per task in `frozen-prompt.md`).

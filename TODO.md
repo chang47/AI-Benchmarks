@@ -7,7 +7,7 @@ Legend: `[x]` done · `[!]` failed / did not run · `[ ]` pending
 - [x] REPORT.md written
 - [x] TODO.md reconciled to reality
 - [x] Final results commit (candidate implementations + independent verification)
-- [ ] 03-sudoku re-run (research was recovered from a stray path; build + verify pending)
+- [x] 03-sudoku re-run (research recovered from stray path → frozen → built → verified)
 - [ ] Josh reviews
 
 ## 01-tennis-scorekeeper (type A, logic)
@@ -21,9 +21,9 @@ Legend: `[x]` done · `[!]` failed / did not run · `[ ]` pending
 - [x] Verify r0 — PASS, passRate 1.00 (39/39 incl. TZ-subprocess invariance), fake-convergence: no
 
 ## 03-sudoku (type A, logic)
-- [x] Research + spec + frozen prompt + metadata (recovered — the agent wrote to a stray `undefined/` path due to the args bug, so it missed the freeze)
-- [ ] Build
-- [ ] Verify
+- [x] Research + spec + frozen prompt + metadata (recovered — the agent wrote to a stray `undefined/` path due to the args bug, so it missed the freeze; frozen in its own pre-build commit)
+- [x] Build r0 (builder claimed DONE, own tests passing)
+- [x] Verify r0 — PASS, passRate 1.00 (108/108 incl. Inkala hard puzzles, deep-unsolvable ~20s < 60s bound, deadly-rectangle 2-solution board), fake-convergence: no
 
 ## 04-bouncing-balls-polygon (type B, visual)
 - [x] Research + spec + frozen prompt + metadata
