@@ -8,7 +8,8 @@ Legend: `[x]` done · `[!]` failed / did not run · `[ ]` pending
 - [x] TODO.md reconciled to reality
 - [x] Final results commit (candidate implementations + independent verification)
 - [x] 03-sudoku re-run (research recovered from stray path → frozen → built → verified)
-- [ ] Josh reviews
+- [x] Deep-research: community-vetted candidate task list → `research/candidate-tasks-report.md` (10-task shortlist + 2 upgrades to existing tasks)
+- [ ] Josh reviews (existing 6 tasks + picks from the shortlist)
 
 ## 01-tennis-scorekeeper (type A, logic)
 - [x] Research + spec + frozen prompt + metadata
