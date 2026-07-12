@@ -1,0 +1,16 @@
+{
+  "slug": "05-svg-object",
+  "type": "visual",
+  "difficulty": "easy",
+  "status": "candidate",
+  "created": "2026-07-11",
+  "authorities": [
+    "https://github.com/simonw/pelican-bicycle",
+    "https://simonwillison.net/2024/Oct/25/pelicans-on-a-bicycle/",
+    "https://simonwillison.net/2025/Jun/6/six-months-in-llms/",
+    "https://simonwillison.net/tags/pelican-riding-a-bicycle/",
+    "https://simonwillison.net/2025/Nov/13/training-for-pelicans-riding-bicycles/",
+    "https://www.robert-glaser.de/agentic-pelican-on-a-bicycle/",
+    "https://grokipedia.com/page/Pelican_on_a_bicycle_AI_benchmark"
+  ]
+}

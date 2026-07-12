@@ -1,0 +1,1 @@
+﻿RESEARCH+SPEC: 8 sources gathered (NASA/MDN/community one-shot comparison); spec.md, frozen-prompt.md, metadata.json written; BASE var was 'undefined' so task folder placed at Projects/vetted-bench/tasks/06-solar-system per the registry design doc.

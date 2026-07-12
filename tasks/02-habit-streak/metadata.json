@@ -1,0 +1,18 @@
+{
+  "slug": "02-habit-streak",
+  "type": "logic",
+  "difficulty": "medium",
+  "status": "candidate",
+  "created": "2026-07-12",
+  "authorities": [
+    "https://github.com/iSoron/uhabits/blob/dev/uhabits-core/src/commonMain/kotlin/org/isoron/uhabits/core/models/StreakList.kt",
+    "https://duolingo.fandom.com/wiki/Streak",
+    "https://blog.duolingo.com/how-duolingo-streak-builds-habit/",
+    "https://duolingo.deconstructoroffun.com/mechanics/streaks",
+    "https://duoplanet.com/duolingo-streak-freeze/",
+    "https://crunchybagel.com/now-available-streaks-10/",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date",
+    "https://howardhinnant.github.io/date_algorithms.html",
+    "https://datatracker.ietf.org/doc/html/rfc3339"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "slug": "01-tennis-scorekeeper",
+  "type": "logic",
+  "difficulty": "medium",
+  "status": "candidate",
+  "created": "2026-07-11",
+  "authorities": [
+    "https://www.itftennis.com/media/7221/2026-rules-of-tennis-english.pdf",
+    "https://www.itftennis.com/en/about-us/governance/rules-and-regulations/",
+    "https://www.usta.com/en/home/improve/tips-and-instruction/national/tennis-scoring-rules.html",
+    "https://www.usta.com/content/dam/usta/coach-organize/content-fragments/resource-library/assets/pdfs/friend-at-court.pdf",
+    "https://en.wikipedia.org/wiki/Tennis_scoring_system",
+    "https://rallyref.com/guides/tennis-tiebreak-rules",
+    "https://worldinsport.com/tennis-tie-break-rules-explained/"
+  ]
+}

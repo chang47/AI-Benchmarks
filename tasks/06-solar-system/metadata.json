@@ -1,0 +1,17 @@
+{
+  "slug": "06-solar-system",
+  "type": "visual",
+  "difficulty": "medium",
+  "status": "candidate",
+  "created": "2026-07-12",
+  "authorities": [
+    "https://www.makeuseof.com/claude-vs-chatgpt-vs-gemini-simulation-obvious-winner/",
+    "https://science.nasa.gov/solar-system/planets/planet-sizes-and-locations-in-our-solar-system/",
+    "https://spaceplace.nasa.gov/years-on-other-planets/en/",
+    "https://en.wikipedia.org/wiki/Solar_System",
+    "https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame",
+    "https://www.growingwiththeweb.com/2017/12/fast-simple-js-fps-counter.html",
+    "https://nssdc.gsfc.nasa.gov/planetary/factsheet/",
+    "https://javascript.plainenglish.io/how-to-calculate-frames-per-second-in-the-canvas-using-javascripts-requestanimationframe-function-9447eaeeef70"
+  ]
+}

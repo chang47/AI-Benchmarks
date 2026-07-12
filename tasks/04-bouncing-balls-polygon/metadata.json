@@ -1,0 +1,17 @@
+{
+  "slug": "04-bouncing-balls-polygon",
+  "type": "visual",
+  "difficulty": "hard",
+  "status": "candidate",
+  "created": "2026-07-11",
+  "authorities": [
+    "https://github.com/KCORES/kcores-llm-arena/blob/main/benchmark-ball-bouncing-inside-spinning-heptagon/README.md",
+    "https://x.com/flavioAd/status/1885449107436679394",
+    "https://x.com/_akhaliq/status/1885733581651050586",
+    "https://techcrunch.com/2025/01/24/people-are-benchmarking-ai-by-having-it-make-balls-bounce-in-rotating-shapes/",
+    "https://artificialanalysis.ai/microevals/balls-bouncing-inside-a-spinning-hexagon-1750176234580",
+    "https://x.com/HCSolakoglu/status/1911889543189712976",
+    "https://github.com/aligeramy/ai-benchmark",
+    "https://x.com/theo/status/1892505193406730559"
+  ]
+}

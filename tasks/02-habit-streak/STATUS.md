@@ -1,0 +1,1 @@
+﻿RESEARCH: spec + frozen prompt + metadata authored from 9 external sources (Loop source, Duolingo x4, Streaks dev blog, MDN, Hinnant, RFC 3339); strict-streak + grace-for-today convention adopted, disagreements logged; NOTE base path arrived as 'undefined' (script bug) - wrote to C:/Users/iamjo/Projects/vetted-bench/tasks/02-habit-streak.

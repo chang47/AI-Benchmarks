@@ -1,0 +1,1 @@
+﻿RESEARCH: spec + frozen prompt (verbatim simonw/pelican-bicycle) + metadata written from 7 cited authorities; contamination note recorded; base resolved to Projects/vetted-bench (orchestrator BASE was undefined).

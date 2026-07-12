@@ -1,0 +1,1 @@
+RESEARCH+SPEC: 7 external authorities collected (ITF Rules 2026 primary, Rules 5/6/7 + Appendix VI read verbatim); spec.md (27 acceptance criteria), frozen-prompt.md, metadata.json written; base resolved from literal "undefined" to C:/Users/iamjo/Projects/vetted-bench.

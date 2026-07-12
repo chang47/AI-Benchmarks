@@ -1,0 +1,1 @@
+RESEARCH: Froze KCORES 20-ball spinning-heptagon prompt verbatim (3 flagged HTML-contract adaptations), authored spec.md with 16 acceptance criteria traced to the KCORES 90-point rubric + community fail modes (containment/escape #1), 8 cited authorities.
