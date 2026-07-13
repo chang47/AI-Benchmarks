@@ -1,0 +1,143 @@
+{
+  "summary": {
+    "target": "C:\\Users\\iamjo\\Projects\\ai-benchmark\\tasks\\15-minecraft-3d\\src\\index.html",
+    "pass": 21,
+    "fail": 0,
+    "skip": 1,
+    "total": 22
+  },
+  "results": [
+    {
+      "id": "R01",
+      "desc": "A1 zero console errors/exceptions at load + over 10s running",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R02",
+      "desc": "A2 <title>, canvas visible in initial viewport, render loop on rAF",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R03",
+      "desc": "A3 terrain on load, not monochrome (<90% one color, >=2 colors)",
+      "status": "pass",
+      "detail": "dominant 36%, 4 colors>=5%"
+    },
+    {
+      "id": "R04",
+      "desc": "A4 blocks read as 3D (shading / >=2 block colors, not flat silhouettes)",
+      "status": "pass",
+      "detail": "6 luminance levels, 8 colors (>=1%)"
+    },
+    {
+      "id": "R05",
+      "desc": "B5 >=16x16 solid-column footprint, every column solid (connected ground)",
+      "status": "skip",
+      "detail": "bbox 20x13, 260 solid cols, filled 100% — judge footprint/connectivity from screenshot"
+    },
+    {
+      "id": "R06",
+      "desc": "B6 procedural height variation (max-min column height >= 2)",
+      "status": "pass",
+      "detail": "height range 6 (min 4, max 10)"
+    },
+    {
+      "id": "R07",
+      "desc": "B7 y up; player camera eye above terrain surface",
+      "status": "pass",
+      "detail": "player eye y 13.00 > surface top 6"
+    },
+    {
+      "id": "R08",
+      "desc": "C8 click canvas -> pointer lock; Escape releases; instructions before lock",
+      "status": "pass",
+      "detail": "click locks (engaged); Escape release UA-guaranteed (not deliverable headlessly); instructions: \"FPS: 33\nClick to lock mouse  •  WASD to move \""
+    },
+    {
+      "id": "R09",
+      "desc": "C9 mouse movementX yaws, movementY pitches, pitch clamped +/-pi/2",
+      "status": "pass",
+      "detail": "yaw+pitch respond; pitch clamped [1.55, -1.55]"
+    },
+    {
+      "id": "R10",
+      "desc": "C10 WASD moves rel. to yaw; time-based; finite; no endless fall",
+      "status": "pass",
+      "detail": "W 3.00u @0deg; S reverses; A/D strafe; y bounded"
+    },
+    {
+      "id": "R11",
+      "desc": "D11 crosshair fixed at exact screen center",
+      "status": "pass",
+      "detail": "DOM crosshair element centered on viewport"
+    },
+    {
+      "id": "R12",
+      "desc": "D12 center-ray voxel raycast; reach within [4,12] blocks",
+      "status": "pass",
+      "detail": "reach >=4 (near target hit) and <=12 (far target missed); ray from screen center"
+    },
+    {
+      "id": "R13",
+      "desc": "D13 left-click removes exactly the targeted block; scene updates",
+      "status": "pass",
+      "detail": "left-click removed targeted block; blockCount -1; center pixel diff 50.0"
+    },
+    {
+      "id": "R14",
+      "desc": "D14 right-click places one block on targeted face; no overwrite; ctx menu suppressed",
+      "status": "pass",
+      "detail": "right-click placed exactly +1 on targeted face; no overwrite; context menu suppressed"
+    },
+    {
+      "id": "R15",
+      "desc": "E15 window.__voxel exists + functional without pointer lock",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R16",
+      "desc": "E16 reported angle convention (yaw0->-Z, forward = -sinYcosP, sinP, -cosYcosP)",
+      "status": "pass",
+      "detail": "yaw convention confirmed at two orientations (dot 1.00, 1.00); pitch-up sign is JUDGE-confirmable"
+    },
+    {
+      "id": "R17",
+      "desc": "E17 hook place +1 / remove -1 remesh scene (pixels change <=2 frames)",
+      "status": "pass",
+      "detail": "blockCount +1/-1 ok; center pixel diff place=36.0 remove=36.0"
+    },
+    {
+      "id": "R18",
+      "desc": "F18 live labeled FPS counter derived from real rAF timing",
+      "status": "pass",
+      "detail": "HUD \"FPS: 60\" ~ measured 60fps"
+    },
+    {
+      "id": "R19",
+      "desc": "F19 idle average FPS over 5s >= 30",
+      "status": "pass",
+      "detail": "idle 60.0 fps"
+    },
+    {
+      "id": "R20",
+      "desc": "F20 25 place() calls < 2s, no errors, following 5s fps >= 30",
+      "status": "pass",
+      "detail": "25 places in 0ms, 0 new errors, post-edit 57.6fps"
+    },
+    {
+      "id": "R21",
+      "desc": "G21 invalid place/remove return false, no throw, no corruption",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R22",
+      "desc": "G22 resize + tab background/refocus: no throw/error, FPS recovers",
+      "status": "pass",
+      "detail": "resize+background survived; post 32.0fps; readout \"FPS: 62\""
+    }
+  ]
+}

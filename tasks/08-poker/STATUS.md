@@ -1,2 +1,4 @@
 ﻿RESEARCH: spec.md + frozen-prompt.md + RESEARCH.md + metadata.json written; canonical-data.json (39 cases, SHA256 90E33334...) saved verbatim to holdout/; all rules sourced from Exercism description + its cited Wikipedia ranking reference; contamination high.
 HOLDOUT: 39 canonical cases -> 37 vitest tests (2 format-mandated reimplements exclusions, 0 error cases); harness validated 37/37 vs scratchpad reference; hash matches RESEARCH.md; FREEZE_MANIFEST.json written.
+BUILD r0: CLAIMED DONE=yes, self-checks 37/37 own vitest + 10 ad-hoc spec edge cases PASS (categories, wheel low, ace-high, QKA23 non-straight, group/kicker tiebreaks, exact ties verbatim+order, suits never break, no input mutation).
+VERIFY r0: PASS — tamper check clean (4/4 SHA256 match), holdout 37/37 (passRate 1.0), fakeConvergence=false.

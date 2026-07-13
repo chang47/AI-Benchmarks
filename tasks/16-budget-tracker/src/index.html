@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget Tracker</title>
+<style>
+  :root {
+    --bg: #0f1220;
+    --panel: #1a1f36;
+    --panel-2: #222a48;
+    --text: #e8ecf8;
+    --muted: #9aa4c4;
+    --border: #2c3457;
+    --income: #35d07f;
+    --expense: #ff6b6b;
+    --accent: #6c8cff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; font-size: .9rem; }
+
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+  .card .label { color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+  .card .value { font-size: 1.5rem; font-weight: 700; margin-top: 4px; }
+  #balanceValue.negative { color: var(--expense); }
+  #balanceValue.nonneg { color: var(--income); }
+  #incomeValue { color: var(--income); }
+  #expenseValue { color: var(--expense); }
+
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+  .panel h2 { font-size: 1rem; margin: 0 0 12px; }
+
+  form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  form .row.full { grid-template-columns: 1fr; }
+  label { display: block; font-size: .78rem; color: var(--muted); margin-bottom: 4px; }
+  input, select, button { font: inherit; }
+  input, select {
+    width: 100%; padding: 9px 10px; background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+  }
+  input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+  .actions { display: flex; gap: 10px; align-items: center; }
+  button {
+    cursor: pointer; padding: 10px 16px; border-radius: 8px; border: 1px solid var(--accent);
+    background: var(--accent); color: #fff; font-weight: 600;
+  }
+  button.secondary { background: transparent; color: var(--muted); border-color: var(--border); }
+  button.mini { padding: 4px 10px; font-size: .8rem; font-weight: 500; }
+  button.danger { background: transparent; color: var(--expense); border-color: var(--expense); }
+
+  #message { min-height: 0; margin-top: 4px; }
+  #message.show {
+    min-height: auto; margin-top: 10px; padding: 9px 12px; border-radius: 8px;
+    background: rgba(255,107,107,.12); border: 1px solid var(--expense); color: #ffd0d0; font-size: .9rem;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--border); font-size: .92rem; vertical-align: middle; }
+  th { color: var(--muted); font-size: .74rem; text-transform: uppercase; letter-spacing: .04em; }
+  td.amount { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+  td.amount.income { color: var(--income); }
+  td.amount.expense { color: var(--expense); }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: .72rem; border: 1px solid var(--border); color: var(--muted); }
+  .tag.income { color: var(--income); border-color: var(--income); }
+  .tag.expense { color: var(--expense); border-color: var(--expense); }
+  .empty { color: var(--muted); text-align: center; padding: 20px; font-style: italic; }
+  .rowbtns { display: flex; gap: 6px; }
+
+  .catlist { list-style: none; padding: 0; margin: 0; }
+  .catlist li { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: .92rem; }
+  .catlist li:last-child { border-bottom: 0; }
+  .catlist .catname { color: var(--muted); }
+  .catlist .catval { font-variant-numeric: tabular-nums; color: var(--expense); font-weight: 600; }
+  @media (max-width: 620px) {
+    .cards { grid-template-columns: 1fr; }
+    form .row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Budget Tracker</h1>
+  <p class="sub">Track income and expenses. Your data stays in this browser.</p>
+
+  <section class="cards">
+    <div class="card">
+      <div class="label">Balance</div>
+      <div class="value" id="balanceValue">$0.00</div>
+    </div>
+    <div class="card">
+      <div class="label">Total Income</div>
+      <div class="value" id="incomeValue">$0.00</div>
+    </div>
+    <div class="card">
+      <div class="label">Total Expenses</div>
+      <div class="value" id="expenseValue">$0.00</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 id="formTitle">Add Transaction</h2>
+    <form id="txForm" autocomplete="off" novalidate>
+      <div class="row">
+        <div>
+          <label for="type">Type</label>
+          <select id="type" name="type">
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+        </div>
+        <div>
+          <label for="category">Category</label>
+          <select id="category" name="category"></select>
+        </div>
+      </div>
+      <div class="row full">
+        <div>
+          <label for="description">Description</label>
+          <input type="text" id="description" name="description" placeholder="e.g. Salary, Groceries">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="amount">Amount</label>
+          <input type="number" id="amount" name="amount" step="0.01" min="0" placeholder="0.00">
+        </div>
+        <div>
+          <label for="date">Date</label>
+          <input type="date" id="date" name="date">
+        </div>
+      </div>
+      <div class="actions">
+        <button type="submit" id="submitBtn">Add Transaction</button>
+        <button type="button" id="cancelBtn" class="secondary" style="display:none;">Cancel</button>
+      </div>
+      <div id="message" role="alert"></div>
+    </form>
+  </section>
+
+  <section class="panel">
+    <h2>Transactions</h2>
+    <div id="listContainer"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Expenses by Category</h2>
+    <div id="categoryContainer"></div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORAGE_KEY = "budget_tracker_v1";
+  var CATEGORIES = ["Salary", "Food", "Rent", "Transport", "Entertainment", "Utilities", "Health", "Other"];
+  var DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+  var transactions = [];
+  var editingId = null;
+  var idCounter = 0;
+
+  // ---------- persistence ----------
+  function loadFromStorage() {
+    var raw = null;
+    try { raw = window.localStorage.getItem(STORAGE_KEY); } catch (e) { raw = null; }
+    if (!raw) { transactions = []; return; }
+    var parsed;
+    try { parsed = JSON.parse(raw); } catch (e) { transactions = []; return; }
+    if (!Array.isArray(parsed)) { transactions = []; return; }
+    var clean = [];
+    for (var i = 0; i < parsed.length; i++) {
+      var t = parsed[i];
+      if (!t || typeof t !== "object") { continue; }
+      var amt = Number(t.amount);
+      if (t.id === undefined || t.id === null) { continue; }
+      if (t.type !== "income" && t.type !== "expense") { continue; }
+      if (typeof t.description !== "string") { continue; }
+      if (!Number.isFinite(amt) || amt <= 0) { continue; }
+      if (typeof t.category !== "string" || t.category.length === 0) { continue; }
+      if (typeof t.date !== "string" || !DATE_RE.test(t.date)) { continue; }
+      clean.push({
+        id: t.id, type: t.type, description: t.description,
+        amount: amt, category: t.category, date: t.date
+      });
+    }
+    transactions = clean;
+  }
+
+  function saveToStorage() {
+    try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions)); } catch (e) { /* ignore quota/denied */ }
+  }
+
+  function genId() {
+    idCounter += 1;
+    return "tx_" + Date.now().toString(36) + "_" + idCounter.toString(36);
+  }
+
+  // ---------- validation ----------
+  function normalizeField(key, value) {
+    // returns normalized value or throws Error
+    switch (key) {
+      case "type":
+        if (value === "income" || value === "expense") { return value; }
+        throw new Error("Invalid type: must be 'income' or 'expense'.");
+      case "description":
+        if (typeof value === "string" && value.trim().length > 0) { return value.trim(); }
+        throw new Error("Invalid description: must be a non-empty string.");
+      case "amount": {
+        var n = (typeof value === "number") ? value : Number(value);
+        if (Number.isFinite(n) && n > 0) { return n; }
+        throw new Error("Invalid amount: must be a finite number greater than 0.");
+      }
+      case "category":
+        if (typeof value === "string" && value.trim().length > 0) { return value; }
+        throw new Error("Invalid category: must be a non-empty string.");
+      case "date":
+        if (typeof value === "string" && DATE_RE.test(value)) { return value; }
+        throw new Error("Invalid date: must be in YYYY-MM-DD form.");
+      default:
+        throw new Error("Unknown field: " + key);
+    }
+  }
+
+  var FIELDS = ["type", "description", "amount", "category", "date"];
+
+  function normalizeFull(input) {
+    if (!input || typeof input !== "object") { throw new Error("Transaction must be an object."); }
+    var out = {};
+    for (var i = 0; i < FIELDS.length; i++) {
+      var k = FIELDS[i];
+      out[k] = normalizeField(k, input[k]);
+    }
+    return out;
+  }
+
+  function normalizePartial(input) {
+    if (!input || typeof input !== "object") { throw new Error("Update must be an object."); }
+    var out = {};
+    for (var i = 0; i < FIELDS.length; i++) {
+      var k = FIELDS[i];
+      if (Object.prototype.hasOwnProperty.call(input, k) && input[k] !== undefined) {
+        out[k] = normalizeField(k, input[k]);
+      }
+    }
+    return out;
+  }
+
+  // ---------- core mutations ----------
+  function createTransaction(input) {
+    var norm = normalizeFull(input); // throws on invalid, state untouched
+    var tx = {
+      id: genId(),
+      type: norm.type,
+      description: norm.description,
+      amount: norm.amount,
+      category: norm.category,
+      date: norm.date
+    };
+    transactions.push(tx);
+    saveToStorage();
+    render();
+    return copyTx(tx);
+  }
+
+  function updateTransaction(id, patch) {
+    var tx = findById(id);
+    if (!tx) { return null; }
+    var norm = normalizePartial(patch); // throws on invalid, state untouched
+    for (var k in norm) {
+      if (Object.prototype.hasOwnProperty.call(norm, k)) { tx[k] = norm[k]; }
+    }
+    saveToStorage();
+    render();
+    return copyTx(tx);
+  }
+
+  function removeTransaction(id) {
+    for (var i = 0; i < transactions.length; i++) {
+      if (transactions[i].id === id) {
+        transactions.splice(i, 1);
+        if (editingId === id) { exitEditMode(); }
+        saveToStorage();
+        render();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function findById(id) {
+    for (var i = 0; i < transactions.length; i++) {
+      if (transactions[i].id === id) { return transactions[i]; }
+    }
+    return null;
+  }
+
+  function copyTx(t) {
+    return { id: t.id, type: t.type, description: t.description, amount: t.amount, category: t.category, date: t.date };
+  }
+
+  function computeBalance() {
+    var b = 0;
+    for (var i = 0; i < transactions.length; i++) {
+      var t = transactions[i];
+      if (t.type === "income") { b += t.amount; } else { b -= t.amount; }
+    }
+    return b;
+  }
+
+  // ---------- formatting / rendering ----------
+  function fmtMoney(n) {
+    var sign = n < 0 ? "-" : "";
+    return sign + "$" + Math.abs(n).toFixed(2);
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  var el = {};
+  function cacheEls() {
+    el.balance = document.getElementById("balanceValue");
+    el.income = document.getElementById("incomeValue");
+    el.expense = document.getElementById("expenseValue");
+    el.list = document.getElementById("listContainer");
+    el.categories = document.getElementById("categoryContainer");
+    el.message = document.getElementById("message");
+    el.form = document.getElementById("txForm");
+    el.type = document.getElementById("type");
+    el.category = document.getElementById("category");
+    el.description = document.getElementById("description");
+    el.amount = document.getElementById("amount");
+    el.date = document.getElementById("date");
+    el.submitBtn = document.getElementById("submitBtn");
+    el.cancelBtn = document.getElementById("cancelBtn");
+    el.formTitle = document.getElementById("formTitle");
+  }
+
+  function renderSummary() {
+    var income = 0, expense = 0;
+    for (var i = 0; i < transactions.length; i++) {
+      if (transactions[i].type === "income") { income += transactions[i].amount; }
+      else { expense += transactions[i].amount; }
+    }
+    var bal = income - expense;
+    el.balance.textContent = fmtMoney(bal);
+    el.balance.className = "value " + (bal < 0 ? "negative" : "nonneg");
+    el.income.textContent = fmtMoney(income);
+    el.expense.textContent = fmtMoney(expense);
+  }
+
+  function renderList() {
+    if (transactions.length === 0) {
+      el.list.innerHTML = '<div class="empty">No transactions yet. Add one above.</div>';
+      return;
+    }
+    var html = '<table><thead><tr>' +
+      '<th>Description</th><th>Category</th><th>Date</th><th>Type</th>' +
+      '<th style="text-align:right;">Amount</th><th></th></tr></thead><tbody>';
+    for (var i = 0; i < transactions.length; i++) {
+      var t = transactions[i];
+      var signed = (t.type === "income" ? "+" : "-") + "$" + t.amount.toFixed(2);
+      html += '<tr data-id="' + escapeHtml(t.id) + '">' +
+        '<td>' + escapeHtml(t.description) + '</td>' +
+        '<td>' + escapeHtml(t.category) + '</td>' +
+        '<td>' + escapeHtml(t.date) + '</td>' +
+        '<td><span class="tag ' + t.type + '">' + t.type + '</span></td>' +
+        '<td class="amount ' + t.type + '" style="text-align:right;">' + signed + '</td>' +
+        '<td><div class="rowbtns">' +
+          '<button type="button" class="mini secondary" data-action="edit" data-id="' + escapeHtml(t.id) + '">Edit</button>' +
+          '<button type="button" class="mini danger" data-action="delete" data-id="' + escapeHtml(t.id) + '">Delete</button>' +
+        '</div></td></tr>';
+    }
+    html += '</tbody></table>';
+    el.list.innerHTML = html;
+  }
+
+  function renderCategories() {
+    var totals = {};
+    for (var i = 0; i < transactions.length; i++) {
+      var t = transactions[i];
+      if (t.type !== "expense") { continue; }
+      if (!Object.prototype.hasOwnProperty.call(totals, t.category)) { totals[t.category] = 0; }
+      totals[t.category] += t.amount;
+    }
+    var names = Object.keys(totals);
+    if (names.length === 0) {
+      el.categories.innerHTML = '<div class="empty">No expenses yet.</div>';
+      return;
+    }
+    names.sort(function (a, b) { return totals[b] - totals[a]; });
+    var html = '<ul class="catlist">';
+    for (var j = 0; j < names.length; j++) {
+      html += '<li><span class="catname">' + escapeHtml(names[j]) + '</span>' +
+        '<span class="catval">' + fmtMoney(totals[names[j]]) + '</span></li>';
+    }
+    html += '</ul>';
+    el.categories.innerHTML = html;
+  }
+
+  function render() {
+    renderSummary();
+    renderList();
+    renderCategories();
+  }
+
+  // ---------- messages ----------
+  function showMessage(text) {
+    el.message.textContent = text;
+    el.message.className = "show";
+  }
+  function clearMessage() {
+    el.message.textContent = "";
+    el.message.className = "";
+  }
+
+  // ---------- edit mode ----------
+  function enterEditMode(id) {
+    var t = findById(id);
+    if (!t) { return; }
+    editingId = id;
+    el.type.value = t.type;
+    el.category.value = t.category;
+    el.description.value = t.description;
+    el.amount.value = String(t.amount);
+    el.date.value = t.date;
+    el.submitBtn.textContent = "Save Changes";
+    el.cancelBtn.style.display = "";
+    el.formTitle.textContent = "Edit Transaction";
+    clearMessage();
+    try { el.description.focus(); } catch (e) {}
+  }
+
+  function exitEditMode() {
+    editingId = null;
+    el.submitBtn.textContent = "Add Transaction";
+    el.cancelBtn.style.display = "none";
+    el.formTitle.textContent = "Add Transaction";
+  }
+
+  function resetForm() {
+    el.form.reset();
+    el.type.value = "income";
+    el.category.value = CATEGORIES[0];
+    el.date.value = todayStr();
+  }
+
+  function todayStr() {
+    var d = new Date();
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var day = String(d.getDate()).padStart(2, "0");
+    return d.getFullYear() + "-" + m + "-" + day;
+  }
+
+  // ---------- events ----------
+  function onSubmit(e) {
+    e.preventDefault();
+    var input = {
+      type: el.type.value,
+      description: el.description.value,
+      amount: el.amount.value,
+      category: el.category.value,
+      date: el.date.value
+    };
+    try {
+      if (editingId !== null) {
+        updateTransaction(editingId, input);
+        exitEditMode();
+      } else {
+        createTransaction(input);
+      }
+      clearMessage();
+      resetForm();
+    } catch (err) {
+      showMessage(err && err.message ? err.message : "Invalid transaction.");
+    }
+  }
+
+  function onListClick(e) {
+    var btn = e.target.closest ? e.target.closest("button[data-action]") : null;
+    if (!btn) { return; }
+    var action = btn.getAttribute("data-action");
+    var id = btn.getAttribute("data-id");
+    // ids are strings in DOM; match against stored id via string compare fallback
+    var t = findByIdLoose(id);
+    if (!t) { return; }
+    if (action === "edit") { enterEditMode(t.id); }
+    else if (action === "delete") { removeTransaction(t.id); }
+  }
+
+  function findByIdLoose(idStr) {
+    for (var i = 0; i < transactions.length; i++) {
+      if (String(transactions[i].id) === String(idStr)) { return transactions[i]; }
+    }
+    return null;
+  }
+
+  function populateCategories() {
+    var html = "";
+    for (var i = 0; i < CATEGORIES.length; i++) {
+      html += '<option value="' + escapeHtml(CATEGORIES[i]) + '">' + escapeHtml(CATEGORIES[i]) + "</option>";
+    }
+    el.category.innerHTML = html;
+  }
+
+  // ---------- public hook ----------
+  function installHook() {
+    window.__budget = {
+      add: function (tx) { return createTransaction(tx); },
+      update: function (id, tx) { return updateTransaction(id, tx); },
+      remove: function (id) { return removeTransaction(id); },
+      list: function () { return transactions.map(copyTx); },
+      balance: function () { return computeBalance(); }
+    };
+  }
+
+  // ---------- init ----------
+  function init() {
+    cacheEls();
+    populateCategories();
+    loadFromStorage();
+    resetForm();
+    render();
+    el.form.addEventListener("submit", onSubmit);
+    el.cancelBtn.addEventListener("click", function () { exitEditMode(); resetForm(); clearMessage(); });
+    el.list.addEventListener("click", onListClick);
+    installHook();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

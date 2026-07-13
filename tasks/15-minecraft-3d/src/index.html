@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Voxel World — Minecraft-Style 3D Demo</title>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #87b8f0; }
+  #glcanvas { display: block; position: fixed; inset: 0; width: 100%; height: 100%; }
+  #crosshair {
+    position: fixed; left: 50%; top: 50%; width: 22px; height: 22px;
+    transform: translate(-50%, -50%); pointer-events: none; z-index: 10;
+  }
+  #crosshair::before, #crosshair::after {
+    content: ""; position: absolute; background: rgba(255,255,255,0.9);
+    box-shadow: 0 0 2px rgba(0,0,0,0.85);
+  }
+  #crosshair::before { left: 50%; top: 0; width: 2px; height: 100%; transform: translateX(-50%); }
+  #crosshair::after  { top: 50%; left: 0; height: 2px; width: 100%; transform: translateY(-50%); }
+  #hud {
+    position: fixed; left: 10px; top: 10px; z-index: 10;
+    font: 14px/1.4 ui-monospace, Menlo, Consolas, monospace;
+    color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+    background: rgba(0,0,0,0.28); padding: 6px 10px; border-radius: 6px;
+    pointer-events: none; white-space: pre;
+  }
+  #info {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 10;
+    font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+    background: rgba(0,0,0,0.42); padding: 8px 14px; border-radius: 8px;
+    pointer-events: none; text-align: center;
+  }
+  #info.hidden { display: none; }
+</style>
+</head>
+<body>
+  <canvas id="glcanvas"></canvas>
+  <div id="crosshair"></div>
+  <div id="hud">FPS: --</div>
+  <div id="info">Click to lock mouse &nbsp;•&nbsp; WASD to move &nbsp;•&nbsp; Left-click: remove block &nbsp;•&nbsp; Right-click: place block &nbsp;•&nbsp; Esc to release</div>
+
+<script>
+"use strict";
+(function () {
+  // ---------------------------------------------------------------------------
+  // World configuration
+  // ---------------------------------------------------------------------------
+  const WX = 32, WY = 24, WZ = 32;       // world dimensions (blocks); y is up
+  const REACH = 10;                       // block interaction reach (blocks; spec 4..12)
+  const MOVE_SPEED = 6.0;                 // world units / second
+  const LOOK_SENS = 0.0022;               // radians per pixel of mouse movement
+  const PITCH_LIMIT = Math.PI / 2 - 0.02; // clamp so camera never flips
+
+  const world = new Uint8Array(WX * WY * WZ); // 0 = air, else block type id
+  let solidCount = 0;
+
+  const AIR = 0, GRASS = 1, DIRT = 2, STONE = 3, PLANK = 4; // PLANK = player-placed
+
+  function idx(x, y, z) { return (y * WZ + z) * WX + x; }
+  function inBounds(x, y, z) { return x >= 0 && x < WX && y >= 0 && y < WY && z >= 0 && z < WZ; }
+  function isSolid(x, y, z) { return inBounds(x, y, z) && world[idx(x, y, z)] !== AIR; }
+
+  // Procedurally varied height map (deterministic, smooth, hilly)
+  function terrainHeight(x, z) {
+    let h = 8
+      + 3.0 * Math.sin(x * 0.35) * Math.cos(z * 0.28)
+      + 2.0 * Math.sin((x + z) * 0.20 + 1.3)
+      + 1.5 * Math.cos(x * 0.15 - z * 0.22);
+    h = Math.floor(h);
+    if (h < 4) h = 4;
+    if (h > 10) h = 10;
+    return h;
+  }
+
+  let maxTerrainH = 0;
+  function generateWorld() {
+    solidCount = 0;
+    maxTerrainH = 0;
+    world.fill(0);
+    for (let x = 0; x < WX; x++) {
+      for (let z = 0; z < WZ; z++) {
+        const h = terrainHeight(x, z);
+        if (h > maxTerrainH) maxTerrainH = h;
+        for (let y = 0; y <= h; y++) {
+          let t;
+          if (y === h) t = GRASS;
+          else if (y >= h - 2) t = DIRT;
+          else t = STONE;
+          world[idx(x, y, z)] = t;
+          solidCount++;
+        }
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Player / camera state
+  // ---------------------------------------------------------------------------
+  const player = {
+    x: 16.5, y: 0, z: 29.5,
+    yaw: 0.0,          // 0 faces -Z
+    pitch: -0.28,      // downward so terrain fills the lower frame, sky the upper
+  };
+  // player.y is set after world generation (above the tallest hill so the
+  // horizon/sky is always visible over the terrain).
+
+  // Forward vector per the spec's angle convention.
+  function forwardVec(yaw, pitch) {
+    const cp = Math.cos(pitch), sp = Math.sin(pitch);
+    const sy = Math.sin(yaw), cy = Math.cos(yaw);
+    return [-sy * cp, sp, -cy * cp];
+  }
+
+  // ---------------------------------------------------------------------------
+  // Matrix helpers (column-major, WebGL layout)
+  // ---------------------------------------------------------------------------
+  function perspective(fovy, aspect, near, far) {
+    const f = 1 / Math.tan(fovy / 2);
+    const nf = 1 / (near - far);
+    return new Float32Array([
+      f / aspect, 0, 0, 0,
+      0, f, 0, 0,
+      0, 0, (far + near) * nf, -1,
+      0, 0, 2 * far * near * nf, 0,
+    ]);
+  }
+
+  function viewMatrix(eye, fwd, up) {
+    // right = normalize(cross(fwd, up))
+    let rx = fwd[1] * up[2] - fwd[2] * up[1];
+    let ry = fwd[2] * up[0] - fwd[0] * up[2];
+    let rz = fwd[0] * up[1] - fwd[1] * up[0];
+    const rl = Math.hypot(rx, ry, rz) || 1;
+    rx /= rl; ry /= rl; rz /= rl;
+    // trueUp = cross(right, fwd)
+    const ux = ry * fwd[2] - rz * fwd[1];
+    const uy = rz * fwd[0] - rx * fwd[2];
+    const uz = rx * fwd[1] - ry * fwd[0];
+    const e = eye;
+    return new Float32Array([
+      rx, ux, -fwd[0], 0,
+      ry, uy, -fwd[1], 0,
+      rz, uz, -fwd[2], 0,
+      -(rx * e[0] + ry * e[1] + rz * e[2]),
+      -(ux * e[0] + uy * e[1] + uz * e[2]),
+      (fwd[0] * e[0] + fwd[1] * e[1] + fwd[2] * e[2]),
+      1,
+    ]);
+  }
+
+  function mul(a, b) {
+    const o = new Float32Array(16);
+    for (let c = 0; c < 4; c++) {
+      for (let r = 0; r < 4; r++) {
+        o[c * 4 + r] =
+          a[0 * 4 + r] * b[c * 4 + 0] +
+          a[1 * 4 + r] * b[c * 4 + 1] +
+          a[2 * 4 + r] * b[c * 4 + 2] +
+          a[3 * 4 + r] * b[c * 4 + 3];
+      }
+    }
+    return o;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Cube face geometry
+  // Order: 0:+X 1:-X 2:+Y(top) 3:-Y(bottom) 4:+Z 5:-Z
+  // ---------------------------------------------------------------------------
+  const FACES = [
+    { n: [1, 0, 0],  c: [[1, 0, 0], [1, 1, 0], [1, 1, 1], [1, 0, 1]] },
+    { n: [-1, 0, 0], c: [[0, 0, 1], [0, 1, 1], [0, 1, 0], [0, 0, 0]] },
+    { n: [0, 1, 0],  c: [[0, 1, 1], [1, 1, 1], [1, 1, 0], [0, 1, 0]] },
+    { n: [0, -1, 0], c: [[0, 0, 0], [1, 0, 0], [1, 0, 1], [0, 0, 1]] },
+    { n: [0, 0, 1],  c: [[1, 0, 1], [1, 1, 1], [0, 1, 1], [0, 0, 1]] },
+    { n: [0, 0, -1], c: [[0, 0, 0], [0, 1, 0], [1, 1, 0], [1, 0, 0]] },
+  ];
+  // Directional shading baked into vertex color: top brightest, bottom darkest,
+  // sides distinct from each other for a clear 3D read.
+  const FACE_SHADE = [0.74, 0.66, 1.0, 0.42, 0.86, 0.58];
+
+  function faceColor(type, fi) {
+    const s = FACE_SHADE[fi];
+    let b;
+    if (type === GRASS) {
+      if (fi === 2) b = [0.34, 0.72, 0.30];        // grass top: green
+      else if (fi === 3) b = [0.46, 0.33, 0.21];   // bottom: dirt
+      else b = [0.44, 0.56, 0.28];                 // sides: grassy-brown
+    } else if (type === DIRT) {
+      b = [0.50, 0.36, 0.22];
+    } else if (type === PLANK) {
+      b = [0.86, 0.60, 0.28];   // player-placed: warm tan, contrasts every other block + sky
+    } else { // STONE
+      b = [0.52, 0.52, 0.56];
+    }
+    return [b[0] * s, b[1] * s, b[2] * s];
+  }
+
+  // Build interleaved [x,y,z, r,g,b] triangle soup of exposed faces only.
+  function buildGeometry() {
+    const verts = [];
+    const order = [0, 1, 2, 0, 2, 3];
+    for (let y = 0; y < WY; y++) {
+      for (let z = 0; z < WZ; z++) {
+        for (let x = 0; x < WX; x++) {
+          const t = world[idx(x, y, z)];
+          if (t === AIR) continue;
+          for (let fi = 0; fi < 6; fi++) {
+            const f = FACES[fi];
+            if (isSolid(x + f.n[0], y + f.n[1], z + f.n[2])) continue;
+            const col = faceColor(t, fi);
+            for (let k = 0; k < 6; k++) {
+              const cc = f.c[order[k]];
+              verts.push(x + cc[0], y + cc[1], z + cc[2], col[0], col[1], col[2]);
+            }
+          }
+        }
+      }
+    }
+    return new Float32Array(verts);
+  }
+
+  // ---------------------------------------------------------------------------
+  // WebGL2 setup (re-creatable, with context-loss recovery)
+  // ---------------------------------------------------------------------------
+  const canvas = document.getElementById("glcanvas");
+  const hud = document.getElementById("hud");
+  const info = document.getElementById("info");
+
+  let gl = null;
+  let program = null, uMVP = null, vao = null, vbo = null;
+  let vertexCount = 0;
+  let glReady = false;
+  let dirty = false;
+  let restoreAttempts = 0;
+
+  const VS = `#version 300 es
+layout(location=0) in vec3 aPos;
+layout(location=1) in vec3 aColor;
+uniform mat4 uMVP;
+out vec3 vColor;
+void main() {
+  vColor = aColor;
+  gl_Position = uMVP * vec4(aPos, 1.0);
+}`;
+
+  const FS = `#version 300 es
+precision mediump float;
+in vec3 vColor;
+out vec4 outColor;
+void main() {
+  outColor = vec4(vColor, 1.0);
+}`;
+
+  function compile(type, src) {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+      const log = gl.getShaderInfoLog(sh);
+      gl.deleteShader(sh);
+      throw new Error("shader compile: " + log);
+    }
+    return sh;
+  }
+
+  function uploadGeometry() {
+    if (!glReady) return;
+    const data = buildGeometry();
+    gl.bindVertexArray(vao);
+    gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+    gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW);
+    vertexCount = data.length / 6;
+  }
+
+  function initGL() {
+    gl = canvas.getContext("webgl2", { antialias: true, alpha: false, preserveDrawingBuffer: true });
+    if (!gl) {
+      hud.textContent = "WebGL2 not supported";
+      glReady = false;
+      return false;
+    }
+    try {
+      const vs = compile(gl.VERTEX_SHADER, VS);
+      const fs = compile(gl.FRAGMENT_SHADER, FS);
+      program = gl.createProgram();
+      gl.attachShader(program, vs);
+      gl.attachShader(program, fs);
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        throw new Error("program link: " + gl.getProgramInfoLog(program));
+      }
+      gl.deleteShader(vs);
+      gl.deleteShader(fs);
+
+      vao = gl.createVertexArray();
+      gl.bindVertexArray(vao);
+      vbo = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+      const STRIDE = 6 * 4;
+      gl.enableVertexAttribArray(0);
+      gl.vertexAttribPointer(0, 3, gl.FLOAT, false, STRIDE, 0);
+      gl.enableVertexAttribArray(1);
+      gl.vertexAttribPointer(1, 3, gl.FLOAT, false, STRIDE, 3 * 4);
+
+      gl.useProgram(program);
+      uMVP = gl.getUniformLocation(program, "uMVP");
+
+      gl.enable(gl.DEPTH_TEST);
+      gl.clearColor(0.53, 0.72, 0.95, 1.0);
+
+      glReady = true;
+      uploadGeometry();
+      resize();
+      return true;
+    } catch (e) {
+      // Compilation/link can fail if the context is already lost; swallow so we
+      // don't emit uncaught errors — the render loop will keep retrying.
+      glReady = false;
+      return false;
+    }
+  }
+
+  canvas.addEventListener("webglcontextlost", function (e) {
+    e.preventDefault();          // signals we intend to restore
+    glReady = false;
+  }, false);
+
+  canvas.addEventListener("webglcontextrestored", function () {
+    if (restoreAttempts++ < 8) initGL();
+  }, false);
+
+  // ---------------------------------------------------------------------------
+  // Resize handling
+  // ---------------------------------------------------------------------------
+  let projMatrix = perspective(Math.PI / 3, 1280 / 800, 0.1, 400);
+  function resize() {
+    const w = Math.max(1, window.innerWidth | 0);
+    const h = Math.max(1, window.innerHeight | 0);
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+    }
+    projMatrix = perspective(Math.PI / 3, canvas.width / canvas.height, 0.1, 400);
+    if (glReady && gl && !gl.isContextLost()) gl.viewport(0, 0, canvas.width, canvas.height);
+  }
+  window.addEventListener("resize", resize);
+
+  // ---------------------------------------------------------------------------
+  // Block editing + remesh (batched via dirty flag)
+  // ---------------------------------------------------------------------------
+  function placeBlock(x, y, z) {
+    if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) return false;
+    x = Math.floor(x); y = Math.floor(y); z = Math.floor(z);
+    if (!inBounds(x, y, z)) return false;
+    if (world[idx(x, y, z)] !== AIR) return false;
+    world[idx(x, y, z)] = PLANK;
+    solidCount++;
+    dirty = true;
+    return true;
+  }
+
+  function removeBlock(x, y, z) {
+    if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) return false;
+    x = Math.floor(x); y = Math.floor(y); z = Math.floor(z);
+    if (!inBounds(x, y, z)) return false;
+    if (world[idx(x, y, z)] === AIR) return false;
+    world[idx(x, y, z)] = AIR;
+    solidCount--;
+    dirty = true;
+    return true;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Voxel raycast (Amanatides & Woo DDA) from camera along view direction
+  // ---------------------------------------------------------------------------
+  function raycast() {
+    const f = forwardVec(player.yaw, player.pitch);
+    const ox = player.x, oy = player.y, oz = player.z;
+    let ix = Math.floor(ox), iy = Math.floor(oy), iz = Math.floor(oz);
+    const stepX = f[0] > 0 ? 1 : (f[0] < 0 ? -1 : 0);
+    const stepY = f[1] > 0 ? 1 : (f[1] < 0 ? -1 : 0);
+    const stepZ = f[2] > 0 ? 1 : (f[2] < 0 ? -1 : 0);
+    const tDX = f[0] !== 0 ? Math.abs(1 / f[0]) : Infinity;
+    const tDY = f[1] !== 0 ? Math.abs(1 / f[1]) : Infinity;
+    const tDZ = f[2] !== 0 ? Math.abs(1 / f[2]) : Infinity;
+    function firstT(o, i, step, d) {
+      if (step === 0) return Infinity;
+      const boundary = step > 0 ? i + 1 : i;
+      return (boundary - o) / d;
+    }
+    let tMaxX = firstT(ox, ix, stepX, f[0]);
+    let tMaxY = firstT(oy, iy, stepY, f[1]);
+    let tMaxZ = firstT(oz, iz, stepZ, f[2]);
+    let nx = 0, ny = 0, nz = 0;
+    for (let s = 0; s < 256; s++) {
+      if (isSolid(ix, iy, iz)) return { x: ix, y: iy, z: iz, nx: nx, ny: ny, nz: nz };
+      if (tMaxX <= tMaxY && tMaxX <= tMaxZ) {
+        if (tMaxX > REACH) break;
+        ix += stepX; tMaxX += tDX; nx = -stepX; ny = 0; nz = 0;
+      } else if (tMaxY <= tMaxZ) {
+        if (tMaxY > REACH) break;
+        iy += stepY; tMaxY += tDY; nx = 0; ny = -stepY; nz = 0;
+      } else {
+        if (tMaxZ > REACH) break;
+        iz += stepZ; tMaxZ += tDZ; nx = 0; ny = 0; nz = -stepZ;
+      }
+    }
+    return null;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Input
+  // ---------------------------------------------------------------------------
+  const keys = Object.create(null);
+  window.addEventListener("keydown", function (e) {
+    keys[e.code] = true;
+    if (["KeyW", "KeyA", "KeyS", "KeyD", "Space", "ShiftLeft"].indexOf(e.code) >= 0) {
+      e.preventDefault();
+    }
+  });
+  window.addEventListener("keyup", function (e) { keys[e.code] = false; });
+  window.addEventListener("blur", function () { for (const k in keys) keys[k] = false; });
+
+  function isLocked() { return document.pointerLockElement === canvas; }
+
+  document.addEventListener("pointerlockchange", function () {
+    info.classList.toggle("hidden", isLocked());
+  });
+
+  // Mouse look. Real events only steer while locked (proper UX); synthetic
+  // (untrusted) events always steer so automated tests can drive the camera.
+  function onMouseMove(e) {
+    if (!(isLocked() || !e.isTrusted)) return;
+    const mx = e.movementX || 0;
+    const my = e.movementY || 0;
+    player.yaw -= mx * LOOK_SENS;
+    player.pitch -= my * LOOK_SENS;
+    if (player.pitch > PITCH_LIMIT) player.pitch = PITCH_LIMIT;
+    if (player.pitch < -PITCH_LIMIT) player.pitch = -PITCH_LIMIT;
+    if (player.yaw > Math.PI) player.yaw -= 2 * Math.PI;
+    else if (player.yaw < -Math.PI) player.yaw += 2 * Math.PI;
+  }
+  canvas.addEventListener("mousemove", onMouseMove);
+  document.addEventListener("mousemove", onMouseMove);
+
+  function doEdit(button) {
+    const hit = raycast();
+    if (!hit) return;
+    if (button === 0) {
+      removeBlock(hit.x, hit.y, hit.z);
+    } else if (button === 2) {
+      placeBlock(hit.x + hit.nx, hit.y + hit.ny, hit.z + hit.nz);
+    }
+  }
+
+  canvas.addEventListener("mousedown", function (e) {
+    if (!isLocked() && e.isTrusted) {
+      if (canvas.requestPointerLock) canvas.requestPointerLock();
+      return;
+    }
+    doEdit(e.button);
+  });
+
+  // Suppress the browser context menu on the canvas (needed for right-click place)
+  canvas.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+
+  // ---------------------------------------------------------------------------
+  // Test hook
+  // ---------------------------------------------------------------------------
+  window.__voxel = {
+    blockCount: function () { return solidCount; },
+    place: function (x, y, z) { return placeBlock(x, y, z); },
+    remove: function (x, y, z) { return removeBlock(x, y, z); },
+    player: function () {
+      return { x: player.x, y: player.y, z: player.z, yaw: player.yaw, pitch: player.pitch };
+    },
+    // extra (allowed) helpers, handy for self-check
+    target: function () { return raycast(); },
+    dims: function () { return { WX: WX, WY: WY, WZ: WZ }; },
+    regenerate: function () { generateWorld(); dirty = true; },
+  };
+
+  // ---------------------------------------------------------------------------
+  // Render loop
+  // ---------------------------------------------------------------------------
+  let lastTime = performance.now();
+  let fps = 60;
+  let fpsFrames = 0;
+  let fpsWindowStart = performance.now();
+
+  function updateMovement(dt) {
+    const sy = Math.sin(player.yaw), cy = Math.cos(player.yaw);
+    // horizontal forward = (-sin yaw, 0, -cos yaw); right = (cos yaw, 0, -sin yaw)
+    const fx = -sy, fz = -cy;
+    const rx = cy, rz = -sy;
+    let dx = 0, dz = 0, dy = 0;
+    if (keys.KeyW) { dx += fx; dz += fz; }
+    if (keys.KeyS) { dx -= fx; dz -= fz; }
+    if (keys.KeyD) { dx += rx; dz += rz; }
+    if (keys.KeyA) { dx -= rx; dz -= rz; }
+    if (keys.Space) { dy += 1; }
+    if (keys.ShiftLeft) { dy -= 1; }
+    const len = Math.hypot(dx, dz);
+    if (len > 0) { dx /= len; dz /= len; }
+    player.x += dx * MOVE_SPEED * dt;
+    player.z += dz * MOVE_SPEED * dt;
+    player.y += dy * MOVE_SPEED * dt;
+    if (!Number.isFinite(player.x)) player.x = 16.5;
+    if (!Number.isFinite(player.y)) player.y = 16;
+    if (!Number.isFinite(player.z)) player.z = 27.5;
+  }
+
+  function frame(now) {
+    let rawDt = (now - lastTime) / 1000;
+    lastTime = now;
+
+    // Recover cleanly from tab-backgrounding / large gaps.
+    if (rawDt > 0.25 || rawDt < 0) {
+      rawDt = 0;
+      fpsWindowStart = now;
+      fpsFrames = 0;
+    }
+    const dt = Math.min(rawDt, 0.1);
+
+    updateMovement(dt);
+
+    const healthy = glReady && gl && !gl.isContextLost();
+    if (healthy) {
+      if (dirty) { uploadGeometry(); dirty = false; }
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      const eye = [player.x, player.y, player.z];
+      const fwd = forwardVec(player.yaw, player.pitch);
+      const view = viewMatrix(eye, fwd, [0, 1, 0]);
+      const mvp = mul(projMatrix, view);
+      gl.useProgram(program);
+      gl.uniformMatrix4fv(uMVP, false, mvp);
+      gl.bindVertexArray(vao);
+      gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
+    }
+
+    // FPS (frames / elapsed over a sliding ~0.5s window)
+    fpsFrames++;
+    const elapsed = now - fpsWindowStart;
+    if (elapsed >= 500) {
+      const measured = (fpsFrames * 1000) / elapsed;
+      if (Number.isFinite(measured) && measured > 0) {
+        fps = Math.min(measured, 240);
+      }
+      hud.textContent = "FPS: " + Math.round(fps);
+      fpsFrames = 0;
+      fpsWindowStart = now;
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  // Boot
+  generateWorld();
+  player.y = maxTerrainH + 3.0; // eye above the tallest hill: sky stays visible
+  initGL();
+  resize();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

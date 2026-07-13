@@ -1,0 +1,13 @@
+{
+  "name": "bowling-score-engine",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "Ten-pin bowling score engine (Exercism canonical).",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.8"
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "summary": {
+    "pass": 30,
+    "fail": 0,
+    "total": 30
+  },
+  "results": [
+    {
+      "id": "A-empty",
+      "ok": true,
+      "detail": "list.len=0 bal=0 txt=$0.00"
+    },
+    {
+      "id": "A-hookshape",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "A-add-returns-id",
+      "ok": true,
+      "detail": "id present=true"
+    },
+    {
+      "id": "A-list-isolation",
+      "ok": true,
+      "detail": "mutation leaked? amt=5000 len=1"
+    },
+    {
+      "id": "A-list-keys",
+      "ok": true,
+      "detail": "keys=amount,category,date,description,id,type"
+    },
+    {
+      "id": "A-income-balance",
+      "ok": true,
+      "detail": "bal=5000 txt=$5000.00"
+    },
+    {
+      "id": "A-mixed-balance",
+      "ok": true,
+      "detail": "bal=4860.6 (expect 4860.60)"
+    },
+    {
+      "id": "A-cat-food",
+      "ok": true,
+      "detail": "Food total present? cat=\"Transport$100.10Food$39.30\""
+    },
+    {
+      "id": "A-cat-transport",
+      "ok": true,
+      "detail": "Transport present? cat=\"Transport$100.10Food$39.30\""
+    },
+    {
+      "id": "A-total-income",
+      "ok": true,
+      "detail": "income card=$5000.00"
+    },
+    {
+      "id": "A-total-expense",
+      "ok": true,
+      "detail": "expense card=$139.40"
+    },
+    {
+      "id": "A-negative-value",
+      "ok": true,
+      "detail": "bal=-25.5"
+    },
+    {
+      "id": "A-negative-signed",
+      "ok": true,
+      "detail": "txt=-$25.50"
+    },
+    {
+      "id": "A-negative-distinct",
+      "ok": true,
+      "detail": "neg=rgb(255, 107, 107) pos=rgb(53, 208, 127)"
+    },
+    {
+      "id": "A-edit-sameid",
+      "ok": true,
+      "detail": "sameId=true len=2"
+    },
+    {
+      "id": "A-edit-cat-move",
+      "ok": true,
+      "detail": "afterCat=\"Transport$100.00\""
+    },
+    {
+      "id": "A-unknown-id",
+      "ok": true,
+      "detail": "u=null r=false threw=false"
+    },
+    {
+      "id": "A-error-throws",
+      "ok": true,
+      "detail": "allThrew=true"
+    },
+    {
+      "id": "A-error-unchanged",
+      "ok": true,
+      "detail": "unchanged=true balSame=true"
+    },
+    {
+      "id": "A-update-invalid-atomic",
+      "ok": true,
+      "detail": "threw=true unchanged=true"
+    },
+    {
+      "id": "A-form-empty-desc",
+      "ok": true,
+      "detail": "len=0 msg=\"Invalid description: must be a non-empty string.\""
+    },
+    {
+      "id": "A-form-bad-amount",
+      "ok": true,
+      "detail": "len=0 msg=\"Invalid amount: must be a finite number greater than 0.\""
+    },
+    {
+      "id": "A-form-valid-add",
+      "ok": true,
+      "detail": "len=1"
+    },
+    {
+      "id": "A-affordances",
+      "ok": true,
+      "detail": "rows=1 edit=true del=true"
+    },
+    {
+      "id": "A-persist-reload",
+      "ok": true,
+      "detail": "preIds=tx_mririvz9_b,tx_mririvz9_c postIds=tx_mririvz9_b,tx_mririvz9_c bal 150->150"
+    },
+    {
+      "id": "A-corrupt-storage",
+      "ok": true,
+      "detail": "len=0 bal=0"
+    },
+    {
+      "id": "A-no-console-errors",
+      "ok": true,
+      "detail": "consoleErr=0 pageErr=0 :: "
+    },
+    {
+      "id": "A-no-dialogs",
+      "ok": true,
+      "detail": "dialogs=0"
+    },
+    {
+      "id": "A-no-network",
+      "ok": true,
+      "detail": "net=0 :: "
+    },
+    {
+      "id": "A-self-contained",
+      "ok": true,
+      "detail": "external refs found=false"
+    }
+  ]
+}

@@ -1,0 +1,221 @@
+{
+  "summary": {
+    "target": "C:\\Users\\iamjo\\Projects\\ai-benchmark\\tasks\\16-budget-tracker\\src\\index.html",
+    "pass": 35,
+    "fail": 0,
+    "skip": 0,
+    "total": 35
+  },
+  "results": [
+    {
+      "id": "R01",
+      "desc": "H1 hook shape window.__budget {add,update,remove,list,balance}",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R02",
+      "desc": "H2 add() returns created tx with assigned id + fields",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R03",
+      "desc": "H3 list() new array of plain 6-field objects; mutation isolation",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R04",
+      "desc": "H8 balance() Number = income - expense (from list())",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R05",
+      "desc": "H4 update() applies fields, returns updated tx (same id)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R06",
+      "desc": "H4/H6 update/remove unknown id -> null/false, no throw",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R07",
+      "desc": "H6 remove(id) -> true, drops the tx",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R08",
+      "desc": "invalid description (empty/whitespace) add() throws; state unchanged",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R09",
+      "desc": "invalid amount (0/neg/NaN/non-finite) add() throws; state unchanged",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R10",
+      "desc": "invalid type/category/date add() throws; state unchanged",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R11",
+      "desc": "update() invalid field throws atomically; state unchanged",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R12",
+      "desc": "self-contained: zero http(s) requests, no external refs in markup",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R13",
+      "desc": "zero console errors on fresh load",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R14",
+      "desc": "no alert/confirm/prompt/native dialogs",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R15",
+      "desc": "zero console errors across the full run",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R16",
+      "desc": "AC1 empty first load: list()=[], balance()=0, shows 0.00",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R17",
+      "desc": "AC1 form controls: type/description/amount#/>=4 categories/date",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R18",
+      "desc": "AC2 add income: balance +exact, row rendered, in localStorage",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R19",
+      "desc": "AC3 add expense: balance -exact, row rendered",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R20",
+      "desc": "AC4 balance = Sum(in)-Sum(ex), 2 decimals, balance() within 0.005",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R21",
+      "desc": "AC5 negative balance shown with leading minus, never clamped",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R22",
+      "desc": "AC5 negative balance visually distinct from non-negative",
+      "status": "pass",
+      "detail": "neg=rgb(255, 107, 107) vs pos=rgb(53, 208, 127)"
+    },
+    {
+      "id": "R23",
+      "desc": "AC6 edit affordance per row",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R24",
+      "desc": "AC6 edit in place: same id, no dup, len same, balance+totals reflect",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R25",
+      "desc": "AC7 delete affordance per row",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R26",
+      "desc": "AC7 delete updates balance+totals; last delete -> empty state 0.00",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R27",
+      "desc": "AC8 total income & total expenses each exact (2 decimals)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R28",
+      "desc": "AC8 per-category expense totals exact (2 decimals)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R29",
+      "desc": "AC8 editing a category moves the amount between category totals",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R30",
+      "desc": "AC9 empty-description form submit adds nothing, no dialog",
+      "status": "pass",
+      "detail": "nothing added on empty-description submit (in-page message wording: judge from screenshot)"
+    },
+    {
+      "id": "R31",
+      "desc": "AC10 bad-amount form submit adds nothing, no dialog",
+      "status": "pass",
+      "detail": "nothing added on amount 0/-5 submit (message wording: judge from screenshot)"
+    },
+    {
+      "id": "R32",
+      "desc": "AC11 add survives reload: same ids, same balance",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R33",
+      "desc": "AC11 edit & delete survive reload; ids unchanged",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R34",
+      "desc": "AC15 ids unique, stable, addressed by id (not position)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R35",
+      "desc": "AC16 corrupt/missing storage -> empty, no crash, no console error",
+      "status": "pass",
+      "detail": ""
+    }
+  ]
+}

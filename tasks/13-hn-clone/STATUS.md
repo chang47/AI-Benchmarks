@@ -1,2 +1,5 @@
 ﻿RESEARCH: spec frozen from arena.ai blog prompt + live news.ycombinator.com HTML/CSS ground truth (16 criteria, 4 authorities, contamination high)
 HOLDOUT: rubric (16 items, equal weight) + autochecks.mjs validated (Chrome-channel run: graceful exit-2 no-candidate, 0/16 on trivial placeholder, no crash) + FREEZE_MANIFEST.json (sha256, 3 files) written; frozen.
+BUILD: src/index.html single-file HN clone built; 27/27 self-checks pass, screenshot verified faithful to real HN.
+BUILD r0: CLAIMED DONE=yes, self-checks 27/27 pass (title, 0 console errors, 0 network, #ff6600 bar+nav order, 85% beige column, 30 varied stories, gray ranks/arrows, exact subtext format, upvote +1/arrow-hides/others-unaffected/at-most-once, More link, no h-scroll @1024px).
+VERIFY r0: PASS, passRate 16/16=1.00, fakeConvergence=false; no tamper (3 sha256 match); item4 harness borderOk:false = wrong-element artifact (picked td wrapper, real span.logo-mark = 18x18 + 1px white border), screenshot-resolved PASS; NOTE extra files under src/ (selfcheck.mjs/png) — contract deviation, non-scoring.

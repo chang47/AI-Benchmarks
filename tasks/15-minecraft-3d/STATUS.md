@@ -1,2 +1,5 @@
 RESEARCH: canonical MicroEvals "Minecraft 3D" (WebGL2 voxel engine) prompt frozen verbatim from served HTML; spec with 22 checkable criteria + __voxel hook + pinned angle convention; Three.js = vendored UMD (<= r160) fallback only, never CDN; contamination high.
 HOLDOUT: rubric.md (22 items, equal weight, 1:1 with spec criteria) + autochecks.mjs (playwright; all 22 auto-checked via __voxel hook / grid-probe / pixel-decode / rAF-timing / real pointer-lock+mouse+keyboard) + FREEZE_MANIFEST.json (sha256) written; validated 22/22 PASS vs a throwaway temp reference impl, and graceful all-fail with a trivial/missing candidate.
+BUILD r0: CLAIMED DONE=yes, self-checks 26/26 PASS (SwiftShader) — self-contained raw WebGL2 voxel world, __voxel hook, pointer-lock look, WASD, DDA raycast place/remove, FPS HUD, sky+terrain composition, context-loss recovery; 0 console errors.
+
+VERIFY r0: PASS — 22/22 (21 auto-pass + R05 skip resolved to pass via independent 32x32 full-world probe); tamper check clean; 0 console errors.

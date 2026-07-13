@@ -45,3 +45,7 @@ per bounce, t>30s — gave max 141.8px (36% of R), zero exceedances of R across 
 bounces above one ball radius (restitution neither dead nor perpetual). Even the compound metric never exceeded
 R in the settled window (max 357.8px). Criterion 9 is satisfied; the raw first-pass number is preserved in
 `results.json` for the record.
+
+## KCORES rubric retrofit (observe-only, cross-benchmark)
+
+Applied the community KCORES 90-pt rubric (18 categories × 5, translated Python/tkinter → our JS/canvas variant; 0 categories N/A, transferable-max 90) to the unchanged `src/index.html` via `verify/kcores-retrofit.mjs` (Chrome channel, file://, 70s/4,083-frame monitored run): **88/90** — every physics/containment/count/color/rotation category 5/5 (incl. containment, KCORES's #1 fail mode); only k15 visual-quality = 3/5, a by-design cap (KCORES's 5-tier rewards pseudo-3D; our spec mandates flat 2D, costing exactly 2 pts). Corroborates the round-0 16/16 PASS. Details: `verify/kcores-retrofit.md`; raw + screenshots: `verify/kcores-retrofit/`.

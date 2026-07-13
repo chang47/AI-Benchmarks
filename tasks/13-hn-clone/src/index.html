@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- data-URI favicon so the browser never fires a /favicon.ico network request -->
+<link rel="icon" href="data:,">
+<title>Hacker News</title>
+<style>
+  /* ---- Base (matches news.ycombinator.com / news.css) ---- */
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #ffffff;               /* page area outside the column is white */
+  }
+  body {
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 10pt;
+    color: #828282;
+  }
+  a { text-decoration: none; }
+  a:link, a:visited { color: #000000; } /* default links are black */
+
+  /* ---- Main centered column ---- */
+  #hnmain {
+    width: 85%;                        /* 85% of the viewport width */
+    margin: 0 auto;
+    background-color: #f6f6ef;         /* beige */
+    border-collapse: collapse;
+  }
+
+  /* ---- Orange top bar ---- */
+  #header {
+    background-color: #ff6600;         /* exact HN orange */
+  }
+  #header-inner {
+    width: 100%;
+    padding: 2px;
+    border-spacing: 0;
+  }
+  .pagetop, .pagetop a:link, .pagetop a:visited {
+    color: #000000;                    /* dark text on the orange, not white */
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 10pt;
+  }
+  .hnname { margin-right: 5px; }
+  .hnname a { font-weight: bold; }
+
+  /* Inline logo mark: white "Y", 1px solid white border, ~18x18 */
+  .logo-mark {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    box-sizing: border-box;
+    border: 1px solid #ffffff;
+    background: #ff6600;
+    color: #ffffff;
+    font-weight: bold;
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 14px;
+    line-height: 16px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  #logo-cell { width: 18px; padding-right: 4px; }
+  #nav-cell  { line-height: 12pt; height: 10px; }
+  #login-cell { text-align: right; padding-right: 4px; }
+
+  /* ---- Story list ---- */
+  #itemlist { border-spacing: 0; }
+  td.rank-cell {
+    text-align: right;                 /* rank right-aligned in its column */
+    vertical-align: top;
+    padding-right: 0;
+    width: 26px;
+  }
+  span.rank { color: #828282; }        /* gray rank "1." "2." ... */
+
+  td.votelinks {
+    vertical-align: top;
+    text-align: center;
+    width: 14px;
+    padding-top: 3px;
+  }
+  /* Gray upward triangle, ~10px, like the real HN votearrow */
+  .votearrow {
+    width: 0;
+    height: 0;
+    margin: 0 auto;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 10px solid #999999;
+    cursor: pointer;
+  }
+  .votelinks.voted .votearrow { display: none; } /* arrow disappears after voting */
+
+  td.title-cell { vertical-align: top; padding-left: 2px; }
+  .titleline a:link, .titleline a:visited {
+    color: #000000;                    /* title is a black link at ~10pt */
+    font-size: 10pt;
+  }
+  .sitebit, .sitebit a:link, .sitebit a:visited {
+    color: #828282;                    /* domain in smaller gray */
+    font-size: 8pt;
+  }
+
+  /* Subtext line under the title (aligned to the title, not the rank) */
+  td.subtext-cell { padding-left: 2px; }
+  .subtext,
+  .subtext a:link,
+  .subtext a:visited {
+    font-size: 7pt;
+    color: #828282;                    /* small gray subtext */
+  }
+
+  tr.spacer { height: 5px; }           /* ~5px dense gap between stories */
+
+  /* "More" link at the bottom, styled like a title link */
+  .morelink, .morelink:link, .morelink:visited {
+    color: #000000;
+    font-size: 10pt;
+  }
+  #morespace { height: 10px; }
+</style>
+</head>
+<body>
+  <center>
+    <table id="hnmain">
+      <!-- ============ Top bar ============ -->
+      <tr>
+        <td id="header" style="padding:0">
+          <table id="header-inner" cellspacing="0" cellpadding="0">
+            <tr>
+              <td id="logo-cell">
+                <a href="#"><span class="logo-mark">Y</span></a>
+              </td>
+              <td id="nav-cell">
+                <span class="pagetop">
+                  <b class="hnname"><a href="#">Hacker News</a></b>
+                  <a href="#">new</a><!--
+                  --> | <a href="#">past</a><!--
+                  --> | <a href="#">comments</a><!--
+                  --> | <a href="#">ask</a><!--
+                  --> | <a href="#">show</a><!--
+                  --> | <a href="#">jobs</a><!--
+                  --> | <a href="#">submit</a>
+                </span>
+              </td>
+              <td id="login-cell">
+                <span class="pagetop"><a href="#">login</a></span>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <tr style="height:6px"><td></td></tr>
+
+      <!-- ============ Story list ============ -->
+      <tr>
+        <td style="padding:0 2px">
+          <table id="itemlist" cellspacing="0" cellpadding="0"></table>
+        </td>
+      </tr>
+    </table>
+  </center>
+
+  <script>
+  (function () {
+    "use strict";
+
+    // ---- Mock data: 30 varied hardcoded stories (no network, no backend) ----
+    var STORIES = [
+      { title: "Show HN: I built a search engine that runs entirely in your browser", domain: "orionsearch.dev", points: 542, user: "mattkrick", age: "1 hour ago", comments: 231 },
+      { title: "The unreasonable effectiveness of small language models", domain: "sequoiacap.com", points: 489, user: "swombat", age: "2 hours ago", comments: 178 },
+      { title: "SQLite is not a toy database", domain: "antonz.org", points: 431, user: "ingve", age: "3 hours ago", comments: 264 },
+      { title: "A brief history of the Unix filesystem", domain: "tuhs.org", points: 388, user: "pabs3", age: "4 hours ago", comments: 92 },
+      { title: "Ask HN: What are you building this weekend?", domain: null, points: 356, user: "throwaway7", age: "5 hours ago", comments: 415 },
+      { title: "Rust is now the second most-loved systems language", domain: "stackoverflow.blog", points: 341, user: "steveklabnik", age: "2 hours ago", comments: 302 },
+      { title: "How we cut our AWS bill by 90% with a single config change", domain: "engineering.figma.com", points: 327, user: "rauchg", age: "6 hours ago", comments: 156 },
+      { title: "The lost art of writing a good bug report", domain: "danluu.com", points: 298, user: "luu", age: "4 hours ago", comments: 71 },
+      { title: "Postgres full-text search is good enough", domain: "supabase.com", points: 276, user: "kiwicopple", age: "7 hours ago", comments: 133 },
+      { title: "Why I still use Make in 2026", domain: "matklad.github.io", points: 254, user: "matklad", age: "3 hours ago", comments: 188 },
+      { title: "A visual guide to how CPUs actually execute code", domain: "cpu.land", points: 241, user: "kognise", age: "8 hours ago", comments: 64 },
+      { title: "The economics of running a one-person software company", domain: null, points: 233, user: "patio11", age: "5 hours ago", comments: 209 },
+      { title: "We rewrote our frontend in vanilla JS and shipped 40% faster", domain: "sourcehut.org", points: 219, user: "ddevault", age: "9 hours ago", comments: 247 },
+      { title: "TypeScript 6.0 released with native type stripping", domain: "devblogs.microsoft.com", points: 205, user: "orta", age: "6 hours ago", comments: 118 },
+      { title: "Understanding the memory hierarchy from L1 to disk", domain: "brendangregg.com", points: 197, user: "bcantrill", age: "10 hours ago", comments: 45 },
+      { title: "Show HN: A tiny WebGL fluid simulation in 3KB", domain: "paveldogreat.github.io", points: 184, user: "paveldog", age: "7 hours ago", comments: 38 },
+      { title: "The case against microservices for small teams", domain: "martinfowler.com", points: 176, user: "kellabyte", age: "11 hours ago", comments: 261 },
+      { title: "How email actually works, explained with packets", domain: "explained-from-first-principles.com", points: 168, user: "ludwigABAP", age: "8 hours ago", comments: 52 },
+      { title: "I read the source code of every popular JS framework", domain: "builder.io", points: 159, user: "steve8708", age: "12 hours ago", comments: 87 },
+      { title: "Ask HN: How do you stay productive with ADHD?", domain: null, points: 147, user: "quietstorm", age: "9 hours ago", comments: 194 },
+      { title: "The surprising history of the semicolon in programming", domain: "twobithistory.org", points: 138, user: "sinclairtarget", age: "13 hours ago", comments: 41 },
+      { title: "Building a Redis clone in 200 lines of Go", domain: "github.com", points: 129, user: "tidwall", age: "10 hours ago", comments: 33 },
+      { title: "Why your unit tests keep breaking (and how to fix it)", domain: "martinfowler.com", points: 121, user: "kentbeck", age: "14 hours ago", comments: 76 },
+      { title: "A love letter to the command line", domain: "jvns.ca", points: 114, user: "b0rk", age: "11 hours ago", comments: 58 },
+      { title: "Show HN: Self-hosted analytics with zero cookies", domain: "plausible.io", points: 102, user: "markosaric", age: "15 hours ago", comments: 29 },
+      { title: "The math behind procedurally generated worlds", domain: "redblobgames.com", points: 94, user: "amitp", age: "12 hours ago", comments: 22 },
+      { title: "Lessons from migrating 3 million lines of code to a monorepo", domain: "shopify.engineering", points: 87, user: "burke", age: "16 hours ago", comments: 61 },
+      { title: "How I finally understood monads", domain: null, points: 79, user: "haskellcurry", age: "13 hours ago", comments: 143 },
+      { title: "A field guide to reading assembly output", domain: "godbolt.org", points: 68, user: "mattgodbolt", age: "17 hours ago", comments: 19 },
+      { title: "The web is fast if you let it be", domain: "infrequently.org", points: 55, user: "slightlyoff", age: "14 hours ago", comments: 88 }
+    ];
+
+    // ---- Render ----
+    function el(tag, attrs, html) {
+      var e = document.createElement(tag);
+      if (attrs) { for (var k in attrs) { if (attrs.hasOwnProperty(k)) e.setAttribute(k, attrs[k]); } }
+      if (html != null) e.innerHTML = html;
+      return e;
+    }
+
+    var list = document.getElementById("itemlist");
+
+    STORIES.forEach(function (s, i) {
+      var rank = i + 1;
+
+      // --- Story row (rank + votearrow + title) ---
+      var row = el("tr", { "class": "athing", id: "story_" + rank });
+
+      var rankTd = el("td", { "class": "rank-cell" },
+        '<span class="rank">' + rank + '.</span>');
+
+      var voteTd = el("td", { "class": "votelinks" });
+      var arrow = el("div", { "class": "votearrow", title: "upvote", role: "button", "aria-label": "upvote" });
+      voteTd.appendChild(arrow);
+
+      var titleTd = el("td", { "class": "title-cell" });
+      var titleHtml = '<span class="titleline"><a href="#">' + s.title + '</a>';
+      if (s.domain) {
+        titleHtml += ' <span class="sitebit">(<a href="#">' + s.domain + '</a>)</span>';
+      }
+      titleHtml += '</span>';
+      titleTd.innerHTML = titleHtml;
+
+      row.appendChild(rankTd);
+      row.appendChild(voteTd);
+      row.appendChild(titleTd);
+
+      // --- Subtext row (aligned to title via a 2-column spacer) ---
+      var subRow = el("tr");
+      subRow.appendChild(el("td", { colspan: "2" }));
+      var subTd = el("td", { "class": "subtext-cell" });
+      var scoreId = "score_" + rank;
+      subTd.innerHTML =
+        '<span class="subtext">' +
+          '<span class="score" id="' + scoreId + '">' + s.points + ' points</span>' +
+          ' by <a href="#" class="hnuser">' + s.user + '</a> ' +
+          '<span class="age"><a href="#">' + s.age + '</a></span>' +
+          ' | <a href="#">hide</a>' +
+          ' | <a href="#">' + s.comments + ' comments</a>' +
+        '</span>';
+      subRow.appendChild(subTd);
+
+      // --- Spacer row ---
+      var spacer = el("tr", { "class": "spacer", style: "height:5px" });
+      spacer.appendChild(el("td", { colspan: "3" }));
+
+      // Client-side upvote: +1 to THIS story only, hide the arrow, once.
+      (function (score, voteCell, points) {
+        var current = points;
+        var voted = false;
+        arrow.addEventListener("click", function (ev) {
+          ev.preventDefault();
+          if (voted) return;
+          voted = true;
+          current += 1;
+          score.textContent = current + " points";
+          voteCell.className = "votelinks voted"; // hides the arrow via CSS
+        });
+      })(subTd.querySelector("#" + scoreId), voteTd, s.points);
+
+      list.appendChild(row);
+      list.appendChild(subRow);
+      list.appendChild(spacer);
+    });
+
+    // ---- "More" link (reload-safe, never navigates away) ----
+    var moreSpacer = el("tr", { id: "morespace" });
+    moreSpacer.appendChild(el("td", { colspan: "3" }));
+    var moreRow = el("tr");
+    moreRow.appendChild(el("td", { colspan: "2" }));
+    var moreTd = el("td", { "class": "title-cell" });
+    var moreLink = el("a", { href: "#", "class": "morelink" }, "More");
+    moreLink.addEventListener("click", function (ev) { ev.preventDefault(); });
+    moreTd.appendChild(moreLink);
+    moreRow.appendChild(moreTd);
+    list.appendChild(moreSpacer);
+    list.appendChild(moreRow);
+  })();
+  </script>
+</body>
+</html>

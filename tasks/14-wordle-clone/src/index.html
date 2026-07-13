@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wordle Clone</title>
+<style>
+  :root {
+    --bg: #121213;
+    --fg: #ffffff;
+    --tile-border-empty: #3a3a3c;
+    --tile-border-filled: #565758;
+    --key-bg: #818384;
+    --key-fg: #ffffff;
+    --green: #538d4e;
+    --yellow: #b59f3b;
+    --gray: #3a3a3c;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    user-select: none;
+  }
+
+  header {
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid var(--tile-border-empty);
+    padding: 8px 0;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  #message {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg);
+    min-height: 32px;
+    margin-top: 6px;
+  }
+
+  main {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  #board {
+    display: grid;
+    grid-template-rows: repeat(6, 1fr);
+    gap: 5px;
+    padding: 10px;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+  }
+
+  .tile {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1;
+    border: 2px solid var(--tile-border-empty);
+    color: var(--fg);
+    background: transparent;
+  }
+
+  .tile.filled {
+    border-color: var(--tile-border-filled);
+  }
+
+  .tile.green {
+    background: var(--green);
+    border-color: var(--green);
+    color: #fff;
+  }
+  .tile.yellow {
+    background: var(--yellow);
+    border-color: var(--yellow);
+    color: #fff;
+  }
+  .tile.gray {
+    background: var(--gray);
+    border-color: var(--gray);
+    color: #fff;
+  }
+
+  .row.shake {
+    animation: shake 0.5s;
+  }
+  @keyframes shake {
+    10%, 90% { transform: translateX(-2px); }
+    20%, 80% { transform: translateX(4px); }
+    30%, 50%, 70% { transform: translateX(-6px); }
+    40%, 60% { transform: translateX(6px); }
+  }
+
+  #keyboard {
+    width: 100%;
+    max-width: 500px;
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+
+  .kb-row {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .key {
+    min-width: 43px;
+    height: 58px;
+    border: 0;
+    border-radius: 4px;
+    background: var(--key-bg);
+    color: var(--key-fg);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    font-family: inherit;
+  }
+
+  .key.wide {
+    min-width: 65px;
+    font-size: 12px;
+  }
+
+  .key.green { background: var(--green); color: #fff; }
+  .key.yellow { background: var(--yellow); color: #fff; }
+  .key.gray { background: var(--gray); color: #fff; }
+
+  .spacer { flex: 0.5; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Wordle</h1>
+  </header>
+  <div id="message" role="status" aria-live="polite"></div>
+  <main>
+    <div id="board" aria-label="Wordle board"></div>
+  </main>
+  <div id="keyboard" aria-label="Keyboard"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var ROWS = 6;
+  var COLS = 5;
+
+  // --- Game state ---
+  var answer = "";            // uppercase 5-letter secret
+  var status = "playing";     // "playing" | "won" | "lost"
+  var currentRow = 0;         // index of the row being edited
+  var currentGuess = "";      // letters typed in the current row (uppercase)
+  var guesses = [];           // array of uppercase submitted words
+  var evaluations = [];       // array of per-guess color arrays
+  var keyState = {};          // letter -> best state ("green"|"yellow"|"gray")
+
+  // --- DOM refs ---
+  var boardEl = document.getElementById("board");
+  var keyboardEl = document.getElementById("keyboard");
+  var messageEl = document.getElementById("message");
+  var tiles = [];             // tiles[row][col] -> element
+  var keyEls = {};            // KEY (uppercase letter or "ENTER"/"BACK") -> element
+
+  var messageTimer = null;
+
+  // --- Build board ---
+  function buildBoard() {
+    boardEl.innerHTML = "";
+    tiles = [];
+    for (var r = 0; r < ROWS; r++) {
+      var rowEl = document.createElement("div");
+      rowEl.className = "row";
+      rowEl.setAttribute("data-row", String(r));
+      var rowTiles = [];
+      for (var c = 0; c < COLS; c++) {
+        var tile = document.createElement("div");
+        tile.className = "tile";
+        tile.setAttribute("data-row", String(r));
+        tile.setAttribute("data-col", String(c));
+        rowEl.appendChild(tile);
+        rowTiles.push(tile);
+      }
+      boardEl.appendChild(rowEl);
+      tiles.push(rowTiles);
+    }
+  }
+
+  // --- Build keyboard ---
+  var KB_LAYOUT = [
+    ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+    ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+    ["ENTER", "Z", "X", "C", "V", "B", "N", "M", "BACK"]
+  ];
+
+  function buildKeyboard() {
+    keyboardEl.innerHTML = "";
+    keyEls = {};
+    for (var r = 0; r < KB_LAYOUT.length; r++) {
+      var rowEl = document.createElement("div");
+      rowEl.className = "kb-row";
+      if (r === 1) {
+        var spL = document.createElement("div");
+        spL.className = "spacer";
+        rowEl.appendChild(spL);
+      }
+      for (var i = 0; i < KB_LAYOUT[r].length; i++) {
+        var label = KB_LAYOUT[r][i];
+        var key = document.createElement("button");
+        key.type = "button";
+        key.className = "key";
+        key.setAttribute("data-key", label);
+        if (label === "ENTER") {
+          key.classList.add("wide");
+          key.textContent = "Enter";
+        } else if (label === "BACK") {
+          key.classList.add("wide");
+          key.textContent = "⌫"; // erase to the left symbol
+          key.setAttribute("aria-label", "Backspace");
+        } else {
+          key.textContent = label;
+        }
+        (function (lbl) {
+          key.addEventListener("click", function (e) {
+            e.preventDefault();
+            handleKey(lbl);
+            key.blur();
+          });
+        })(label);
+        rowEl.appendChild(key);
+        keyEls[label] = key;
+      }
+      if (r === 1) {
+        var spR = document.createElement("div");
+        spR.className = "spacer";
+        rowEl.appendChild(spR);
+      }
+      keyboardEl.appendChild(rowEl);
+    }
+  }
+
+  // --- Messaging (in-page only, never a dialog) ---
+  function showMessage(text, persist) {
+    messageEl.textContent = text;
+    if (messageTimer) {
+      clearTimeout(messageTimer);
+      messageTimer = null;
+    }
+    if (!persist) {
+      messageTimer = setTimeout(function () {
+        messageEl.textContent = "";
+        messageTimer = null;
+      }, 1500);
+    }
+  }
+
+  function shakeRow(r) {
+    var rowEl = boardEl.children[r];
+    if (!rowEl) return;
+    rowEl.classList.remove("shake");
+    // force reflow so the animation can retrigger
+    void rowEl.offsetWidth;
+    rowEl.classList.add("shake");
+    setTimeout(function () {
+      rowEl.classList.remove("shake");
+    }, 500);
+  }
+
+  // --- Core scoring: two-pass normative algorithm (spec C1) ---
+  function evaluateGuess(guess, ans) {
+    var result = new Array(COLS);
+    var counts = {};
+    var i, ch;
+    // Tally answer letter counts
+    for (i = 0; i < COLS; i++) {
+      ch = ans[i];
+      counts[ch] = (counts[ch] || 0) + 1;
+    }
+    // Pass 1: greens
+    for (i = 0; i < COLS; i++) {
+      if (guess[i] === ans[i]) {
+        result[i] = "green";
+        counts[guess[i]] -= 1;
+      }
+    }
+    // Pass 2: yellows / grays, left to right
+    for (i = 0; i < COLS; i++) {
+      if (result[i] === "green") continue;
+      ch = guess[i];
+      if (counts[ch] > 0) {
+        result[i] = "yellow";
+        counts[ch] -= 1;
+      } else {
+        result[i] = "gray";
+      }
+    }
+    return result;
+  }
+
+  // --- Keyboard state precedence: green > yellow > gray ---
+  var RANK = { gray: 1, yellow: 2, green: 3 };
+  function updateKeyState(letter, newState) {
+    var prev = keyState[letter];
+    if (!prev || RANK[newState] > RANK[prev]) {
+      keyState[letter] = newState;
+    }
+  }
+
+  function paintKey(letter) {
+    var el = keyEls[letter];
+    if (!el) return;
+    var st = keyState[letter];
+    el.classList.remove("green", "yellow", "gray");
+    if (st) el.classList.add(st);
+  }
+
+  // --- Rendering ---
+  function renderCurrentRow() {
+    if (currentRow >= ROWS) return;
+    var rowTiles = tiles[currentRow];
+    for (var c = 0; c < COLS; c++) {
+      var t = rowTiles[c];
+      if (c < currentGuess.length) {
+        t.textContent = currentGuess[c];
+        t.classList.add("filled");
+      } else {
+        t.textContent = "";
+        t.classList.remove("filled");
+      }
+    }
+  }
+
+  function renderEvaluatedRow(rowIndex, word, evalArr) {
+    var rowTiles = tiles[rowIndex];
+    for (var c = 0; c < COLS; c++) {
+      var t = rowTiles[c];
+      t.textContent = word[c];
+      t.classList.remove("filled");
+      t.classList.add(evalArr[c]);
+    }
+  }
+
+  // --- Input handling (single code path for physical + on-screen + hooks) ---
+  function isLetter(k) {
+    return k.length === 1 && k >= "A" && k <= "Z";
+  }
+
+  function handleKey(rawKey) {
+    if (status !== "playing") return;
+    var key = rawKey.toUpperCase();
+    if (key === "ENTER") {
+      submitGuess();
+    } else if (key === "BACK" || key === "BACKSPACE" || key === "DELETE") {
+      deleteLetter();
+    } else if (isLetter(key)) {
+      addLetter(key);
+    }
+  }
+
+  function addLetter(letter) {
+    if (status !== "playing") return;
+    if (currentGuess.length >= COLS) return;
+    currentGuess += letter;
+    renderCurrentRow();
+  }
+
+  function deleteLetter() {
+    if (status !== "playing") return;
+    if (currentGuess.length === 0) return;
+    currentGuess = currentGuess.slice(0, currentGuess.length - 1);
+    renderCurrentRow();
+  }
+
+  // Commit a fully-formed 5-letter guess. Returns the eval array, or null if
+  // the submission is rejected. Used by both Enter and the __wordle.guess hook.
+  function commitGuess(word) {
+    if (status !== "playing") return null;
+    if (typeof word !== "string") return null;
+    var up = word.toUpperCase();
+    if (up.length !== COLS) return null;
+    for (var i = 0; i < COLS; i++) {
+      if (!isLetter(up[i])) return null;
+    }
+
+    var evalArr = evaluateGuess(up, answer);
+
+    // Paint the row.
+    renderEvaluatedRow(currentRow, up, evalArr);
+
+    // Update keyboard states (best-state precedence).
+    for (var j = 0; j < COLS; j++) {
+      updateKeyState(up[j], evalArr[j]);
+    }
+    for (var k = 0; k < COLS; k++) {
+      paintKey(up[k]);
+    }
+
+    // Record.
+    guesses.push(up);
+    evaluations.push(evalArr);
+    currentRow += 1;
+    currentGuess = "";
+
+    // End-state checks: WIN takes priority over out-of-guesses (E4).
+    var isWin = evalArr.every(function (s) { return s === "green"; });
+    if (isWin) {
+      status = "won";
+      showMessage("You win!", true);
+    } else if (currentRow >= ROWS) {
+      status = "lost";
+      showMessage("The word was " + answer, true);
+    }
+
+    return evalArr;
+  }
+
+  function submitGuess() {
+    if (status !== "playing") return;
+    if (currentGuess.length < COLS) {
+      showMessage("Not enough letters");
+      shakeRow(currentRow);
+      return;
+    }
+    commitGuess(currentGuess);
+  }
+
+  // --- Reset / new game ---
+  function resetGame() {
+    status = "playing";
+    currentRow = 0;
+    currentGuess = "";
+    guesses = [];
+    evaluations = [];
+    keyState = {};
+    if (messageTimer) {
+      clearTimeout(messageTimer);
+      messageTimer = null;
+    }
+    messageEl.textContent = "";
+    // Clear tiles
+    for (var r = 0; r < ROWS; r++) {
+      for (var c = 0; c < COLS; c++) {
+        var t = tiles[r][c];
+        t.textContent = "";
+        t.className = "tile";
+      }
+    }
+    // Clear keyboard coloring
+    for (var lbl in keyEls) {
+      if (Object.prototype.hasOwnProperty.call(keyEls, lbl)) {
+        keyEls[lbl].classList.remove("green", "yellow", "gray");
+      }
+    }
+  }
+
+  function setAnswerInternal(word) {
+    if (typeof word !== "string") return;
+    var up = word.toUpperCase();
+    // Validate: exactly 5 A-Z letters.
+    if (up.length !== COLS) {
+      throw new Error("setAnswer requires a 5-letter A-Z word");
+    }
+    for (var i = 0; i < COLS; i++) {
+      if (!isLetter(up[i])) {
+        throw new Error("setAnswer requires a 5-letter A-Z word");
+      }
+    }
+    resetGame();
+    answer = up;
+  }
+
+  // --- Default answer (no dictionary; F1). ---
+  var DEFAULTS = [
+    "CRANE", "SLATE", "AUDIO", "TRACE", "ROAST",
+    "MOUND", "PLANT", "GHOST", "BRICK", "FLUTE"
+  ];
+
+  function pickDefaultAnswer() {
+    var idx = Math.floor(Math.random() * DEFAULTS.length);
+    return DEFAULTS[idx];
+  }
+
+  // --- Physical keyboard wiring ---
+  document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var k = e.key;
+    if (k === "Enter") {
+      handleKey("ENTER");
+    } else if (k === "Backspace") {
+      handleKey("BACK");
+    } else if (k.length === 1 && /^[a-zA-Z]$/.test(k)) {
+      handleKey(k.toUpperCase());
+    }
+  });
+
+  // --- Test hook (spec section "Test hook") ---
+  window.__wordle = {
+    setAnswer: function (word) {
+      setAnswerInternal(word);
+    },
+    guess: function (word) {
+      // Same code path as typing + Enter: reject unless playing & valid 5xA-Z.
+      return commitGuess(word);
+    },
+    state: function () {
+      return {
+        status: status,
+        answer: answer,
+        guesses: guesses.slice(),
+        evaluations: evaluations.map(function (arr) { return arr.slice(); })
+      };
+    }
+  };
+
+  // --- Init ---
+  buildBoard();
+  buildKeyboard();
+  answer = pickDefaultAnswer();
+  status = "playing";
+})();
+</script>
+</body>
+</html>

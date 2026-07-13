@@ -1,0 +1,311 @@
+{
+  "candidate": "C:\\Users\\iamjo\\Projects\\ai-benchmark\\tasks\\13-hn-clone\\src\\index.html",
+  "fileUrl": "file:///C:/Users/iamjo/Projects/ai-benchmark/tasks/13-hn-clone/src/index.html",
+  "browser": "chrome-channel",
+  "checkedAt": "2026-07-13T05:06:45.880Z",
+  "screenshot": "C:\\Users\\iamjo\\AppData\\Local\\Temp\\hn-clone-holdout-1783919203511.png",
+  "summary": {
+    "total": 16,
+    "passed": 15,
+    "failed": 1,
+    "manualReviewItems": [
+      4
+    ]
+  },
+  "results": [
+    {
+      "item": 1,
+      "name": "loads clean: zero console errors, zero network requests, title exactly \"Hacker News\"",
+      "pass": true,
+      "manualReview": false,
+      "detail": {
+        "title": "Hacker News",
+        "titleOk": true,
+        "consoleErrorsAtLoad": [],
+        "pageErrorsAtLoad": [],
+        "httpRequests": [],
+        "fileSubresourceWarnings": []
+      }
+    },
+    {
+      "item": 2,
+      "name": "centered 85% beige #f6f6ef column on white page; Verdana typography",
+      "pass": true,
+      "manualReview": false,
+      "detail": {
+        "columnFound": true,
+        "ratio": 0.85,
+        "centeredOk": true,
+        "htmlBg": "rgb(255, 255, 255)",
+        "bodyBg": "rgb(255, 255, 255)",
+        "titleFont": "Verdana, Geneva, sans-serif",
+        "subtextFont": "Verdana, Geneva, sans-serif"
+      }
+    },
+    {
+      "item": 3,
+      "name": "orange #ff6600 bar at top of column, spanning its width",
+      "pass": true,
+      "manualReview": false,
+      "detail": {
+        "barFound": true,
+        "bar": {
+          "left": 96,
+          "right": 1184,
+          "top": 0,
+          "bottom": 22.359375,
+          "w": 1088,
+          "h": 22.359375,
+          "cy": 11.1796875
+        },
+        "columnTop": 0,
+        "columnW": 1088
+      }
+    },
+    {
+      "item": 4,
+      "name": "top bar: ~18px square logo w/ 1px white border, bold \"Hacker News\", exact nav order",
+      "pass": false,
+      "manualReview": true,
+      "detail": {
+        "navOk": true,
+        "hnOk": true,
+        "hnWeight": "700",
+        "logoSquare": {
+          "tag": "td",
+          "left": 98,
+          "w": 22,
+          "h": 18.359375,
+          "borderWidth": "0px",
+          "borderColor": "rgb(130, 130, 130)",
+          "borderStyle": "none",
+          "text": "Y"
+        },
+        "borderOk": false,
+        "graphicalLogo": false,
+        "barText": "Y Hacker News new | past | comments | ask | show | jobs | submit login"
+      }
+    },
+    {
+      "item": 5,
+      "name": "login link flush at right edge; top-bar text dark (not white)",
+      "pass": true,
+      "manualReview": false,
+      "detail": {
+        "loginFound": true,
+        "gapToRightEdge": 6,
+        "navColor": "rgb(0, 0, 0)",
+        "loginColor": "rgb(0, 0, 0)"
+      }
+    },
+    {
+      "item": 6,
+      "name": "20+ stories with varied titles/points/comments/authors/ages",
+      "pass": true,
+      "manualReview": false,
+      "detail": {
+        "storyCount": 30,
+        "titleCount": 30,
+        "distinctTitles": 30,
+        "distinctPoints": 30,
+        "distinctComments": 30,
+        "distinctUsers": 30,
+        "distinctAges": 17
+      }
+    },
+    {
+      "item": 7,
+      "name": "ranks \"1., 2., ...\" consecutive, right-aligned, gray",
+      "pass": true,
+      "manualReview": false,
+      "detail": {
+        "count": 30,
+        "first5": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "consecutive": true,
+        "rankColor": "rgb(130, 130, 130)",
+        "alignMethod": "computed text-align"
+      }
+    },
+    {
+      "item": 8,
+      "name": "gray ~10px upvote triangle with cursor:pointer and title=\"upvote\", between rank and title",
+      "pass": true,
+      "manualReview": false,
+      "detail": {
+        "arrowCount": 30,
+        "first": {
+          "r": {
+            "left": 126,
+            "right": 136,
+            "top": 31.359375,
+            "bottom": 41.359375,
+            "w": 10,
+            "h": 10,
+            "cy": 36.359375
+          },
+          "cursor": "pointer",
+          "cursorOk": true,
+          "visible": true,
+          "colorGuess": "rgb(153, 153, 153)",
+          "tag": "div"
+        },
+        "positionOk": true,
+        "colorGuess": "rgb(153, 153, 153)",
+        "grayKnown": true
+      }
+    },
+    {
+      "item": 9,
+      "name": "title = black ~10pt link; domain in parens smaller + gray",
+      "pass": true,
+      "manualReview": false,
+      "detail": {
+        "titleColor": "rgb(0, 0, 0)",
+        "titleFontSize": 13.3333,
+        "domainMentions": 26,
+        "firstDomain": {
+          "text": "(orionsearch.dev)",
+          "fontSize": 10.6667,
+          "color": "rgb(130, 130, 130)"
+        }
+      }
+    },
+    {
+      "item": 10,
+      "name": "subtext \"{points} points by {user} {age} | hide | {n} comments\", ~7pt #828282, title-indented",
+      "pass": true,
+      "manualReview": false,
+      "detail": {
+        "matchingSubtextLines": 30,
+        "sample": "542 points by mattkrick 1 hour ago | hide | 231 comments",
+        "fontSize": 9.33333,
+        "color": "rgb(130, 130, 130)",
+        "indentOk": true
+      }
+    },
+    {
+      "item": 11,
+      "name": "ages are relative strings (\"2 hours ago\"), never absolute dates",
+      "pass": true,
+      "manualReview": false,
+      "detail": {
+        "sampleAges": [
+          "1 hour ago",
+          "2 hours ago",
+          "3 hours ago",
+          "4 hours ago",
+          "5 hours ago"
+        ],
+        "badAges": []
+      }
+    },
+    {
+      "item": 12,
+      "name": "subtext links same gray as subtext; list dense (~5px row gaps)",
+      "pass": true,
+      "manualReview": false,
+      "detail": {
+        "subtextHasLinks": true,
+        "linkColor": "rgb(130, 130, 130)",
+        "subtextColor": "rgb(130, 130, 130)",
+        "medianRowPitchPx": 37
+      }
+    },
+    {
+      "item": 13,
+      "name": "clicking upvote increments THAT story by exactly 1 (no reload, no dialog)",
+      "pass": true,
+      "manualReview": false,
+      "detail": {
+        "clickError": null,
+        "dialogs": [],
+        "before0": 542,
+        "after0": 543,
+        "incrementedExactlyOne": true,
+        "othersUnchanged": true,
+        "noReload": true,
+        "method": "index"
+      }
+    },
+    {
+      "item": 14,
+      "name": "voted arrow disappears; points can rise at most once; \"N points\" wording kept",
+      "pass": true,
+      "manualReview": false,
+      "detail": {
+        "secondClick": {
+          "attempted": false,
+          "clicked": false
+        },
+        "visibleArrowsBefore": 30,
+        "visibleArrowsAfter": 29,
+        "votedArrowStillVisible": false,
+        "allSubtextsStillParse": true,
+        "pointsAfterSecondAttempt": 543,
+        "expected": 543
+      }
+    },
+    {
+      "item": 15,
+      "name": "\"More\" link below last story, styled like a title link, safe to click",
+      "pass": true,
+      "manualReview": false,
+      "detail": {
+        "moreFound": true,
+        "more": {
+          "r": {
+            "left": 140,
+            "right": 172.96875,
+            "top": 1148.359375,
+            "bottom": 1164.359375,
+            "w": 32.96875,
+            "h": 16,
+            "cy": 1156.359375
+          },
+          "color": "rgb(0, 0, 0)",
+          "fontSize": 13.3333,
+          "isAnchor": true
+        },
+        "belowOk": true,
+        "styleOk": true,
+        "moreClick": {
+          "clicked": true,
+          "stillHere": true,
+          "textLen": 3895,
+          "newErrors": 0,
+          "newDialogs": 0
+        }
+      }
+    },
+    {
+      "item": 16,
+      "name": "no horizontal scroll at 1024/1440px; never blank; no uncaught exceptions",
+      "pass": true,
+      "manualReview": false,
+      "detail": {
+        "widthChecks": [
+          {
+            "width": 1024,
+            "scrollWidth": 1024,
+            "clientWidth": 1024,
+            "textLen": 3896
+          },
+          {
+            "width": 1440,
+            "scrollWidth": 1440,
+            "clientWidth": 1440,
+            "textLen": 3896
+          }
+        ],
+        "interactionErrors": [],
+        "bodyTextLen": 3896
+      }
+    }
+  ]
+}

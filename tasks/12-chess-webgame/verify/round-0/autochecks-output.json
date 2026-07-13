@@ -1,0 +1,583 @@
+{
+  "summary": {
+    "target": "C:\\Users\\iamjo\\Projects\\ai-benchmark\\tasks\\12-chess-webgame\\src\\index.html",
+    "artifacts": "C:\\Users\\iamjo\\AppData\\Local\\Temp\\12-chess-autocheck-artifacts",
+    "hook": "present",
+    "gates": {
+      "pass": 4,
+      "fail": 0,
+      "allPass": true
+    },
+    "criteria": {
+      "pass": 17,
+      "fail": 0,
+      "manual": 1,
+      "total": 18
+    },
+    "autochecks": {
+      "pass": 49,
+      "fail": 0,
+      "skip": 1,
+      "total": 50
+    },
+    "overall": "PASS-pending-manual"
+  },
+  "gates": [
+    {
+      "id": "G1",
+      "criterion": "G",
+      "desc": "Test hook shape: window.__chess {board(),turn,move()} + fresh snapshot",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "G2",
+      "criterion": "G",
+      "desc": "No blocking dialogs (alert/confirm/prompt/beforeunload) anywhere",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "G3",
+      "criterion": "G",
+      "desc": "Fully self-contained: zero non-file/data/blob requests + no external markup refs",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "G4",
+      "criterion": "G",
+      "desc": "Zero console errors / uncaught page errors across load + every sequence",
+      "status": "pass",
+      "detail": ""
+    }
+  ],
+  "criteria": [
+    {
+      "criterion": 1,
+      "label": "Board render",
+      "checks": [
+        "R1"
+      ],
+      "status": "pass"
+    },
+    {
+      "criterion": 2,
+      "label": "Initial position",
+      "checks": [
+        "R2",
+        "R3"
+      ],
+      "status": "manual"
+    },
+    {
+      "criterion": 3,
+      "label": "White first + visible turn",
+      "checks": [
+        "R4",
+        "R5",
+        "R6"
+      ],
+      "status": "pass"
+    },
+    {
+      "criterion": 4,
+      "label": "Click-to-move",
+      "checks": [
+        "K1",
+        "K2",
+        "K3",
+        "K4",
+        "K5",
+        "K6"
+      ],
+      "status": "pass"
+    },
+    {
+      "criterion": 5,
+      "label": "Turn alternation",
+      "checks": [
+        "L1"
+      ],
+      "status": "pass"
+    },
+    {
+      "criterion": 6,
+      "label": "Self-capture + capture removal",
+      "checks": [
+        "L2",
+        "L3"
+      ],
+      "status": "pass"
+    },
+    {
+      "criterion": 7,
+      "label": "Pawn pushes",
+      "checks": [
+        "L4",
+        "L5",
+        "L6",
+        "L7"
+      ],
+      "status": "pass"
+    },
+    {
+      "criterion": 8,
+      "label": "Pawn captures",
+      "checks": [
+        "L7",
+        "L3"
+      ],
+      "status": "pass"
+    },
+    {
+      "criterion": 9,
+      "label": "Knight",
+      "checks": [
+        "L8",
+        "L9"
+      ],
+      "status": "pass"
+    },
+    {
+      "criterion": 10,
+      "label": "Bishop/rook/queen/king geometry",
+      "checks": [
+        "L10",
+        "L11",
+        "L12",
+        "L13"
+      ],
+      "status": "pass"
+    },
+    {
+      "criterion": 11,
+      "label": "Path blocking",
+      "checks": [
+        "L14"
+      ],
+      "status": "pass"
+    },
+    {
+      "criterion": 12,
+      "label": "Illegal-move contract",
+      "checks": [
+        "L15"
+      ],
+      "status": "pass"
+    },
+    {
+      "criterion": 13,
+      "label": "Never leave king in check",
+      "checks": [
+        "L16",
+        "L17",
+        "L18"
+      ],
+      "status": "pass"
+    },
+    {
+      "criterion": 14,
+      "label": "Checkmate",
+      "checks": [
+        "E1",
+        "E2",
+        "E3"
+      ],
+      "status": "pass"
+    },
+    {
+      "criterion": 15,
+      "label": "Stalemate",
+      "checks": [
+        "E4",
+        "E5"
+      ],
+      "status": "pass"
+    },
+    {
+      "criterion": 16,
+      "label": "Promotion",
+      "checks": [
+        "S1",
+        "S2"
+      ],
+      "status": "pass"
+    },
+    {
+      "criterion": 17,
+      "label": "En passant",
+      "checks": [
+        "S3",
+        "S4"
+      ],
+      "status": "pass"
+    },
+    {
+      "criterion": 18,
+      "label": "Castling",
+      "checks": [
+        "S5",
+        "S6",
+        "S7",
+        "S8",
+        "S9",
+        "S10",
+        "S11"
+      ],
+      "status": "pass"
+    }
+  ],
+  "results": [
+    {
+      "id": "G1",
+      "criterion": "G",
+      "desc": "Test hook shape: window.__chess {board(),turn,move()} + fresh snapshot",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R1",
+      "criterion": 1,
+      "desc": "Board render 8x8 alternating, a1 dark / h1 light (FIDE 2.1)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R2",
+      "criterion": 2,
+      "desc": "Initial position = exactly the 32 FIDE Art.2 pieces",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R3",
+      "criterion": 2,
+      "desc": "Pieces visually distinguishable/identifiable (White vs Black, each type)",
+      "status": "skip",
+      "detail": "visual — judge board.png: all 32 pieces drawn, White/Black distinguishable, each type identifiable"
+    },
+    {
+      "id": "R4",
+      "criterion": 3,
+      "desc": "White to move at load (turn === \"w\")",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R5",
+      "criterion": 3,
+      "desc": "Visible turn indicator that updates after a move",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "R6",
+      "criterion": 3,
+      "desc": "Hook-driven move repaints the rendered board",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "K1",
+      "criterion": 4,
+      "desc": "Clicking a piece shows a visible selection highlight",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "K2",
+      "criterion": 4,
+      "desc": "Click e2 then e4 completes the move + flips turn",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "K3",
+      "criterion": 4,
+      "desc": "Click e2 then illegal e5 leaves position + turn unchanged",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "K4",
+      "criterion": 4,
+      "desc": "Click e2, then d2 (reselect), then d4 — d-pawn moves, e-pawn untouched",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "K5",
+      "criterion": 4,
+      "desc": "Clicking Black's e7 then e5 at the start moves nothing (white to move)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "K6",
+      "criterion": 4,
+      "desc": "Full Fool's mate playable by clicks alone; game then ends",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "L1",
+      "criterion": 5,
+      "desc": "Turn alternation: after 1.e4 turn=b & d2d4 rejected; after 1...e5 turn=w",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "L2",
+      "criterion": 6,
+      "desc": "Self-capture banned (a1a2, b1d2 from start rejected)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "L3",
+      "criterion": 6,
+      "desc": "Capture removes the piece: 1.e4 d5 2.exd5 -> 31 entries, d5=wP",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "L4",
+      "criterion": 7,
+      "desc": "Pawn pushes: e2e5 reject(3sq); e2e3 ok; d7d5 ok; e3e5 reject(double after moved); e3e4 ok",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "L5",
+      "criterion": 7,
+      "desc": "Blocked double push: c2c4 rejected when c3 occupied (1.Nc3 a6)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "L6",
+      "criterion": 7,
+      "desc": "Backward (e4e3) and sideways (e4d4) pawn moves rejected",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "L7",
+      "criterion": 7,
+      "desc": "Pawn captures: e2d3/e2f3 diag-empty reject; 1.e4 e5 then e4e5 straight-onto-enemy reject",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "L8",
+      "criterion": 9,
+      "desc": "Knight L-moves over the pawn wall accepted; non-L (b1b3,b1d4) rejected",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "L9",
+      "criterion": 9,
+      "desc": "All eight L-targets from d5 accepted (1.Nc3 a6 2.Nd5 b6)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "L10",
+      "criterion": 10,
+      "desc": "Bishop: f1d3 accepted, off-line f1g3 rejected (path cleared by 1.e4)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "L11",
+      "criterion": 10,
+      "desc": "Rook: a1a3 accepted, off-line a1b3 rejected (path cleared by 1.a4)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "L12",
+      "criterion": 10,
+      "desc": "Queen: d1h5 accepted, off-line d1e3 rejected (path cleared by 1.e4)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "L13",
+      "criterion": 10,
+      "desc": "King: e1e2 accepted; two-square e1e3 and off-line e1d3 rejected",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "L14",
+      "criterion": 11,
+      "desc": "Sliders cannot jump: a1a3, c1e3, d1d3, f1b5, h1h3 all rejected from start",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "L16",
+      "criterion": 13,
+      "desc": "King may not step onto attacked square: 1.e4 d5 2.Ke2 dxe4 -> Kf3/Kd3 reject, Ke3 ok",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "L17",
+      "criterion": 13,
+      "desc": "Pinned piece frozen: 1.e4 d5 2.Bb5+ Nc6 3.Nf3 -> Nc6 moves reject, Ng8f6 ok",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "L18",
+      "criterion": 13,
+      "desc": "In check must resolve: after 2.Bb5+ non-resolving moves reject, block c7c6 accepted",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "E1",
+      "criterion": 14,
+      "desc": "Checkmate (Fool's mate) ends game: 4 moves accepted, then every move rejected",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "E2",
+      "criterion": 14,
+      "desc": "Checkmate visibly declared with winner (Black wins / 0-1 / mate)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "E3",
+      "criterion": 14,
+      "desc": "Check is visibly indicated (after 1.e4 d5 2.Bb5+)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "E4",
+      "criterion": 15,
+      "desc": "Stalemate (Sam Loyd 10-move line) ends game: 19 moves accepted, then moves rejected",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "E5",
+      "criterion": 15,
+      "desc": "Draw-by-stalemate visibly declared",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "S1",
+      "criterion": 16,
+      "desc": "Promotion default queen + capture-promotion: bxa8 (no arg) -> a8=wQ, 28 entries",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "S2",
+      "criterion": 16,
+      "desc": "Promotion choices via 3rd arg: q/n/r/b -> wQ/wN/wR/wB",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "S3",
+      "criterion": 17,
+      "desc": "En passant works: 1.e4 a6 2.e5 d5 3.exd6ep -> d6=wP, d5 empty, 31 entries",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "S4",
+      "criterion": 17,
+      "desc": "En passant expires after one move (interpose 3.Nc3 a5, then e5d6 rejected)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "S5",
+      "criterion": 18,
+      "desc": "Kingside castling both colors: e1g1 -> g1=wK/f1=wR; e8g8 -> g8=bK/f8=bR",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "S6",
+      "criterion": 18,
+      "desc": "Queenside castling both colors: e1c1 -> c1=wK/d1=wR; e8c8 -> c8=bK/d8=bR",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "S7",
+      "criterion": 18,
+      "desc": "Castling from start rejected (pieces between): e1g1, e1c1",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "S8",
+      "criterion": 18,
+      "desc": "Castling permanently illegal after king moved & returned (FIDE 3.8.2.1)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "S9",
+      "criterion": 18,
+      "desc": "Castling illegal after that rook moved & returned (FIDE 3.8.2.1)",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "S10",
+      "criterion": 18,
+      "desc": "Castling rejected when landing g1 attacked (Bc5 thru open f2); control (f2 home) accepted",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "S11",
+      "criterion": 18,
+      "desc": "Castling rejected when crossing f1 attacked (Ba6); control (Bb7) accepted",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "L15",
+      "criterion": 12,
+      "desc": "Illegal-move contract: every rejection returned false + left snapshot & turn unchanged",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "G2",
+      "criterion": "G",
+      "desc": "No blocking dialogs (alert/confirm/prompt/beforeunload) anywhere",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "G3",
+      "criterion": "G",
+      "desc": "Fully self-contained: zero non-file/data/blob requests + no external markup refs",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "G4",
+      "criterion": "G",
+      "desc": "Zero console errors / uncaught page errors across load + every sequence",
+      "status": "pass",
+      "detail": ""
+    }
+  ]
+}

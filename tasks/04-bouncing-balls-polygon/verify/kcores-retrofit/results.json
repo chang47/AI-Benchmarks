@@ -1,0 +1,462 @@
+{
+  "meta": {
+    "runSeconds": 70,
+    "startedAt": "2026-07-13T05:06:14.897Z",
+    "browser": "chrome-channel"
+  },
+  "raw": {
+    "static": {
+      "bytes": 10162,
+      "externalScriptSrc": false,
+      "externalLink": false,
+      "externalImg": false
+    },
+    "early": {
+      "t": 0,
+      "r": 26.4,
+      "R": 396,
+      "cx": 640,
+      "cy": 450,
+      "verts": [
+        [
+          640,
+          54
+        ],
+        [
+          949.6052670573398,
+          203.09803846394155
+        ],
+        [
+          1026.0714532240022,
+          538.1182898467005
+        ],
+        [
+          811.817960690553,
+          806.783671689358
+        ],
+        [
+          468.182039309447,
+          806.783671689358
+        ],
+        [
+          253.92854677599786,
+          538.1182898467006
+        ],
+        [
+          330.39473294266014,
+          203.09803846394158
+        ]
+      ],
+      "balls": [
+        {
+          "n": 1,
+          "color": "#f8b862",
+          "x": 640,
+          "y": 450,
+          "a": 1.0133340973245253
+        },
+        {
+          "n": 2,
+          "color": "#f6ad49",
+          "x": 633.1867317250412,
+          "y": 456.2415523240168,
+          "a": 2.491886862997742
+        },
+        {
+          "n": 3,
+          "color": "#f39800",
+          "x": 641.1423370005868,
+          "y": 436.98269358979786,
+          "a": 5.653408251217122
+        },
+        {
+          "n": 4,
+          "color": "#f08300",
+          "x": 649.7376695305297,
+          "y": 462.7008106872826,
+          "a": 3.1362054703172277
+        },
+        {
+          "n": 5,
+          "color": "#ec6d51",
+          "x": 621.802453208422,
+          "y": 446.7813526492749,
+          "a": 5.300661866843836
+        },
+        {
+          "n": 6,
+          "color": "#ee7948",
+          "x": 657.4328752847562,
+          "y": 438.9102362826732,
+          "a": 4.57687753754143
+        },
+        {
+          "n": 7,
+          "color": "#ed6d3d",
+          "x": 634.1247252820469,
+          "y": 471.8574185801659,
+          "a": 2.618644872772892
+        },
+        {
+          "n": 8,
+          "color": "#ec6800",
+          "x": 628.7318343432908,
+          "y": 428.3050318568347,
+          "a": 3.5477375843960015
+        },
+        {
+          "n": 9,
+          "color": "#ec6800",
+          "x": 664.5490805735029,
+          "y": 458.9645659680579,
+          "a": 4.0070942334128805
+        },
+        {
+          "n": 10,
+          "color": "#ee7800",
+          "x": 614.3774486347927,
+          "y": 460.5774884323884,
+          "a": 6.122833533433625
+        },
+        {
+          "n": 11,
+          "color": "#eb6238",
+          "x": 652.3836902307165,
+          "y": 423.5345467397655,
+          "a": 5.201669518520293
+        },
+        {
+          "n": 12,
+          "color": "#ea5506",
+          "x": 649.1727763434305,
+          "y": 479.24061856653174,
+          "a": 5.466729191117805
+        },
+        {
+          "n": 13,
+          "color": "#ea5506",
+          "x": 612.3054389718543,
+          "y": 433.9518695961707,
+          "a": 1.9285532768274656
+        },
+        {
+          "n": 14,
+          "color": "#eb6101",
+          "x": 672.5379399549673,
+          "y": 442.8451929804545,
+          "a": 4.962459725948608
+        },
+        {
+          "n": 15,
+          "color": "#e49e61",
+          "x": 620.1173784227215,
+          "y": 478.28370129977225,
+          "a": 3.8095568693676483
+        },
+        {
+          "n": 16,
+          "color": "#e45e32",
+          "x": 635.3993500819279,
+          "y": 414.51059284333786,
+          "a": 0.3163562886516455
+        },
+        {
+          "n": 17,
+          "color": "#e17b34",
+          "x": 668.262657684452,
+          "y": 473.817300027742,
+          "a": 0.8849205527782976
+        },
+        {
+          "n": 18,
+          "color": "#dd7a56",
+          "x": 601.9351237075772,
+          "y": 451.57619568662864,
+          "a": 0.8336358230741419
+        },
+        {
+          "n": 19,
+          "color": "#db8449",
+          "x": 667.7859230464857,
+          "y": 422.3460801972889,
+          "a": 5.827973833193322
+        },
+        {
+          "n": 20,
+          "color": "#d66a35",
+          "x": 638.1420517827758,
+          "y": 490.23334970422064,
+          "a": 2.5644355924738726
+        }
+      ],
+      "innerW": 1280,
+      "innerH": 900
+    },
+    "rotation": {
+      "degPerSec": 72.00478039864434,
+      "fps": 59.506025294872295,
+      "simSpeedRatio": 1.000066394425641,
+      "windowSec": 4.016400000095367
+    },
+    "monitor": {
+      "frames": 4083,
+      "minCenterDist": 26.399999999999928,
+      "minGuard": -7.105427357601002e-14,
+      "containViolFrames": 0,
+      "ballCountBadFrames": 0,
+      "contactFrames": 3752,
+      "maxOverlapLate": 1.781461010217427,
+      "overlapRun": 0,
+      "maxOverlapRun": 0,
+      "keMax": 3674558.5660113343,
+      "keLateMax": 1061222.8295984564,
+      "speedMaxEarly": 930.4348708281213,
+      "speedMaxLate": 902.5827103047974,
+      "spinAbsMaxLate": 21.337680854715735,
+      "maxAscent": 377.9061925567772,
+      "ascGtR": 638,
+      "ascTotal": 2837,
+      "ascOverR": 0,
+      "meanYAccum": 38589236.24843416,
+      "meanYFrames": 58340
+    },
+    "final": {
+      "frames": 4089,
+      "simT": 69.47500000001898,
+      "ballCount": 20,
+      "numbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "colors": [
+        "#f8b862",
+        "#f6ad49",
+        "#f39800",
+        "#f08300",
+        "#ec6d51",
+        "#ee7948",
+        "#ed6d3d",
+        "#ec6800",
+        "#ec6800",
+        "#ee7800",
+        "#eb6238",
+        "#ea5506",
+        "#ea5506",
+        "#eb6101",
+        "#e49e61",
+        "#e45e32",
+        "#e17b34",
+        "#dd7a56",
+        "#db8449",
+        "#d66a35"
+      ],
+      "angles": [
+        202.75191764567657,
+        193.32815023524157,
+        297.47857268308127,
+        187.32121713830918,
+        174.26304089575368,
+        216.37916411103393,
+        137.27675507329346,
+        247.75639325408522,
+        236.9442841491665,
+        206.25468517872037,
+        203.76698078449903,
+        231.26609151070696,
+        235.93734722198846,
+        245.0239664908507,
+        230.5207282945924,
+        158.45340332223006,
+        183.22400411889703,
+        206.9691214175815,
+        201.88258276485934,
+        85.49961824206486
+      ],
+      "canvas": true,
+      "scrollY": 0,
+      "scrollX": 0
+    },
+    "stillAnimating": true,
+    "numbersRotating": true,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "networkRequests": [
+      "file:///C:/Users/iamjo/Projects/ai-benchmark/tasks/04-bouncing-balls-polygon/src/index.html"
+    ],
+    "executedCleanly": true
+  },
+  "categories": {
+    "k1_single_file": {
+      "name": "Single-file implementation",
+      "score": 5,
+      "max": 5,
+      "transferable": true,
+      "evidence": "deliverable = one src/index.html (10162B); external <script src>=false, <link>=false, <img>=false",
+      "note": "KCORES \"one Python file\" -> our \"one HTML file\". Direct transfer."
+    },
+    "k2_library_compliance": {
+      "name": "Library / no-physics-engine compliance",
+      "score": 5,
+      "max": 5,
+      "transferable": true,
+      "evidence": "network requests off-document = 0; vanilla JS + Canvas, hand-rolled collision (resolveWall/resolvePairs in source), no CDN/framework/physics lib",
+      "note": "KCORES restricts to tkinter/math/numpy... -> our spec restricts to vanilla JS + Canvas, no libraries/physics engine. Transfers as \"self-contained, hand-rolled\"."
+    },
+    "k3_ball_count": {
+      "name": "Ball count = 20",
+      "score": 5,
+      "max": 5,
+      "transferable": true,
+      "evidence": "20 balls at load and on all 4083 monitored frames (bad-count frames=0)",
+      "note": ""
+    },
+    "k4_uniform_size": {
+      "name": "Uniform ball size",
+      "score": 5,
+      "max": 5,
+      "transferable": true,
+      "evidence": "single shared radius r=26.40px (one RB constant drives every ball; render arc uses RB for all 20)",
+      "note": ""
+    },
+    "k5_numbers_1_20": {
+      "name": "Numbers 1-20, unique",
+      "score": 5,
+      "max": 5,
+      "transferable": true,
+      "evidence": "numbers sorted = 1..20 unique = true; count=20",
+      "note": ""
+    },
+    "k6_drop_from_center": {
+      "name": "Initial drop from center",
+      "score": 5,
+      "max": 5,
+      "transferable": true,
+      "evidence": "t=0.00s max spawn dist from center = 40.3px vs R=396px (tight central cluster, then falls)",
+      "note": ""
+    },
+    "k7_colors": {
+      "name": "Color palette (all 20 verbatim, in order)",
+      "score": 5,
+      "max": 5,
+      "transferable": true,
+      "evidence": "all 20 spec colors present in order, duplicates preserved = true",
+      "note": ""
+    },
+    "k8_collision_physics": {
+      "name": "Collision physics (ball-ball AND ball-wall)",
+      "score": 5,
+      "max": 5,
+      "transferable": true,
+      "evidence": "ball-ball contact on 3752/4083 frames; ball-wall: min (centerDist - r) guard = -0.00px (balls ride the wall). Both hand-resolved.",
+      "note": ""
+    },
+    "k9_friction": {
+      "name": "Friction + rotation",
+      "score": 5,
+      "max": 5,
+      "transferable": true,
+      "evidence": "max |spin| (t>8s) = 21.34rad/s; KE damps from drop peak 3674559 -> settled peak 1061223 (Coulomb-capped tangential impulse + spin coupling in source)",
+      "note": ""
+    },
+    "k10_gravity": {
+      "name": "Gravity (down, screen-space)",
+      "score": 5,
+      "max": 5,
+      "transferable": true,
+      "evidence": "mean ball y (t>20s) = 661 vs center y 450 -> pools below center; G applied as +y only, never rotated (source line: b.vy += G*h)",
+      "note": ""
+    },
+    "k11_elasticity": {
+      "name": "Elasticity / bounce bounded",
+      "score": 5,
+      "max": 5,
+      "transferable": true,
+      "evidence": "free-flight ascents (t>12s): max rise 378px < R=396px; 638 rises > 1 radius, 0 exceeded R (e_wall=0.85, neither dead nor perpetual)",
+      "note": ""
+    },
+    "k12_number_rotation": {
+      "name": "Numbers rotate with ball spin",
+      "score": 5,
+      "max": 5,
+      "transferable": true,
+      "evidence": "painted-number orientation advances over final 1.5s = true (ctx.rotate(b.a); b.a += b.w*h)",
+      "note": ""
+    },
+    "k13_overlap": {
+      "name": "No persistent overlap",
+      "score": 5,
+      "max": 5,
+      "transferable": true,
+      "evidence": "max overlap depth (t>10s) = 1.78px (3.4% of a diameter); longest >2px run = 0 frames",
+      "note": ""
+    },
+    "k14_containment": {
+      "name": "Boundary containment (never escapes)",
+      "score": 5,
+      "max": 5,
+      "transferable": true,
+      "evidence": "0 of 4083 frames had a center on/outside the polygon; min center-to-wall dist = 26.40px (eroded-polygon clamp). KCORES #1 fail mode.",
+      "note": ""
+    },
+    "k15_visual_quality": {
+      "name": "Visual rendering quality",
+      "score": 3,
+      "max": 5,
+      "transferable": true,
+      "evidence": "crisp flat 2D: filled heptagon w/ rounded stroke, per-ball dark outline, bold centered numbers scaled to radius (fs~25px). Numbers fit & legible in screenshots.",
+      "note": "KCORES 5-tier requires \"近似3D\" (3D-like shading). Our spec deliberately mandates FLAT design, so the top 2 pts are unreachable BY DESIGN, not a defect. Scored at KCORES \"clear\" tier = 3."
+    },
+    "k16_heptagon_accuracy": {
+      "name": "Heptagon accuracy (7 equal sides, fits)",
+      "score": 5,
+      "max": 5,
+      "transferable": true,
+      "evidence": "7 vertices; side lengths equal within 0.000% (mean 343.6px); all vertices inside 1280x900 viewport = true",
+      "note": ""
+    },
+    "k17_rotation_speed": {
+      "name": "Rotation speed 360deg/5s about center",
+      "score": 5,
+      "max": 5,
+      "transferable": true,
+      "evidence": "measured 72.00 deg/s over 4.0s (target 72; within 0.0%); rotates about canvas center",
+      "note": ""
+    },
+    "k18_smoothness": {
+      "name": "Animation smoothness",
+      "score": 5,
+      "max": 5,
+      "transferable": true,
+      "evidence": "fps=59.5; sim-time/wall-time ratio=1.000 (1.0=real-time); fixed-step accumulator, still animating at end=true",
+      "note": ""
+    }
+  },
+  "summary": {
+    "rawScore": 88,
+    "transferableMax": 90,
+    "scoreStr": "88/90",
+    "categories": 18,
+    "transferable": 18,
+    "na": 0,
+    "executedCleanly": true,
+    "fullKcores90Note": "raw 88/90 (k15 flat-design cap costs 2 by design)"
+  }
+}
