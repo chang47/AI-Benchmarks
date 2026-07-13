@@ -1,0 +1,16 @@
+﻿{
+    "task":  "16-budget-tracker",
+    "frozen_at":  "2026-07-12T21:35:30-07:00",
+    "algorithm":  "sha256",
+    "excludes":  [
+                     "node_modules",
+                     "package-lock.json",
+                     "FREEZE_MANIFEST.json (self)"
+                 ],
+    "files":  {
+                  "autochecks.mjs":  "19295ed64da864256c5027ce930547a72d961b4897b7e5bf97f78e6bef468a16",
+                  "rubric.md":  "b04142a09be9a2149a5f13037272ba735747388e698caaa27123d89f36dfc0cb",
+                  "package.json":  "500199531184cb05b968518c4bec4403407595e3304793ede95f3b3cf77503bf",
+                  ".gitignore":  "88b6b09796bc021a6f46b5964be1cbe30ef7a25d613ee43f868e720ee4d15587"
+              }
+}

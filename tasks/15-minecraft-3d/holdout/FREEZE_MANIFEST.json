@@ -1,0 +1,14 @@
+{
+    "frozen_at":  "2026-07-12T21:59:45-07:00",
+    "algorithm":  "sha256",
+    "excludes":  [
+                     "node_modules",
+                     "package-lock.json",
+                     "FREEZE_MANIFEST.json (self)"
+                 ],
+    "files":  {
+                  "autochecks.mjs":  "34cac5da4d3e4d4b481646330111de0dfc7509016a193f646fbcd7d6019b41f7",
+                  "rubric.md":  "e3e5364429ae6d16cc28a71d068b5cb4356d4554c766ad89ab5a53e0ba1ba798",
+                  "package.json":  "8b105d76e4e3722ecc15837a8eb0ec08a2b0514a21ee8540cf110d8c273611ad"
+              }
+}
