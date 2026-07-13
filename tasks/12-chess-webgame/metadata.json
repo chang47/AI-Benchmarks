@@ -1,0 +1,15 @@
+{
+  "slug": "12-chess-webgame",
+  "type": "visual",
+  "difficulty": "medium",
+  "status": "candidate",
+  "created": "2026-07-12",
+  "authorities": [
+    "https://arena.ai/blog/webdev-arena/",
+    "https://handbook.fide.com/chapter/E012023",
+    "https://epoch.ai/benchmarks/webdev-arena",
+    "https://en.wikipedia.org/wiki/Fool%27s_mate",
+    "https://en.wikipedia.org/wiki/Stalemate"
+  ],
+  "contamination": "high — 'Build a game of chess' is a top-5 WebDev Arena prompt (3,154 submissions) and chess implementations are ubiquitous in training corpora"
+}

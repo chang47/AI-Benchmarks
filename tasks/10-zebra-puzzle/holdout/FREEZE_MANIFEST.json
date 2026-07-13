@@ -1,0 +1,10 @@
+{
+    "algorithm":  "sha256",
+    "frozen_at":  "2026-07-12",
+    "files":  {
+                  "canonical-data.json":  "5f7a2ee4db631f63f94ba7f2e10d30ffd461e93571753e58c5f43fabc8db9233",
+                  "package.json":  "bf8cf37af3f0f734d49ba814a088b6928ac4a5fe8f53bf1bd6d46b9baaea66f2",
+                  "tests/zebra.test.mjs":  "0ecf2a28aa39f973a810cb8f7ef4c83b1de39a5d13c66a0df5168a1897800a06",
+                  "VETTING.md":  "88a2d72942ffd4a53255ba79dab219034338e608659aa71b625b3e2f4f6ce81b"
+              }
+}

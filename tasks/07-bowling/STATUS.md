@@ -1,0 +1,2 @@
+﻿RESEARCH: spec.md + frozen-prompt.md + research/RESEARCH.md + metadata.json written; canonical-data.json saved byte-verbatim to holdout/ (SHA256 3470AB86..., 30 cases); API pinned to class Bowling + 4 exact error strings, corroborated by aider polyglot-benchmark JS copy.
+HOLDOUT: 31/31 canonical cases translated mechanically to vitest (0 excluded; exact-match error assertions; validated 31/31 vs scratchpad reference + mutation check); FREEZE_MANIFEST.json written.

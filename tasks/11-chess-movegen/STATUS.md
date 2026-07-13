@@ -1,0 +1,2 @@
+﻿RESEARCH: spec + holdout frozen — 6 CPW positions (+mirrored Pos4), 30 graded (fen,depth) pairs totaling ~16.5M nodes under a 120s bound, FIDE E012023 + CPW Perft cited; no implementation or tests written.
+HOLDOUT: answer key frozen - 44 vitest tests (30 canonical perft pairs verbatim from RESEARCH.md + FIDE legality cases), all FENs/counts cross-validated vs chess.js, per-pair + 120s total time bounds, FREEZE_MANIFEST.json sha256-pinned.

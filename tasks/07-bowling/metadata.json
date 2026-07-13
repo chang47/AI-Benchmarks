@@ -1,0 +1,14 @@
+{
+  "slug": "07-bowling",
+  "type": "logic",
+  "difficulty": "medium",
+  "status": "candidate",
+  "created": "2026-07-12",
+  "authorities": [
+    "https://raw.githubusercontent.com/exercism/problem-specifications/main/exercises/bowling/description.md",
+    "https://raw.githubusercontent.com/exercism/problem-specifications/main/exercises/bowling/canonical-data.json",
+    "https://github.com/Aider-AI/polyglot-benchmark",
+    "https://raw.githubusercontent.com/exercism/javascript/main/config.json"
+  ],
+  "contamination": "high — the Exercism bowling exercise and the classic bowling kata are ubiquitous in training data (the aider polyglot benchmark itself includes it), so grading leans on exact error strings and tenth-frame state-machine edge cases rather than novelty"
+}

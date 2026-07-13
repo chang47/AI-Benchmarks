@@ -1,0 +1,7 @@
+﻿{
+  "name": "holdout-15-minecraft-3d",
+  "private": true,
+  "type": "module",
+  "description": "Holdout autochecks for task 15-minecraft-3d (answer key; builder never sees this).",
+  "scripts": { "check": "node autochecks.mjs" }
+}

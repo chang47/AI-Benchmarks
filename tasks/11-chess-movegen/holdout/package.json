@@ -1,0 +1,13 @@
+{
+  "name": "task11-chess-movegen-holdout",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "HOLDOUT answer key for Task 11 (chess legal-move generator, perft-graded). Never shown to the builder.",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  }
+}

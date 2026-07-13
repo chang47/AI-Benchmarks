@@ -1,0 +1,12 @@
+{
+    "task":  "07-bowling",
+    "role":  "holdout",
+    "frozen_at":  "2026-07-12",
+    "algorithm":  "sha256",
+    "files":  {
+                  "canonical-data.json":  "3470ab86e0e5089dd442e915f56b42acfad022e7258b904f3d1642b67a21c71a",
+                  "package.json":  "1a003106df9b6f0c8536e614a874068ed3bf3a9daf666cc1824d7cf382c2d937",
+                  "tests/bowling.canonical.test.mjs":  "d7b31a9c308742b7db8de09206dbeebfced93cbd56febf162136430f9effcd64",
+                  "VETTING.md":  "746e0cdf41b17ea2438217929775c23838f9d00170c6a02b1291d500781b76fa"
+              }
+}

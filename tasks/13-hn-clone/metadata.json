@@ -1,0 +1,14 @@
+{
+  "slug": "13-hn-clone",
+  "type": "visual",
+  "difficulty": "easy",
+  "status": "candidate",
+  "created": "2026-07-12",
+  "authorities": [
+    "https://arena.ai/blog/webdev-arena/",
+    "https://news.ycombinator.com/",
+    "https://news.ycombinator.com/news.css",
+    "https://news.ycombinator.com/newest"
+  ],
+  "contamination": "high — HN clones are a ubiquitous tutorial/training exercise and the arena prompt is public, so grading must weight the pinned observable details over generic resemblance"
+}

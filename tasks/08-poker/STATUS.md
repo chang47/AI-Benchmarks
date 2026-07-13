@@ -1,0 +1,2 @@
+﻿RESEARCH: spec.md + frozen-prompt.md + RESEARCH.md + metadata.json written; canonical-data.json (39 cases, SHA256 90E33334...) saved verbatim to holdout/; all rules sourced from Exercism description + its cited Wikipedia ranking reference; contamination high.
+HOLDOUT: 39 canonical cases -> 37 vitest tests (2 format-mandated reimplements exclusions, 0 error cases); harness validated 37/37 vs scratchpad reference; hash matches RESEARCH.md; FREEZE_MANIFEST.json written.

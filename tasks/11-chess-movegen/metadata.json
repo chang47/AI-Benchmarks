@@ -1,0 +1,13 @@
+{
+  "slug": "11-chess-movegen",
+  "type": "logic",
+  "difficulty": "hard",
+  "status": "candidate",
+  "created": "2026-07-12",
+  "authorities": [
+    "https://www.chessprogramming.org/Perft_Results",
+    "https://www.chessprogramming.org/Perft",
+    "https://handbook.fide.com/chapter/E012023"
+  ],
+  "contamination": "medium — the six CPW perft positions and counts are heavily memorized by models, but grading calls the function (not the numbers) and divide-style sub-position checks defeat hardcoded FEN-to-count lookup tables"
+}

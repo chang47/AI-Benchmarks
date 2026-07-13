@@ -1,0 +1,1 @@
+RESEARCH: canonical MicroEvals "Minecraft 3D" (WebGL2 voxel engine) prompt frozen verbatim from served HTML; spec with 22 checkable criteria + __voxel hook + pinned angle convention; Three.js = vendored UMD (<= r160) fallback only, never CDN; contamination high.

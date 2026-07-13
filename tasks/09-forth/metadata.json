@@ -1,0 +1,13 @@
+{
+  "slug": "09-forth",
+  "type": "logic",
+  "difficulty": "medium",
+  "status": "candidate",
+  "created": "2026-07-12",
+  "authorities": [
+    "https://raw.githubusercontent.com/exercism/problem-specifications/main/exercises/forth/description.md",
+    "https://raw.githubusercontent.com/exercism/problem-specifications/main/exercises/forth/canonical-data.json",
+    "https://github.com/Aider-AI/polyglot-benchmark"
+  ],
+  "contamination": "high — Exercism forth (description + canonical tests) is ubiquitous in training data and ships verbatim in the aider polyglot-benchmark; validity rests on mechanical holdout translation, not novelty"
+}

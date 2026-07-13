@@ -1,0 +1,10 @@
+{
+    "algorithm":  "sha256",
+    "frozen_at":  "2026-07-12",
+    "files":  {
+                  "canonical-data.json":  "6578301f6345b328b01292fef2925662d0d3c2f946e447dac969c031a089b176",
+                  "package.json":  "c294be442a4492838e6c9d52fa8939435ce23c7c715e80a5868f98a6457d6ddf",
+                  "VETTING.md":  "cfc14fd159018db515eeff69c74c23c807b2a3b3a7ce1c6b99b2a6f7302281c9",
+                  "tests/forth.canonical.test.mjs":  "b72631310ae107f776b5eb3f75ab8d6ee7e49297a0a11a1240dfea1e65acc244"
+              }
+}

@@ -1,0 +1,21 @@
+{
+  "slug": "16-budget-tracker",
+  "type": "visual",
+  "difficulty": "easy",
+  "status": "candidate",
+  "created": "2026-07-12",
+  "authorities": [
+    "https://artificialanalysis.ai/microevals",
+    "https://artificialanalysis.ai/microevals/budget-tracker-app-1753363368477",
+    "https://github.com/bradtraversy/vanillawebprojects",
+    "https://www.freecodecamp.org/news/how-to-build-an-expense-tracker-with-html-css-and-javascript/",
+    "https://www.geeksforgeeks.org/javascript/build-an-expense-tracker-with-html-css-and-javascript/",
+    "https://www.tutorjoes.in/JS_tutorial/income_expense_tracker_in_js",
+    "https://github.com/smircodes/Budget-app",
+    "https://zerotomastery.io/courses/build-personal-finance-app/",
+    "https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage",
+    "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/date",
+    "https://en.wikipedia.org/wiki/Create,_read,_update_and_delete"
+  ],
+  "contamination": "high — the expense/budget-tracker tutorial family (Traversy 16k-star repo, freeCodeCamp, GfG) saturates training corpora and the MicroEval is public with model outputs, so discrimination comes from the objective checklist (edit-updates-everything, negative balance, hook semantics, reload survival), not novelty; swap a personal variant at episode time."
+}

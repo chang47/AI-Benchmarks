@@ -1,0 +1,16 @@
+{
+  "slug": "10-zebra-puzzle",
+  "type": "logic",
+  "difficulty": "medium",
+  "status": "candidate",
+  "created": "2026-07-12",
+  "authorities": [
+    "https://raw.githubusercontent.com/exercism/problem-specifications/main/exercises/zebra-puzzle/instructions.md",
+    "https://raw.githubusercontent.com/exercism/problem-specifications/main/exercises/zebra-puzzle/introduction.md",
+    "https://raw.githubusercontent.com/exercism/problem-specifications/main/exercises/zebra-puzzle/canonical-data.json",
+    "https://raw.githubusercontent.com/exercism/problem-specifications/main/exercises/zebra-puzzle/metadata.toml",
+    "https://en.wikipedia.org/wiki/Zebra_Puzzle",
+    "https://github.com/Aider-AI/polyglot-benchmark"
+  ],
+  "contamination": "high — the Exercism exercise, its exact answers, and thousands of public solutions (incl. the aider polyglot-benchmark copy) are in training data, so the benchmark signal is the solver-structure contract (real constraint search + uniqueness assertion + perturbation sensitivity), not the answer strings"
+}

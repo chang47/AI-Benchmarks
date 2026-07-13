@@ -1,0 +1,1 @@
+﻿RESEARCH: spec frozen from WebDev Arena canonical prompt ('Build a game of chess', #3 most-asked) + FIDE Laws E012023; 18 checkable criteria incl. verified Fool's-mate and Loyd-stalemate test lines; spec.md/frozen-prompt.md/metadata.json/research written.

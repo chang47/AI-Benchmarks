@@ -1,0 +1,13 @@
+{
+  "name": "hn-clone-holdout-autochecks",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Holdout answer-key autochecks for ai-benchmark task 13-hn-clone. Grades a candidate src/index.html against the frozen rubric (rubric.md).",
+  "scripts": {
+    "check": "node autochecks.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.1"
+  }
+}

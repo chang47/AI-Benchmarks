@@ -1,0 +1,28 @@
+﻿{
+    "task":  "11-chess-movegen",
+    "role":  "HOLDOUT FREEZE MANIFEST - sha256 of every file under holdout/ except node_modules, package-lock.json, and this manifest itself",
+    "frozen":  "2026-07-12",
+    "algorithm":  "SHA256 (PowerShell Get-FileHash)",
+    "files":  [
+                  {
+                      "path":  "package.json",
+                      "sha256":  "74e3d358c99f4b3b3513f5de8ab34faf4c8e828acd60cbde578bdf0cd21d59e9"
+                  },
+                  {
+                      "path":  "tests/_contract.mjs",
+                      "sha256":  "7a9a865c4b3576b7f5a0b308351356292251a0bbef406d25963f1ca595c1730c"
+                  },
+                  {
+                      "path":  "tests/legality-fide.test.mjs",
+                      "sha256":  "6ffa5523871621dd0e71b611740aa920c3c692d4a350d88ca81cebc05aca7feb"
+                  },
+                  {
+                      "path":  "tests/perft-canonical.test.mjs",
+                      "sha256":  "dba67f1cf8762d825f69600e94ead3a928f002f9dc476327fb0d9b9c720c495b"
+                  },
+                  {
+                      "path":  "vitest.config.mjs",
+                      "sha256":  "62d009b5cec738c10a3b1c802a033e69afde2e479ee7fff34a6e88f364dd1551"
+                  }
+              ]
+}

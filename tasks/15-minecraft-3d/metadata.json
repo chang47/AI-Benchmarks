@@ -1,0 +1,23 @@
+{
+  "slug": "15-minecraft-3d",
+  "type": "visual",
+  "difficulty": "hard",
+  "status": "candidate",
+  "created": "2026-07-12",
+  "authorities": [
+    "https://artificialanalysis.ai/microevals/minecraft-3d-1751239585894",
+    "https://artificialanalysis.ai/microevals",
+    "https://artificialanalysis.ai/microevals/minecraft-clone-1762988092197",
+    "https://github.com/BurnyCoder/minecraft-clone",
+    "https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API",
+    "https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code",
+    "http://www.cse.yorku.ca/~amana/research/grid.pdf",
+    "https://0fps.net/2012/06/30/meshing-in-a-minecraft-game/",
+    "https://minecraft.wiki/w/Breaking",
+    "https://github.com/mrdoob/three.js/pull/25435",
+    "https://discourse.threejs.org/t/umd-version-of-three-js-v-161/60912",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules",
+    "https://www.growingwiththeweb.com/2017/12/fast-simple-js-fps-counter.html"
+  ],
+  "contamination": "high — Minecraft-clone one-shots and this exact public MicroEvals prompt are ubiquitous in training data; grading leans on the pinned __voxel hook contract and behavioral checks rather than novelty"
+}

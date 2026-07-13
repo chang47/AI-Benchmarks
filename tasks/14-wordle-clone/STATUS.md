@@ -1,0 +1,1 @@
+﻿RESEARCH: spec.md + research/RESEARCH.md + frozen-prompt.md + metadata.json written; NYT duplicate-letter rules sourced (Wikipedia + 3 explainers, MicroEval prompt verbatim), 6 concrete guess/answer cases pinned.

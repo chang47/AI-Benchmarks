@@ -1,0 +1,15 @@
+{
+  "slug": "08-poker",
+  "type": "logic",
+  "difficulty": "medium",
+  "status": "candidate",
+  "created": "2026-07-12",
+  "authorities": [
+    "https://raw.githubusercontent.com/exercism/problem-specifications/main/exercises/poker/description.md",
+    "https://raw.githubusercontent.com/exercism/problem-specifications/main/exercises/poker/canonical-data.json",
+    "https://github.com/exercism/problem-specifications/tree/main/exercises/poker",
+    "https://en.wikipedia.org/wiki/List_of_poker_hands",
+    "https://github.com/Aider-AI/polyglot-benchmark"
+  ],
+  "contamination": "high — canonical Exercism exercise shipped verbatim in the aider polyglot-benchmark; the spec, test data, and thousands of public solutions are in training corpora"
+}

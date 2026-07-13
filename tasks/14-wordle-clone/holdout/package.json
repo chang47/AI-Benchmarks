@@ -1,0 +1,11 @@
+{
+  "name": "task14-wordle-holdout-autochecks",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node autochecks.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.1"
+  }
+}
