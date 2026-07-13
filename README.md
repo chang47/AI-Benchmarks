@@ -1,57 +1,95 @@
-# AI Benchmark — overnight autonomous run (2026-07-11)
+# AI Benchmark
 
-Candidate tasks for the **Vetted Bench** project (design doc: `../vetted-bench/docs/superpowers/specs/2026-07-11-vetted-bench-design.md`), built overnight by autonomous agents.
+Candidate tasks for the **Vetted Bench** project (design doc: `../vetted-bench/docs/superpowers/specs/2026-07-11-vetted-bench-design.md`) — a personal AI-coding benchmark where the "correct answer" is defined by *other people* (official rules, published eval suites, canonical community prompts), so no spec has to be hand-invented.
+
+**Status:** 16 tasks built and independently verified — **16/16 PASS**, all round 0, zero fake-convergence. Awaiting Josh's review before any are promoted into the real Vetted Bench. Full results: [`REPORT.md`](./REPORT.md). Candidate sources: [`research/candidate-tasks-report.md`](./research/candidate-tasks-report.md).
+
+---
+
+## Getting Started
+
+**Prereqs:** Node 18+ and npm; Google Chrome (the visual auto-checks drive it via Playwright's `channel: "chrome"`).
+
+**Just want to review it?** Open [`REPORT.md`](./REPORT.md) — it has a per-task "what to eyeball" guide with file paths and screenshots. Fastest tour: open the visual tasks in a browser (below) and skim two or three `VERIFY.md` tables.
+
+**Open a VISUAL task (04, 05, 06, 12, 13, 14, 15, 16):**
+```
+# just double-click, or:
+start tasks/14-wordle-clone/src/index.html      # Windows
+```
+(Task 05 is an SVG: open `tasks/05-svg-object/src/object.svg`.) Screenshots the verifier took are in each task's `verify/round-0/`.
+
+**Run a LOGIC task's graded answer key (01–03, 07–11):**
+```
+cd tasks/07-bowling/holdout      # wave-2 tasks: answer key under holdout/
+npm install
+npx vitest run
+# wave-1 logic tasks (01,02,03) keep the independent suite under verify/tests/ instead
+```
+Every rule those tests assert traces to a cited source in the task's `research/RESEARCH.md`.
+
+**Test a NEW model against a task (the whole point of the bench):**
+1. Give the model `tasks/<slug>/frozen-prompt.md` **verbatim** (that's the frozen one-shot prompt).
+2. Save its output to the file path named in `tasks/<slug>/spec.md`'s artifact contract.
+3. Grade it: for logic, run the `holdout/` (or `verify/tests/`) suite against the new file; for visual, run `holdout/autochecks.mjs` with node + open it in Chrome.
+
+**Re-run the autonomous build/verify pipeline:** that's driven by the `Workflow` tool from a Claude Code session, not a shell script — just ask me ("re-run the bench", "add a task", "run the raw lane").
+
+---
 
 ## The meta-experiment
 
-This run rehearses the vetted-bench loop with one twist: **"what to build" and "what counts as correct" are outsourced to research** — external authorities and community consensus (official rules, canonical community prompts, how other people judge these tasks) — instead of Josh hand-vetting. Per task:
+Each task rehearses the vetted-bench loop with one twist: **"what to build" and "what counts as correct" are outsourced** — external authorities and community consensus, never hand-invented. Per task:
 
-1. **Research** — read the second brain + the web; write `spec.md` (requirements + numbered acceptance criteria, every rule traceable to an external source), `frozen-prompt.md` (the one-shot prompt for future bench runs), `research/RESEARCH.md` (sources).
-2. **Freeze** — all specs committed to git **before any implementation exists**.
-3. **Build** — an implementer agent builds from `spec.md` only.
-4. **Verify** — a separate agent (never the builder) writes and runs its own checks from the spec: unit tests for logic tasks, browser checks + screenshots for visual tasks. If it fails, the builder gets behavioral feedback and retries (max 2 fix rounds).
+1. **Research** — read the second brain + the web; write `spec.md` (numbered acceptance criteria, every rule traceable to an external source), `frozen-prompt.md` (the one-shot prompt for future runs), `research/RESEARCH.md` (sources). Wave-2 logic tasks also freeze a machine-readable **answer key** (`holdout/`, e.g. Exercism's own `canonical-data.json`).
+2. **Freeze** — specs + answer keys committed to git **before any implementation exists** (verifiable in history).
+3. **Build** — an implementer agent builds from `spec.md` only, blind to the answer key.
+4. **Verify** — a separate agent (never the builder) tamper-checks the frozen key by hash, then grades the candidate against it: unit tests for logic, browser checks + screenshots for visual. On fail, the builder gets behavioral feedback and retries (max 2 rounds). It also records a **fake-convergence** flag: did the builder claim done while failing the key?
 
-## Tasks (from the vetted-bench starter suite)
+Wave 1 (tasks 01–06) ran on Fable; wave 2 (07–16) ran build **and** verify on Opus.
 
-| # | Task | Type |
-|---|------|------|
-| 01 | Tennis scoring engine + scoreboard app | A (logic) |
-| 02 | Habit-streak engine | A (logic) |
-| 03 | Sudoku solver + validator | A (logic) |
-| 04 | Bouncing balls in a spinning polygon | B (visual) |
-| 05 | SVG object (community-canonical) | B (visual) |
-| 06 | Animated solar system + FPS counter | B (visual) |
+## Tasks
+
+| # | Task | Type | Correctness authority |
+|---|------|------|----------------------|
+| 01 | Tennis scoring engine + scoreboard | A logic | ITF Rules of Tennis |
+| 02 | Habit-streak engine | A logic | Streaks/Loop/Duolingo conventions |
+| 03 | Sudoku solver + validator | A logic | Known hard puzzles (Inkala) |
+| 04 | Bouncing balls in a spinning polygon | B visual | KCORES 90-pt rubric |
+| 05 | SVG pelican on a bicycle | B visual | Simon Willison's eval |
+| 06 | Animated solar system + FPS counter | B visual | Ordinal planetary facts |
+| 07 | Bowling score engine | A logic | Exercism canonical-data |
+| 08 | Poker hand ranking | A logic | Exercism canonical-data |
+| 09 | Forth mini-interpreter | A logic | Exercism canonical-data |
+| 10 | Zebra puzzle solver | A logic | Exercism canonical-data |
+| 11 | Chess legal-move generator (perft) | A logic | Chess Programming Wiki perft + FIDE |
+| 12 | Chess web game | B visual | WebDev Arena prompt + FIDE |
+| 13 | Hacker News clone | B visual | WebDev Arena prompt + live HN |
+| 14 | Wordle clone | B visual | NYT rules (duplicate-letter logic) |
+| 15 | Minecraft-style 3D voxel demo | B visual | MicroEvals canonical prompt |
+| 16 | Budget tracker (CRUD) | B visual | MicroEvals prompt + CRUD lineage |
 
 ## Per-task layout
 
 ```
 tasks/<slug>/
   research/RESEARCH.md   sources + adopted correctness rules
-  spec.md                the builder's only brief
+  spec.md                the builder's only brief (+ artifact contract)
   frozen-prompt.md       one-shot prompt for future bench runs
-  metadata.json          {type, difficulty, status, authorities}
-  src/                   the implementation
-  verify/                verifier's tests / screenshots
+  metadata.json          {type, difficulty, status, authorities, contamination}
+  holdout/               frozen answer key (wave-2): canonical tests / rubric + autochecks + FREEZE_MANIFEST
+  src/                   the candidate implementation
+  verify/                verifier's independent run: tests, screenshots
   VERIFY.md              verdict, per-check results, feedback history
   STATUS.md              append-only stage log
 ```
 
 ## Caveats for review
 
-- Research-vetted ≠ Josh-vetted. Promotion into the real Vetted Bench still requires the human vetting gates from the design doc.
-- Tasks 04/05 use community-canonical prompts deliberately (tonight's rule is "what other people defined") — the real bench swaps in personal variants for contamination reasons.
-
-Run report: `REPORT.md`. Per-task progress: `TODO.md` + each task's `STATUS.md`.
+- **Research-vetted ≠ Josh-vetted.** Promotion into the real Vetted Bench still needs the human vetting gates in the design doc.
+- **Contamination:** the most canonical prompts (pelican, KCORES heptagon) are heavily in training data — the real bench swaps in personal variants. Tonight's rule was deliberately "what other people defined."
+- **The fake-convergence metric is 16/16 null** — a strong frozen spec + the builder's own TDD didn't produce a caught lie. That drama lives in the **raw lane** (one-shot from `frozen-prompt.md`, no fix loop, no self-tests), which hasn't been run yet.
 
 ## Relocation note (2026-07-12)
 
-The overnight orchestrator had an args bug: the base path reached agents as the literal string
-`"undefined"`. Five tasks self-resolved it to the `vetted-bench` folder and one (03-sudoku)
-wrote its research to a stray `undefined/` directory. Post-run, the main thread ported the two
-run commits here via `git format-patch`/`git am` (author timestamps preserved — the
-freeze-before-build ordering is still verifiable in this repo's history), recovered the sudoku
-research, and restored `vetted-bench` to its pre-run state (backup branch
-`overnight-run-mislocated` kept there until reviewed). Paths inside agent-written files
-(`STATUS.md`, `research/RESEARCH.md`) still mention `vetted-bench` — left untouched as run
-evidence. Verify harness `node_modules` were not ported; `npm install` inside a task's
-`src/`/`verify/` dir before re-running its tests.
+The wave-1 overnight orchestrator had an args bug: the base path reached agents as the literal string `"undefined"`, so five tasks self-resolved into the `vetted-bench` folder and one (03-sudoku) wrote to a stray `undefined/` dir. Post-run the two run commits were ported here via `git format-patch`/`git am` (author timestamps preserved — the freeze-before-build ordering is still verifiable), the sudoku research recovered, and `vetted-bench` restored to its pre-run state (backup branch `overnight-run-mislocated` kept there until reviewed). Wave 2 hardcoded the base path, so it stayed clean.
