@@ -1,6 +1,6 @@
 # AI Benchmark
 
-Candidate tasks for the **Vetted Bench** project (design doc: `../vetted-bench/docs/superpowers/specs/2026-07-11-vetted-bench-design.md`) — a personal AI-coding benchmark where the "correct answer" is defined by *other people* (official rules, published eval suites, canonical community prompts), so no spec has to be hand-invented.
+Candidate tasks for the **Vetted Bench** project (design doc folded in at [`design/2026-07-11-vetted-bench-design.md`](./design/2026-07-11-vetted-bench-design.md)) — a personal AI-coding benchmark where the "correct answer" is defined by *other people* (official rules, published eval suites, canonical community prompts), so no spec has to be hand-invented.
 
 **Status:** 16 tasks built and independently verified — **16/16 PASS**, all round 0, zero fake-convergence. Awaiting Josh's review before any are promoted into the real Vetted Bench. Full results: [`REPORT.md`](./REPORT.md). Candidate sources: [`research/candidate-tasks-report.md`](./research/candidate-tasks-report.md).
 
@@ -89,6 +89,19 @@ tasks/<slug>/
 - **Research-vetted ≠ Josh-vetted.** Promotion into the real Vetted Bench still needs the human vetting gates in the design doc.
 - **Contamination:** the most canonical prompts (pelican, KCORES heptagon) are heavily in training data — the real bench swaps in personal variants. Tonight's rule was deliberately "what other people defined."
 - **The fake-convergence metric is 16/16 null** — a strong frozen spec + the builder's own TDD didn't produce a caught lie. That drama lives in the **raw lane** (one-shot from `frozen-prompt.md`, no fix loop, no self-tests), which hasn't been run yet.
+
+## Public vs private (contamination) — decided public
+
+Repo visibility barely matters for *this* suite, so it's public. The usual "keep your benchmark private" advice doesn't apply here, for two reasons:
+
+- **The answers are already public.** The logic tasks are graded by Exercism's own `canonical-data.json`, FIDE laws, and Chess Programming Wiki perft counts — all public. This repo *repackages* public data; hiding it conceals nothing a model or a person couldn't already find.
+- **Live look-up is a run-mode choice, not a visibility choice.** A model can only "look up" an answer mid-eval if you run it *with tools/web access*. A sealed one-shot (paste `frozen-prompt.md`, take the output) generates from weights and can't search — public repo or not.
+
+Privacy only earns its keep for tasks whose answer is **not** already on the web — future *personal-variant* or bespoke tasks. Keep **those** in a private holdout; for the community-canonical 16, privacy is theater. The lever that actually protects an eval is **how you run the model** (tools vs sealed one-shot), not repo visibility.
+
+## Integrity: the builder never sees the answer key
+
+Each task's answer key (`holdout/`) is frozen and committed *before* the candidate is built, hash-pinned in `FREEZE_MANIFEST.json`, and the builder agent is instructed never to read `holdout/`, `research/`, or `verify/`. A post-run transcript audit of the wave-2 run confirmed **zero** builders opened any answer-key or research file. Note this is currently enforced by instruction + freeze-ordering + tamper-check, **not** physical isolation — before running a model you don't control, build in a checkout that omits `holdout/` and auto-void any run whose builder reads it.
 
 ## Relocation note (2026-07-12)
 
