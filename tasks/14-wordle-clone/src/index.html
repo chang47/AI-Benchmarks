@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Wordle (reference)</title>
+<style>
+  :root { --green:#6aaa64; --yellow:#c9b458; --gray:#787c7e; --empty:#d3d6da; --bg:#fff; --fg:#1a1a1b; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font-family:"Helvetica Neue",Arial,sans-serif;
+         display:flex; flex-direction:column; align-items:center; min-height:100vh; }
+  header { font-weight:700; letter-spacing:.2em; font-size:1.6rem; padding:.6rem; border-bottom:1px solid #eee; width:100%; text-align:center; }
+  #msg { height:1.4rem; margin:.4rem; font-weight:600; color:#c0392b; }
+  #board { display:grid; grid-template-rows:repeat(6,1fr); gap:5px; margin:.5rem; }
+  .row { display:grid; grid-template-columns:repeat(5,1fr); gap:5px; }
+  .tile { width:56px; height:56px; display:flex; align-items:center; justify-content:center;
+          font-size:1.9rem; font-weight:700; text-transform:uppercase; border:2px solid var(--empty); color:var(--fg); }
+  .tile.filled { border-color:#878a8c; }
+  .tile.green { background:var(--green); border-color:var(--green); color:#fff; }
+  .tile.yellow { background:var(--yellow); border-color:var(--yellow); color:#fff; }
+  .tile.gray { background:var(--gray); border-color:var(--gray); color:#fff; }
+  #keyboard { display:flex; flex-direction:column; gap:6px; margin:.6rem; width:100%; max-width:500px; }
+  .krow { display:flex; gap:5px; justify-content:center; }
+  .key { min-width:32px; height:52px; border:0; border-radius:4px; background:var(--empty); color:var(--fg);
+         font-weight:700; text-transform:uppercase; cursor:pointer; flex:1; padding:0 4px; }
+  .key.wide { flex:1.5; font-size:.72rem; }
+  .key.green { background:var(--green); color:#fff; } .key.yellow { background:var(--yellow); color:#fff; } .key.gray { background:var(--gray); color:#fff; }
+  .shake { animation:shake .4s; } @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+  button#new { margin:.4rem; padding:.4rem .9rem; }
+</style>
+</head>
+<body>
+<header>WORDLE</header>
+<div id="msg" role="status" aria-live="polite"></div>
+<div id="board"></div>
+<div id="keyboard"></div>
+<button id="new">New game</button>
+
+<!-- classic script -> window.ANSWERS / window.VALID_GUESSES (loads over file://) -->
+<script src="./words.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ANSWERS = window.ANSWERS || [];
+  var VALID = new Set(window.VALID_GUESSES || []);
+  var RANK = { gray: 1, yellow: 2, green: 3 };
+
+  // --- THE CORE: two-pass, count-consuming evaluator (pure) ---
+  function evaluate(answer, guess) {
+    answer = String(answer).toUpperCase(); guess = String(guess).toUpperCase();
+    var colors = ["gray", "gray", "gray", "gray", "gray"];
+    var remaining = {};
+    for (var i = 0; i < answer.length; i++) remaining[answer[i]] = (remaining[answer[i]] || 0) + 1;
+    // pass 1 — greens first, consume the count
+    for (i = 0; i < 5; i++) {
+      if (guess[i] === answer[i]) { colors[i] = "green"; remaining[guess[i]]--; }
+    }
+    // pass 2 — yellow only while an unconsumed copy remains, else gray
+    for (i = 0; i < 5; i++) {
+      if (colors[i] === "green") continue;
+      if (remaining[guess[i]] > 0) { colors[i] = "yellow"; remaining[guess[i]]--; }
+    }
+    return colors;
+  }
+
+  // --- game state ---
+  var state;
+  function newGame(answer) {
+    state = {
+      answer: answer ? String(answer).toUpperCase() : (ANSWERS[Math.floor(Math.random() * ANSWERS.length)] || "CRANE"),
+      rows: [], current: "", over: false, won: false, kb: {},
+    };
+    render(); msg("");
+    return { answer: state.answer };
+  }
+
+  function submitGuess(word) {
+    if (state.over) return { accepted: false, reason: "game over", over: true };
+    word = String(word).toUpperCase();
+    if (word.length !== 5) return { accepted: false, reason: "not enough letters" };
+    if (!VALID.has(word)) return { accepted: false, reason: "not in word list" };
+    var colors = evaluate(state.answer, word);
+    state.rows.push({ guess: word, colors: colors });
+    // keyboard best-state: green > yellow > gray, never downgrade
+    for (var i = 0; i < 5; i++) {
+      var L = word[i], c = colors[i];
+      if (!state.kb[L] || RANK[c] > RANK[state.kb[L]]) state.kb[L] = c;
+    }
+    var win = colors.every(function (c) { return c === "green"; });
+    if (win) { state.won = true; state.over = true; }
+    else if (state.rows.length >= 6) { state.over = true; }
+    state.current = "";
+    render();
+    return { accepted: true, colors: colors, win: win, over: state.over };
+  }
+
+  function keyboardState() { return Object.assign({}, state.kb); }
+  function stateSnapshot() {
+    return { answer: state.answer, rows: state.rows.map(function (r) { return { guess: r.guess, colors: r.colors.slice() }; }),
+             over: state.over, won: state.won };
+  }
+
+  // --- rendering ---
+  var board = document.getElementById("board"), kbEl = document.getElementById("keyboard"), msgEl = document.getElementById("msg");
+  function msg(t, shake) {
+    msgEl.textContent = t || "";
+    if (shake) { board.classList.remove("shake"); void board.offsetWidth; board.classList.add("shake"); }
+  }
+  function render() {
+    board.innerHTML = "";
+    for (var r = 0; r < 6; r++) {
+      var row = document.createElement("div"); row.className = "row";
+      var done = state.rows[r];
+      var typing = r === state.rows.length ? state.current : "";
+      for (var c = 0; c < 5; c++) {
+        var t = document.createElement("div"); t.className = "tile";
+        if (done) { t.textContent = done.guess[c]; t.classList.add(done.colors[c]); }
+        else if (typing[c]) { t.textContent = typing[c]; t.classList.add("filled"); }
+        row.appendChild(t);
+      }
+      board.appendChild(row);
+    }
+    renderKeyboard();
+    if (state.over) msg(state.won ? "You got it!" : "Answer: " + state.answer);
+  }
+  var LAYOUT = ["QWERTYUIOP", "ASDFGHJKL", "↵ZXCVBNM⌫"];
+  function renderKeyboard() {
+    kbEl.innerHTML = "";
+    LAYOUT.forEach(function (rowStr) {
+      var kr = document.createElement("div"); kr.className = "krow";
+      rowStr.split("").forEach(function (ch) {
+        var key = document.createElement("button"); key.className = "key";
+        if (ch === "↵") { key.textContent = "ENTER"; key.classList.add("wide"); key.dataset.k = "Enter"; }
+        else if (ch === "⌫") { key.textContent = "DEL"; key.classList.add("wide"); key.dataset.k = "Backspace"; }
+        else { key.textContent = ch; key.dataset.k = ch; if (state.kb[ch]) key.classList.add(state.kb[ch]); }
+        key.addEventListener("click", function () { handleKey(key.dataset.k); });
+        kr.appendChild(key);
+      });
+      kbEl.appendChild(kr);
+    });
+  }
+
+  // --- input ---
+  function handleKey(k) {
+    if (state.over) return;
+    if (k === "Enter") {
+      var res = submitGuess(state.current);
+      if (!res.accepted) msg(res.reason, true);
+    } else if (k === "Backspace") { state.current = state.current.slice(0, -1); render(); }
+    else if (/^[a-zA-Z]$/.test(k) && state.current.length < 5) { state.current += k.toUpperCase(); render(); }
+  }
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === "Backspace" || /^[a-zA-Z]$/.test(e.key)) handleKey(e.key);
+  });
+  document.getElementById("new").addEventListener("click", function () { newGame(); });
+
+  // --- headless test hook (AC8) ---
+  window.__wordle = {
+    evaluate: evaluate,
+    newGame: function (a) { return newGame(a); },
+    submitGuess: function (w) { return submitGuess(w); },
+    keyboardState: keyboardState,
+    state: stateSnapshot,
+  };
+
+  newGame();
+})();
+</script>
+</body>
+</html>
