@@ -1,46 +1,46 @@
-# Frozen one-shot prompt — Task 14 Wordle Clone
+# Frozen one-shot prompt — Wordle (STRONG / foundations version)
 
-Community-canonical core wording ("Create a wordle clone") taken verbatim from
-the Artificial Analysis MicroEval "Wordle Clone"
-(https://artificialanalysis.ai/microevals/wordle-clone-1750214619418:
-"Create a wordle clone using a large open source wordle dictionary for words").
-The dictionary clause is replaced by the no-dictionary rule and the artifact/
-hook contract required for offline deterministic verification — deviations
-documented in `research/RESEARCH.md` §1.
+> This is the **strong** prompt: it hands the model the foundations (the exact duplicate-letter
+> algorithm + the grading hook) so a good model can one-shot a *correct* Wordle. It's the "with
+> a well-founded prompt, you get a reliable one-shot" lane. The **weak/naive** prompt for the
+> raw-lane fake-convergence demo lives separately (see `research/SOURCE-OF-TRUTH.md` §7 — a bare
+> "build a Wordle clone" with no duplicate guidance). Freeze this wording; run best-of-3.
 
 ---
 
-Create a wordle clone as a single, fully self-contained HTML file (all CSS and
-JavaScript inline; no external resources or network requests; must work opened
-from disk). Follow the NYT Wordle rules:
+Build a playable **Wordle** game as a single self-contained web page. Deliver two files only: `index.html` and `words.js` (a local module I will provide, exporting `ANSWERS` and `VALID_GUESSES` as arrays of uppercase 5-letter words). No network requests, no CDNs, no other files.
 
-- The player has 6 guesses to find a secret 5-letter word, on a 6x5 tile grid.
-- Do NOT use a word dictionary: accept any 5-letter A-Z guess
-  (case-insensitive). A submission with fewer than 5 letters is rejected
-  without consuming a guess.
-- Input works from both the physical keyboard and an on-screen keyboard
-  (letter keys plus Enter and Backspace).
-- After each guess, color the row's tiles: green = right letter right spot,
-  yellow = letter in the word but wrong spot, gray = no credit. Implement the
-  exact NYT duplicate-letter rules: greens are evaluated first and each
-  green/yellow consumes one occurrence of that letter in the answer; remaining
-  yellows are awarded left-to-right, never exceeding the number of times the
-  letter appears in the answer; excess copies are gray. Example: guess LEVEL
-  vs answer HOTEL scores gray, gray, gray, green, green.
-- Color the on-screen keyboard keys with each letter's best result so far
-  (green over yellow over gray); keys never downgrade.
-- Win: all 5 tiles green — show an in-page win message and stop accepting
-  input. Lose: after 6 failed guesses — reveal the answer in an in-page
-  message and stop accepting input. Never use alert() or other dialogs.
+**Game:** 6 guesses to find a hidden 5-letter word on a 6×5 grid. After each guess, color its 5 tiles green / yellow / gray, color the on-screen keyboard, and win on all-green or lose after 6.
 
-For automated testing, expose window.__wordle with exactly:
-- setAnswer(word): set the secret answer (5 letters, case-insensitive) and
-  reset the game to a fresh state.
-- guess(word): play a guess through the same logic as typing + Enter; return
-  an array of 5 strings ("green" | "yellow" | "gray") in board order, or null
-  if the guess is invalid or the game is over (in which case nothing changes).
-- state(): return { status: "playing" | "won" | "lost", answer: <uppercase>,
-  guesses: <uppercase words>, evaluations: <array of the per-guess color
-  arrays> }.
+**Tile coloring — implement EXACTLY this two-pass algorithm (do not use a naive "is the letter in the word" check, which is wrong for repeated letters):**
 
-Output the complete HTML file and nothing else.
+```
+evaluate(answer, guess):            // both length 5, uppercase
+  colors = ['gray'] * 5
+  remaining = letter-frequency count of answer
+  // PASS 1 — greens first, and CONSUME the count
+  for i in 0..4:
+    if guess[i] == answer[i]: colors[i]='green'; remaining[guess[i]] -= 1
+  // PASS 2 — a letter is yellow ONLY while an unconsumed copy remains, else gray
+  for i in 0..4:
+    if colors[i]=='green': continue
+    if remaining[guess[i]] > 0: colors[i]='yellow'; remaining[guess[i]] -= 1
+  return colors
+```
+
+Rule in words: a repeated guess letter is colored green/yellow **at most as many times as it occurs in the answer**; every extra copy is gray. Example: answer `APPLE`, guess `ALLEY` → `green, yellow, gray, yellow, gray` (the second `L` is gray because `APPLE` has only one `L`, already used).
+
+**Keyboard:** each key shows its best state so far under `green > yellow > gray`. Never downgrade a green/yellow key to gray on a later guess; a yellow key may later upgrade to green.
+
+**Guess validity:** a submitted guess must be exactly 5 letters AND a member of `VALID_GUESSES`. Reject anything else with a small inline message (a shake/toast) — do **not** use `alert()` or any blocking dialog, and do **not** consume a guess row for a rejected word.
+
+**Answer:** pick a random word from `ANSWERS` at game start.
+
+**Expose a headless test hook** on `window.__wordle` so the game can be graded without a UI:
+- `evaluate(answer, guess)` → array of 5 of `'green'|'yellow'|'gray'` (the pure function above)
+- `newGame(answer?)` → start a game; use `answer` (uppercased) if given, else random from `ANSWERS`
+- `submitGuess(word)` → `{ accepted, reason?, colors?, win?, over? }`
+- `keyboardState()` → `{ [letter]: 'green'|'yellow'|'gray' }`
+- `state()` → `{ answer, rows, over, won }`
+
+Make it clean and playable (grid, physical + on-screen keyboard, win/lose feedback), but correctness of the coloring and the hook is what matters most.

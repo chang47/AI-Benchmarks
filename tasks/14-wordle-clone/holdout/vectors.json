@@ -1,0 +1,11 @@
+[
+  { "answer": "ALLOW", "guess": "LOLLY", "expected": ["yellow", "yellow", "green", "gray", "gray"], "source": "Rosetta Code (mandated)" },
+  { "answer": "BULLY", "guess": "LOLLY", "expected": ["gray", "gray", "green", "green", "green"], "source": "Rosetta Code" },
+  { "answer": "ROBIN", "guess": "SONIC", "expected": ["gray", "green", "yellow", "green", "gray"], "source": "Rosetta Code" },
+  { "answer": "ROBIN", "guess": "ALERT", "expected": ["gray", "gray", "gray", "yellow", "gray"], "source": "Rosetta Code" },
+  { "answer": "ROBIN", "guess": "ROBIN", "expected": ["green", "green", "green", "green", "green"], "source": "Rosetta Code" },
+  { "answer": "SPACE", "guess": "PLACE", "expected": ["yellow", "gray", "green", "green", "green"], "source": "NacomiTagiera Jest (place/space)" },
+  { "answer": "ABBEY", "guess": "BOBBY", "expected": ["yellow", "gray", "green", "gray", "green"], "source": "hand-verified two-pass" },
+  { "answer": "MAXIM", "guess": "MAMMA", "expected": ["green", "green", "yellow", "gray", "gray"], "source": "hand-verified two-pass" },
+  { "answer": "APPLE", "guess": "ALLEY", "expected": ["green", "yellow", "gray", "yellow", "gray"], "source": "classic teaching example (2nd L gray)" }
+]

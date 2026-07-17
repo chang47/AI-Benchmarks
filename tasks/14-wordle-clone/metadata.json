@@ -1,17 +1,20 @@
 {
   "slug": "14-wordle-clone",
   "type": "visual",
+  "role": "flagship-loop-video",
   "difficulty": "medium",
   "status": "candidate",
   "created": "2026-07-12",
+  "reworked": "2026-07-17",
   "authorities": [
-    "https://artificialanalysis.ai/microevals/wordle-clone-1750214619418",
-    "https://en.wikipedia.org/wiki/Wordle",
-    "https://www.stuckonaword.com/articles/wordle-repeated-letters-guide.html",
-    "https://wordlesolverx.org/past-wordle-words/does-wordle-repeat-letters/",
-    "https://wordfinder.yourdictionary.com/blog/can-letters-repeat-in-wordle-a-closer-look-at-the-rules/",
-    "https://nerdschalk.com/wordle-same-letter-twice-rules-explained-how-does-it-work/",
-    "https://github.com/cwackerfuss/react-wordle"
+    "https://rosettacode.org/wiki/Wordle_comparison",
+    "https://github.com/cwackerfuss/react-wordle",
+    "https://github.com/dgvai/wordle-algorithm",
+    "https://github.com/NacomiTagiera/Wordle",
+    "https://github.com/jlumbroso/wordle-react-clone",
+    "https://gist.github.com/cfreshman/a03ef2cba789d8cf00c08f767e0fad7b",
+    "https://gist.github.com/cfreshman/cdcdf777450c5b5301e439061d29694c",
+    "https://jonahlawrence.hashnode.dev/why-most-wordle-clones-are-wrong"
   ],
-  "contamination": "high - Wordle clones saturate training data; discrimination rests on duplicate-letter scoring, keyboard best-state precedence, and exact test-hook compliance rather than novelty"
+  "contamination": "high - Wordle clones saturate training data; discrimination rests on the duplicate-letter two-pass rule, keyboard best-state precedence, and exact test-hook compliance rather than novelty. See research/SOURCE-OF-TRUTH.md."
 }

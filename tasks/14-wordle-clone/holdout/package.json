@@ -1,9 +1,10 @@
 {
-  "name": "task14-wordle-holdout-autochecks",
+  "name": "wordle-holdout",
   "private": true,
   "type": "module",
+  "description": "Frozen answer key for the flagship Wordle task — run: node verify-reference.mjs",
   "scripts": {
-    "check": "node autochecks.mjs"
+    "check": "node verify-reference.mjs"
   },
   "devDependencies": {
     "playwright": "^1.61.1"
