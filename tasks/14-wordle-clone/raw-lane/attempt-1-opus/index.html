@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Wordle</title>
+<style>
+  :root {
+    --bg: #121213;
+    --tile-border: #3a3a3c;
+    --tile-border-active: #565758;
+    --text: #ffffff;
+    --green: #538d4e;
+    --yellow: #b59f3b;
+    --gray: #3a3a3c;
+    --key-bg: #818384;
+    --key-text: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    touch-action: manipulation;
+  }
+  #app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  header {
+    border-bottom: 1px solid var(--tile-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 6px 0;
+    flex: 0 0 auto;
+  }
+  header h1 {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  header button.newgame {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: 1px solid var(--tile-border-active);
+    color: var(--text);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+  }
+  header button.newgame:hover { background: #2a2a2b; }
+
+  #board-wrap {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  #board {
+    display: grid;
+    grid-template-rows: repeat(6, 1fr);
+    gap: 5px;
+    padding: 10px;
+    width: 330px;
+    height: 396px;
+    max-width: 100%;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+  }
+  .tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 700;
+    text-transform: uppercase;
+    border: 2px solid var(--tile-border);
+    color: var(--text);
+    user-select: none;
+    line-height: 1;
+  }
+  .tile.filled {
+    border-color: var(--tile-border-active);
+    animation: pop 0.1s ease;
+  }
+  @keyframes pop {
+    0% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+  }
+  .tile.green  { background: var(--green);  border-color: var(--green);  }
+  .tile.yellow { background: var(--yellow); border-color: var(--yellow); }
+  .tile.gray   { background: var(--gray);   border-color: var(--gray);   }
+  .row.invalid { animation: shake 0.5s; }
+  @keyframes shake {
+    10%, 90% { transform: translateX(-2px); }
+    20%, 80% { transform: translateX(4px); }
+    30%, 50%, 70% { transform: translateX(-8px); }
+    40%, 60% { transform: translateX(8px); }
+  }
+
+  #keyboard {
+    flex: 0 0 auto;
+    padding: 8px 6px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .kb-row {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+  }
+  .key {
+    flex: 1 1 auto;
+    height: 58px;
+    min-width: 0;
+    border: 0;
+    border-radius: 4px;
+    background: var(--key-bg);
+    color: var(--key-text);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 0.15s ease;
+  }
+  .key.wide { flex: 1.5 1 auto; font-size: 11px; }
+  .key.green  { background: var(--green);  }
+  .key.yellow { background: var(--yellow); }
+  .key.gray   { background: var(--gray);   }
+  .key:active { opacity: 0.85; }
+
+  #toast-wrap {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .toast {
+    background: #ffffff;
+    color: #121213;
+    font-weight: 700;
+    padding: 12px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    animation: fade 0.2s ease;
+  }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+  @media (max-height: 640px) {
+    #board { height: 330px; width: 275px; }
+    .tile { font-size: 26px; }
+    .key { height: 48px; }
+  }
+</style>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Wordle</h1>
+      <button class="newgame" id="newgame-btn" type="button">New</button>
+    </header>
+    <div id="board-wrap">
+      <div id="board" aria-label="game board"></div>
+    </div>
+    <div id="keyboard"></div>
+  </div>
+  <div id="toast-wrap" aria-live="polite"></div>
+
+  <script src="./words.js"></script>
+  <script>
+  (function () {
+    "use strict";
+
+    var ROWS = 6;
+    var COLS = 5;
+
+    var ANSWERS = (window.ANSWERS || []).map(function (w) { return String(w).toUpperCase(); });
+    // Valid guesses = the provided guess list UNION the answers, so the hidden
+    // word is always itself a legal guess even if it's absent from the list.
+    var validSet = new Set();
+    (window.VALID_GUESSES || []).forEach(function (w) { validSet.add(String(w).toUpperCase()); });
+    ANSWERS.forEach(function (w) { validSet.add(w); });
+
+    // ---- Pure coloring logic (two-pass, duplicate-safe) -------------------
+    // Pass 1: mark exact-position matches green and consume those answer
+    // letters. Pass 2: for the rest, mark yellow only if an unconsumed copy
+    // of the letter remains in the answer; otherwise gray. Consuming letters
+    // is what makes duplicates behave correctly (e.g. guessing a letter twice
+    // when the answer contains it once yields one yellow/green, one gray).
+    function evaluate(answer, guess) {
+      answer = String(answer).toUpperCase();
+      guess = String(guess).toUpperCase();
+      var result = new Array(COLS);
+      var i;
+      var remaining = {};
+      for (i = 0; i < answer.length; i++) {
+        var a = answer[i];
+        remaining[a] = (remaining[a] || 0) + 1;
+      }
+      for (i = 0; i < COLS; i++) {
+        if (guess[i] === answer[i]) {
+          result[i] = "green";
+          remaining[guess[i]]--;
+        } else {
+          result[i] = null;
+        }
+      }
+      for (i = 0; i < COLS; i++) {
+        if (result[i]) continue;
+        var g = guess[i];
+        if (remaining[g] > 0) {
+          result[i] = "yellow";
+          remaining[g]--;
+        } else {
+          result[i] = "gray";
+        }
+      }
+      return result;
+    }
+
+    // ---- Game state -------------------------------------------------------
+    var game = null; // { answer, rows: [{guess, colors}], current: "", over, won }
+
+    function randomAnswer() {
+      if (!ANSWERS.length) return "ABOUT";
+      return ANSWERS[Math.floor(Math.random() * ANSWERS.length)];
+    }
+
+    function newGame(answer) {
+      var ans = answer ? String(answer).toUpperCase() : randomAnswer();
+      game = { answer: ans, rows: [], current: "", over: false, won: false };
+      render();
+      return { answer: ans };
+    }
+
+    var COLOR_RANK = { gray: 0, yellow: 1, green: 2 };
+
+    function keyboardState() {
+      var map = {};
+      for (var r = 0; r < game.rows.length; r++) {
+        var guess = game.rows[r].guess;
+        var colors = game.rows[r].colors;
+        for (var i = 0; i < COLS; i++) {
+          var ch = guess[i];
+          var c = colors[i];
+          if (!(ch in map) || COLOR_RANK[c] > COLOR_RANK[map[ch]]) {
+            map[ch] = c;
+          }
+        }
+      }
+      return map;
+    }
+
+    function stateSnapshot() {
+      return {
+        answer: game.answer,
+        rows: game.rows.map(function (r) {
+          return { guess: r.guess, colors: r.colors.slice() };
+        }),
+        over: game.over,
+        won: game.won
+      };
+    }
+
+    // core submit used by both UI and headless hook
+    function submitGuess(word) {
+      if (!game) newGame();
+      if (game.over) {
+        return { accepted: false, reason: "game_over" };
+      }
+      var w = String(word || "").toUpperCase();
+      if (w.length !== COLS) {
+        return { accepted: false, reason: "bad_length" };
+      }
+      if (!/^[A-Z]{5}$/.test(w)) {
+        return { accepted: false, reason: "bad_length" };
+      }
+      if (!validSet.has(w)) {
+        return { accepted: false, reason: "not_in_list" };
+      }
+      var colors = evaluate(game.answer, w);
+      game.rows.push({ guess: w, colors: colors });
+      game.current = "";
+      var win = w === game.answer;
+      if (win) {
+        game.won = true;
+        game.over = true;
+      } else if (game.rows.length >= ROWS) {
+        game.over = true;
+      }
+      return {
+        accepted: true,
+        colors: colors,
+        win: win,
+        over: game.over
+      };
+    }
+
+    // ---- DOM rendering ----------------------------------------------------
+    var boardEl = document.getElementById("board");
+    var keyboardEl = document.getElementById("keyboard");
+    var toastWrap = document.getElementById("toast-wrap");
+
+    var KB_ROWS = [
+      "QWERTYUIOP".split(""),
+      "ASDFGHJKL".split(""),
+      ["ENTER"].concat("ZXCVBNM".split("")).concat(["BACK"])
+    ];
+
+    function buildBoard() {
+      boardEl.innerHTML = "";
+      for (var r = 0; r < ROWS; r++) {
+        var row = document.createElement("div");
+        row.className = "row";
+        row.dataset.row = String(r);
+        for (var c = 0; c < COLS; c++) {
+          var tile = document.createElement("div");
+          tile.className = "tile";
+          tile.dataset.row = String(r);
+          tile.dataset.col = String(c);
+          row.appendChild(tile);
+        }
+        boardEl.appendChild(row);
+      }
+    }
+
+    function buildKeyboard() {
+      keyboardEl.innerHTML = "";
+      KB_ROWS.forEach(function (keys) {
+        var rowEl = document.createElement("div");
+        rowEl.className = "kb-row";
+        keys.forEach(function (k) {
+          var key = document.createElement("button");
+          key.type = "button";
+          key.className = "key" + (k === "ENTER" || k === "BACK" ? " wide" : "");
+          key.dataset.key = k;
+          key.textContent = k === "BACK" ? "⌫" : k;
+          key.addEventListener("click", function () { onKey(k); });
+          rowEl.appendChild(key);
+        });
+        keyboardEl.appendChild(rowEl);
+      });
+    }
+
+    function render() {
+      // fill in every tile from committed rows + the in-progress current row
+      for (var r = 0; r < ROWS; r++) {
+        var committed = game.rows[r];
+        for (var c = 0; c < COLS; c++) {
+          var tile = boardEl.querySelector('.tile[data-row="' + r + '"][data-col="' + c + '"]');
+          tile.className = "tile";
+          tile.textContent = "";
+          if (committed) {
+            tile.textContent = committed.guess[c];
+            tile.classList.add("filled", committed.colors[c]);
+          } else if (r === game.rows.length && !game.over) {
+            if (c < game.current.length) {
+              tile.textContent = game.current[c];
+              tile.classList.add("filled");
+            }
+          }
+        }
+      }
+      // keyboard colors
+      var ks = keyboardState();
+      var keyEls = keyboardEl.querySelectorAll(".key");
+      keyEls.forEach(function (el) {
+        var k = el.dataset.key;
+        el.classList.remove("green", "yellow", "gray");
+        if (ks[k]) el.classList.add(ks[k]);
+      });
+    }
+
+    function toast(msg) {
+      var t = document.createElement("div");
+      t.className = "toast";
+      t.textContent = msg;
+      toastWrap.appendChild(t);
+      setTimeout(function () {
+        t.style.transition = "opacity 0.3s ease";
+        t.style.opacity = "0";
+        setTimeout(function () {
+          if (t.parentNode) t.parentNode.removeChild(t);
+        }, 300);
+      }, 1100);
+    }
+
+    function shakeCurrentRow() {
+      var r = game.rows.length;
+      var rowEl = boardEl.querySelector('.row[data-row="' + r + '"]');
+      if (!rowEl) return;
+      rowEl.classList.remove("invalid");
+      // force reflow so the animation restarts
+      void rowEl.offsetWidth;
+      rowEl.classList.add("invalid");
+      setTimeout(function () { rowEl.classList.remove("invalid"); }, 500);
+    }
+
+    // ---- Input handling ---------------------------------------------------
+    function onKey(k) {
+      if (!game || game.over) return;
+      if (k === "ENTER") {
+        commitCurrent();
+      } else if (k === "BACK") {
+        if (game.current.length > 0) {
+          game.current = game.current.slice(0, -1);
+          render();
+        }
+      } else if (/^[A-Z]$/.test(k)) {
+        if (game.current.length < COLS) {
+          game.current += k;
+          render();
+        }
+      }
+    }
+
+    function commitCurrent() {
+      if (game.current.length < COLS) {
+        toast("Not enough letters");
+        shakeCurrentRow();
+        return;
+      }
+      var word = game.current;
+      var res = submitGuess(word);
+      if (!res.accepted) {
+        if (res.reason === "not_in_list") {
+          toast("Not in word list");
+          shakeCurrentRow();
+        } else if (res.reason === "bad_length") {
+          toast("Not enough letters");
+          shakeCurrentRow();
+        }
+        return;
+      }
+      render();
+      if (res.win) {
+        var praise = ["Genius", "Magnificent", "Impressive", "Splendid", "Great", "Phew"];
+        toast(praise[Math.min(game.rows.length - 1, praise.length - 1)]);
+      } else if (res.over) {
+        toast(game.answer);
+      }
+    }
+
+    document.addEventListener("keydown", function (e) {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      var key = e.key;
+      if (key === "Enter") {
+        onKey("ENTER");
+        e.preventDefault();
+      } else if (key === "Backspace") {
+        onKey("BACK");
+        e.preventDefault();
+      } else if (/^[a-zA-Z]$/.test(key)) {
+        onKey(key.toUpperCase());
+      }
+    });
+
+    document.getElementById("newgame-btn").addEventListener("click", function () {
+      newGame();
+      toast("New game");
+    });
+
+    // ---- Headless test hook ----------------------------------------------
+    // submitGuess here also reflects into the UI so headless drives + renders.
+    window.__wordle = {
+      evaluate: evaluate,
+      newGame: function (answer) {
+        return newGame(answer);
+      },
+      submitGuess: function (word) {
+        var res = submitGuess(word);
+        if (res.accepted) render();
+        return res;
+      },
+      keyboardState: keyboardState,
+      state: stateSnapshot
+    };
+
+    // ---- Boot -------------------------------------------------------------
+    buildBoard();
+    buildKeyboard();
+    newGame();
+  })();
+  </script>
+</body>
+</html>
