@@ -13,10 +13,13 @@ export function parseClaude(events) {
   const m = emptyMetrics();
   const info = { modelReported: null, sessionId: null, finalText: null, isError: null, stopReason: null, errorDetail: null, init: null };
   const seenMsg = new Set();
+  const lastUsage = new Map(); // message id → last usage seen (for sessions with no result event)
+  let firstT = null, lastT = null;
   const toolNames = new Map();
 
   for (const e of events) {
     const t = e.timestamp || null;
+    if (t) { firstT = firstT || t; lastT = t; }
     const sub = e.parent_tool_use_id || (e.isSidechain ? "sidechain" : null);
 
     if (e.type === "system") {
@@ -40,6 +43,7 @@ export function parseClaude(events) {
     if (e.type === "assistant" && e.message) {
       const msg = e.message;
       if (msg.model && msg.model !== "<synthetic>") info.modelReported = info.modelReported || msg.model;
+      if (msg.id && msg.usage && !e.parent_tool_use_id && !e.isSidechain) lastUsage.set(msg.id, msg.usage);
       let ctx;
       if (msg.id && !seenMsg.has(msg.id) && msg.usage) {
         seenMsg.add(msg.id);
@@ -104,7 +108,16 @@ export function parseClaude(events) {
     }
   }
 
-  // Interactive session files have no result event: fall back to the last assistant text.
+  // Interactive session files have no result event: derive what we can, and say so via costBasis.
+  if (m.numTurns == null && lastUsage.size) {
+    const us = [...lastUsage.values()];
+    const sum = (k) => us.reduce((a, u) => a + (u[k] || 0), 0);
+    m.numTurns = us.length;
+    m.inputTokens = sum("input_tokens"); m.outputTokens = sum("output_tokens");
+    m.cacheReadTokens = sum("cache_read_input_tokens"); m.cacheCreationTokens = sum("cache_creation_input_tokens");
+    m.costBasis = "derived-from-session-messages";
+    if (firstT && lastT) m.harnessDurationMs = new Date(lastT) - new Date(firstT);
+  }
   if (info.finalText == null) {
     const last = [...steps].reverse().find((s) => s.kind === "assistant-text" && !s.subagent);
     info.finalText = last ? last.body : null;

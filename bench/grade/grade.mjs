@@ -16,13 +16,15 @@ export function tamperCheck(holdoutDir) {
   if (!existsSync(manPath)) return { ok: false, detail: "no FREEZE_MANIFEST.json" };
   const man = readJson(manPath);
   const bad = [];
-  for (const [rel, v] of Object.entries(man.files || {})) {
+  // Manifests were written by different tools: {path: hash} maps and [{path, sha256}] lists both exist.
+  const entries = Array.isArray(man.files) ? man.files.map((f) => [f.path, f.sha256 || f.hash]) : Object.entries(man.files || {});
+  for (const [rel, v] of entries) {
     const want = typeof v === "string" ? v : v.sha256 || v.hash;
     const p = join(holdoutDir, rel);
     if (!existsSync(p)) bad.push(`${rel} (missing)`);
-    else if (sha256File(p) !== want) bad.push(`${rel} (hash mismatch)`);
+    else if (sha256File(p) !== String(want).toLowerCase()) bad.push(`${rel} (hash mismatch)`); // manifests mix hex case
   }
-  return { ok: bad.length === 0, checked: Object.keys(man.files || {}).length, detail: bad.join(", ") || "all hashes match" };
+  return { ok: bad.length === 0, checked: entries.length, detail: bad.join(", ") || "all hashes match" };
 }
 
 /** Per-task sandbox: node_modules copied once, frozen files re-copied + re-verified every grade. */

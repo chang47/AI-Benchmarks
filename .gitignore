@@ -8,3 +8,4 @@ runs/*/grade/
 runs/_controls/
 .bench-cache/
 reports/site/
+reports/view/

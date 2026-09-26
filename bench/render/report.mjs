@@ -179,7 +179,7 @@ export async function viewFile(file, outPath) {
   mkdirSync(join(dirname(out), "assets"), { recursive: true });
   copyAssets(dirname(out));
   const meta = { runId: basename(file), harness: parsed.format, model: parsed.info.modelReported || "(not reported)",
-    modelReported: parsed.info.modelReported, status: parsed.info.isError ? "error" : "ok", metrics: parsed.metrics,
+    modelReported: parsed.info.modelReported, status: parsed.info.isError ? "error" : "ok", metrics: { durationMs: parsed.metrics.harnessDurationMs, ...parsed.metrics },
     parserVersion: parsed.parserVersion, init: parsed.info.init, finalText: parsed.info.finalText };
   writeFileSync(out, page({
     title: `Transcript · ${basename(file)}`, bodyClass: "p-run",

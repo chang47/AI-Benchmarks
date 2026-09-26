@@ -23,7 +23,7 @@ export const readJson = (p, fallback) => {
     if (fallback !== undefined) return fallback;
     throw new Error(`missing JSON file: ${p}`);
   }
-  return JSON.parse(readFileSync(p, "utf8"));
+  return JSON.parse(readFileSync(p, "utf8").replace(/^﻿/, "")); // some frozen manifests carry a BOM
 };
 export const writeJson = (p, obj) => {
   mkdirSync(dirname(p), { recursive: true });
