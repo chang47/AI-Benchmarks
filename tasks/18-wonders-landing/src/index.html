@@ -14,6 +14,7 @@
   body.has-cursor, body.has-cursor * { cursor: none !important; }
   #world { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; display: block; background: var(--night); }
   main, footer, .nav { position: relative; z-index: 2; }
+  main { overflow-x: clip; } /* scrims may extend past the viewport; clip (unlike hidden) keeps position: sticky working */
   a { color: inherit; }
   :focus-visible { outline: 2px solid var(--glow); outline-offset: 4px; }
 
@@ -24,7 +25,7 @@
   .nav ul { display: flex; gap: clamp(12px, 1.8vw, 30px); list-style: none; margin: 0; padding: 0; }
   .nav ul a { text-decoration: none; font-size: 14px; opacity: .8; }
   .nav ul a:hover, .nav ul a:focus-visible { opacity: 1; }
-  .menu { display: none; font: inherit; font-size: 14px; color: var(--ink); background: none; border: 1px solid #ffffff66; border-radius: 30px; padding: 6px 16px; }
+  .menu { display: none; font: inherit; font-size: 14px; color: var(--ink); background: #0a0b1acc; border: 1px solid #ffffff66; border-radius: 30px; padding: 6px 16px; backdrop-filter: blur(8px); }
   @media (max-width: 767px) {
     .nav { mix-blend-mode: normal; background: linear-gradient(#02030acc, #02030a00); }
     .menu { display: block; }
@@ -43,6 +44,15 @@
   h3 { font-family: var(--serif); font-weight: 400; margin: 0; }
   p { color: var(--soft); max-width: 30em; font-size: clamp(16px, 1.25vw, 20px); margin: 0 0 1em; }
   .copy { text-shadow: 0 2px 30px #000a; }
+  /* readability scrim: a soft dark pool behind each text block, fading to nothing at its edges, so text stays
+     legible whatever the live WebGL scene puts behind it (measured with bench/grade/web/legibility.mjs) */
+  .scrim { position: relative; isolation: isolate; }
+  .scrim::before { content: ""; position: absolute; inset: -32% -16%; z-index: -1; pointer-events: none;
+    background: radial-gradient(closest-side, rgba(2,3,10,.86), rgba(2,3,10,.74) 62%, rgba(2,3,10,0) 100%); }
+  .scrim.tight::before { inset: -40% -6%; } /* hero subtitle only: keep the galaxy visible around it */
+  #hero h1 { text-shadow: 0 0 40px #02030acc, 0 2px 12px #02030a; }
+  /* phones: text spans the width, so an oval fades out right where the words are; use a feathered panel */
+  @media (max-width: 767px) { .scrim::before { inset: -14px -10px; border-radius: 22px; background: rgba(2,3,10,.74); box-shadow: 0 0 40px 26px rgba(2,3,10,.74); } }
   #hero { min-height: 170vh; padding-top: 0; }
   #hero .copy { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
   #hero p { margin: 0 auto 2em; }
@@ -63,13 +73,13 @@
   .card { position: relative; flex: 0 0 min(72vw, 1080px); height: min(62vh, 620px); border-radius: 22px; overflow: hidden;
     background: #0b0d22; box-shadow: 0 30px 80px #0009; }
   .card canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .card .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 30px; background: linear-gradient(#0000, #000c); }
+  .card .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 60px 30px 26px; background: linear-gradient(#0000, #000000b3 45%, #000000e6); }
   .card h3 { font-size: clamp(28px, 3vw, 44px); }
   .card p { margin: 4px 0 0; font-size: 16px; color: #e4e6ff; }
   .card .num { position: absolute; top: 22px; left: 28px; font-size: 13px; letter-spacing: .2em; color: var(--glow); }
 
   #ocean { min-height: 180vh; }
-  .count { font-family: var(--display); font-weight: 800; font-size: clamp(40px, 7vw, 116px); color: var(--glow); line-height: 1; margin-top: .3em;
+  .count { font-family: var(--display); font-weight: 800; font-size: clamp(40px, 7vw, 116px); color: #ffe9c7; line-height: 1; margin-top: .3em;
     font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
   .count + span { color: var(--soft); letter-spacing: .08em; }
 
@@ -135,14 +145,14 @@
   <section id="hero" class="chapter" data-section="hero">
     <div class="copy" data-anim="hero-title">
       <h1>Wonders of the Universe</h1>
-      <p>A journey from the edge of the galaxy to the waves at your feet.</p>
+      <p class="scrim tight">A journey from the edge of the galaxy to the waves at your feet.</p>
       <a class="cta" href="#meteors" data-cursor-label="GO">Begin the journey</a>
     </div>
     <span class="scrollhint" aria-hidden="true">SCROLL</span>
   </section>
 
   <section id="meteors" class="chapter" data-section="meteors">
-    <div class="copy" data-anim="meteors-text">
+    <div class="copy scrim" data-anim="meteors-text">
       <span class="kicker">01 — SKY</span>
       <h2>Where the sky falls</h2>
       <p>On the highest ridges the night opens up, and every few seconds a grain of ancient dust burns across it.</p>
@@ -150,7 +160,7 @@
   </section>
 
   <section id="volcano" class="chapter" data-section="volcano">
-    <div class="copy" data-anim="volcano-text">
+    <div class="copy scrim" data-anim="volcano-text">
       <span class="kicker">02 — FIRE</span>
       <h2>The earth breathes fire</h2>
       <p>Scroll to wake the mountain. Deep below, rock melts into rivers of light.</p>
@@ -158,7 +168,7 @@
   </section>
 
   <section id="waterfall" class="chapter" data-section="waterfall">
-    <div class="copy" data-anim="waterfall-text">
+    <div class="copy scrim" data-anim="waterfall-text">
       <span class="kicker">03 — WATER</span>
       <h2>Water that never stops</h2>
       <p>A river leaps from the cliff and becomes mist, rain, and forest.</p>
@@ -169,7 +179,7 @@
 
   <section id="wonders" data-section="wonders">
     <div class="stage">
-      <div class="copy" data-anim="wonders-text"><span class="kicker">04 — ELSEWHERE</span><h2>More wonders</h2></div>
+      <div class="copy scrim" data-anim="wonders-text"><span class="kicker">04 — ELSEWHERE</span><h2>More wonders</h2></div>
       <div class="track" id="track" data-cursor-label="DRAG">
         <article class="card"><canvas data-art="0" aria-hidden="true"></canvas><span class="num">01</span><div class="cap"><h3>Aurora</h3><p>Curtains of charged light over the poles.</p></div></article>
         <article class="card"><canvas data-art="1" aria-hidden="true"></canvas><span class="num">02</span><div class="cap"><h3>Nebula</h3><p>Clouds where new stars are born.</p></div></article>
@@ -182,7 +192,7 @@
   </section>
 
   <section id="ocean" class="chapter" data-section="ocean">
-    <div class="copy" data-anim="ocean-text">
+    <div class="copy scrim" data-anim="ocean-text">
       <span class="kicker">05 — TIDE</span>
       <h2>The tide remembers the moon</h2>
       <div class="count" data-counter>0</div>
@@ -191,7 +201,7 @@
   </section>
 
   <section id="voices" data-section="voices">
-    <div class="copy" data-anim="voices-text">
+    <div class="copy scrim" data-anim="voices-text">
       <span class="kicker">06 — VOICES</span>
       <h2>What people felt</h2>
       <div class="carousel" data-carousel aria-roledescription="carousel">
@@ -207,7 +217,7 @@
   </section>
 
   <section id="join" data-section="join">
-    <div class="copy" data-anim="join-text">
+    <div class="copy scrim" data-anim="join-text">
       <span class="kicker">07 — STAY</span>
       <h2>Get the wonder letter</h2>
       <p>One strange and beautiful thing from the universe, every month.</p>
