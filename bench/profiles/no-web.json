@@ -1,0 +1,11 @@
+{
+  "name": "no-web",
+  "description": "clean-room with web tools denied — use when contamination (looking up the answer) matters.",
+  "isolation": "tmp",
+  "harnessSetup": "clean",
+  "tools": { "allow": null, "deny": ["WebSearch", "WebFetch"] },
+  "skill": null,
+  "effort": null,
+  "contextPrefill": null,
+  "timeoutMin": 30
+}

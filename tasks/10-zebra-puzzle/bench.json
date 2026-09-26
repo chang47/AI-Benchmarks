@@ -1,0 +1,6 @@
+{
+  "artifacts": ["src/zebra.mjs"],
+  "extractFromFinal": true,
+  "grader": { "kind": "vitest", "cwd": "holdout" },
+  "judgeItems": []
+}

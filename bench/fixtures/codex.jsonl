@@ -1,0 +1,7 @@
+{"type":"thread.started","thread_id":"01a0dc81-3b4e-7c13-b896-ce598ea88d51"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"I’ll create hello.txt with the word hi.\n"}}
+{"type":"item.started","item":{"id":"item_1","type":"command_execution","command":"\"C:\\\\windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\" -Command \"Set-Content -LiteralPath 'hello.txt' -Value 'hi' -NoNewline\"","aggregated_output":"","exit_code":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_1","type":"command_execution","command":"\"C:\\\\windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\" -Command \"Set-Content -LiteralPath 'hello.txt' -Value 'hi' -NoNewline\"","aggregated_output":"","exit_code":0,"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_2","type":"agent_message","text":"done"}}
+{"type":"turn.completed","usage":{"input_tokens":27922,"cached_input_tokens":23552,"cache_write_input_tokens":0,"output_tokens":91,"reasoning_output_tokens":0}}

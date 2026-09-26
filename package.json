@@ -1,0 +1,15 @@
+{
+  "name": "vetted-bench",
+  "private": true,
+  "type": "module",
+  "description": "Vetted Bench — frozen AI coding tasks + a harness that runs, grades and renders agent runs.",
+  "scripts": {
+    "bench": "node bench/cli.mjs",
+    "report": "node bench/cli.mjs report",
+    "check": "node bench/checks/check.mjs",
+    "check:all": "node bench/checks/check.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.55.0"
+  }
+}

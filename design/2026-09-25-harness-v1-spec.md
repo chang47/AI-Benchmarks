@@ -1,6 +1,6 @@
 # Vetted Bench harness v1 — runner, grader, report (spec)
 
-_Created 2026-09-25 · rev 2 (Josh's answers folded in) · Status: DRAFT → ready to build step 1._
+_Created 2026-09-25 · rev 2 (Josh's answers folded in) · Status: **BUILT 2026-09-26** (see "Implementation status" at the end)._
 _Implements "Phase 2 — a Harness" from `2026-07-11-vetted-bench-design.md`. Task format is the contract; no frozen file changes._
 
 ## Why
@@ -296,3 +296,28 @@ Most models now pass text-logic tasks, so the current suite can't separate front
 5. Track B spec
 
 Root `npm run check` = B1 reference sanity for every wired task + C1 consistency + a parser round-trip over the fixture transcripts in `bench/fixtures/`. It is the regression gate, and each step lands on master only when its checks pass.
+
+---
+
+## Implementation status (2026-09-26)
+
+Built in `bench/` (commands in README → "The harness"). All three steps shipped; `npm run check` is the gate.
+
+**Deviations from the spec, each forced by something measured while building:**
+- **Clean Claude profile ≠ `--bare`.** `--bare` refuses subscription (OAuth) auth. Clean = `--setting-sources "" --strict-mcp-config --disable-slash-commands --no-chrome`: verified 0 hooks, 0 skills, 0 MCP, and the model reports no CLAUDE.md.
+- **CLIs are spawned without a shell.** A shell silently drops the empty `--setting-sources ""` argument.
+- **claude-glm clean mode injects `~/.claude-glm/settings.json` env.** `--setting-sources ""` would otherwise drop the GLM endpoint and auth.
+- **Artifacts are collected three ways, and `artifacts[].source` records which:**
+  - the declared path;
+  - the same file name elsewhere in the workspace;
+  - extracted from the final message. Tasks 15 and 17's frozen prompts say "output the complete contents of index.html", so many agents reply with the file instead of writing it.
+- **The AI judge takes a 3-vote majority** (`VBENCH_JUDGE_VOTES`). A single call on the same reference item went pass / unclear / pass, which is not stable enough to grade with.
+- **Deterministic resolvers run before the judge** (`bench.json → resolvers`). Task 15 R05 is skipped by the frozen grader because its probe window clips at a near-edge spawn. The bench-side 48×48 hook probe resolves it (reference: largest solid square 27×27, blockCount 8616→8616, which matches the July human resolution). A resolver is tagged `resolver`, never mistaken for the frozen grader.
+- **The claim classifier sees the head and tail of the final message** (`clipEnds`). Code-only replies put their "done" or caveats at the end.
+- **Tamper check accepts every manifest dialect found on disk:** `{path: hash}` and `[{path, sha256}]`, upper- or lower-case hex, with or without a BOM. All 11 holdout manifests verify.
+
+**Not built yet (next):**
+- the context-flooding condition (`contextPrefill`);
+- hosting / sharing;
+- wiring tasks 01–06 (no holdout manifest) and 11–14 / 16;
+- statistics beyond k/n and medians.
