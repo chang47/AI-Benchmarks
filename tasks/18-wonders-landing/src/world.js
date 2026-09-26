@@ -80,7 +80,7 @@
         const d = far ? 4.6 - p * 0.6 : 4.1 - p * 2.0;          // the hero slowly falls toward the galaxy as you scroll
         const tilt = far ? 1.0 : 0.95 - p * 0.45;
         cam.position.set(Math.sin(t * 0.03) * 0.3 + mouse.sx * 0.25, Math.sin(tilt) * d + mouse.sy * 0.15, Math.cos(tilt) * d);
-        cam.lookAt(0, 0, 0);
+        cam.lookAt(far ? -1.35 : 0, 0, 0);                 // far view: galaxy sits to the right, clear of the left-aligned text
         mat.uniforms.uTime.value = t; mat.uniforms.uSize.value = 11 * renderer.getPixelRatio() * (rt.height / 700);
         renderer.setRenderTarget(rt); renderer.setClearColor(0x010208, 1); renderer.clear(); renderer.render(scene, cam);
       },
