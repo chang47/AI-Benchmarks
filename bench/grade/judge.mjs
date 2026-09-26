@@ -113,3 +113,42 @@ export async function judgeVisualItems({ slug, cfg, hold, gradeDir, items, log =
     meta: { model: JUDGE_MODEL, promptSha256: sha256(VISUAL_PROMPT), screenshots: shots, votes: VOTES, parsedVotes: calls.filter((r) => r.json).length },
   };
 }
+
+// ---------------------------------------------------------------- yes/no checklist (points tasks)
+// Each question is answered yes/no from fixed frames the grader saved. Blind, VOTES independent calls,
+// strict majority wins; anything else is "unclear" and scores 0. The judge never gives an overall rating.
+const CHECKLIST_PROMPT = `You are an impartial grader. You do NOT know which model or tool built this page.
+{{INSTRUCTIONS}}
+
+Open every frame with the Read tool before answering. The frames:
+{{FRAMES}}
+
+Questions:
+{{QUESTIONS}}
+
+Rules: answer each question strictly "yes" or "no". Say "yes" only when the named frames clearly show it; if they do
+not clearly show it, say "no". Do not give scores or overall opinions.
+Reply with ONLY a JSON object: {"answers": {"<ID>": {"answer": "yes"|"no", "reason": "<one sentence>"}}}`;
+
+export async function judgeChecklist({ slug, cfg, gradeDir, items, log = console.log }) {
+  const spec = JSON.parse(readFileSync(join(taskDir(slug), cfg.judgeQuestions), "utf8"));
+  const framesDir = join(gradeDir, "frames");
+  const frames = [...new Set(items.flatMap((c) => c.frames || []))].filter((f) => existsSync(join(framesDir, f)));
+  const prompt = CHECKLIST_PROMPT
+    .replace("{{INSTRUCTIONS}}", spec.instructions)
+    .replace("{{FRAMES}}", frames.map((f) => `- ${join(framesDir, f)}`).join("\n") || "(no frames could be captured)")
+    .replace("{{QUESTIONS}}", items.map((c) => `- ${c.id}: ${spec.questions.find((q) => q.id === c.id)?.q || c.name}  [frames: ${(c.frames || []).join(", ")}]`).join("\n"));
+  writeFileSync(join(gradeDir, "judge-checklist-prompt.md"), prompt);
+  log(`[judge] checklist: ${items.length} yes/no question(s) · ${frames.length} frame(s) · ${JUDGE_MODEL} × ${VOTES} votes`);
+  const calls = frames.length ? await Promise.all(Array.from({ length: VOTES }, (_, k) =>
+    askClaude({ prompt, cwd: gradeDir, outPath: join(gradeDir, `judge-checklist-${k + 1}.json`), allowRead: true, timeoutMs: 8 * 60_000 }))) : [];
+  const verdicts = {};
+  for (const c of items) {
+    const votes = calls.map((r) => r.json?.answers?.[c.id]).filter((v) => v && ["yes", "no"].includes(String(v.answer).toLowerCase()));
+    const yes = votes.filter((v) => String(v.answer).toLowerCase() === "yes").length, no = votes.length - yes;
+    const verdict = yes > VOTES / 2 ? "yes" : no > VOTES / 2 ? "no" : "unclear";
+    const why = votes.find((v) => String(v.answer).toLowerCase() === verdict)?.reason || (frames.length ? "no majority" : "no frames");
+    verdicts[c.id] = { verdict, reasoning: `${why} [votes: ${votes.map((v) => String(v.answer).toLowerCase()).join("/") || "none"}]` };
+  }
+  return { verdicts, meta: { mode: "checklist", model: JUDGE_MODEL, promptSha256: sha256(CHECKLIST_PROMPT), frames, votes: VOTES, parsedVotes: calls.filter((r) => r.json).length } };
+}

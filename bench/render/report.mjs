@@ -85,7 +85,8 @@ function summarizeRun(r) {
     peakContextTokens: x.peakContextTokens, costUsdEstimate: x.costUsdEstimate, toolCalls: x.toolCalls, toolErrors: x.toolErrors,
     numTurns: x.numTurns,
     graded: !!g && g.status === "graded", passed: g?.passed ?? null, total: g?.total ?? null, allPass: g?.allPass ?? null,
-    unresolved: g?.unresolved ?? 0, judged: !!g?.checks?.some((c) => c.method === "judged"),
+    unresolved: g?.unresolved ?? 0, judged: !!g?.checks?.some((c) => c.method === "judged" || (c.method === "judge-checklist" && c.status !== "skip")),
+    pointsEarned: g?.pointsEarned ?? null, pointsPossible: g?.pointsPossible ?? null, score: g?.score ?? null,
     claim: g?.claim?.label ?? null, fakeConvergence: g?.fakeConvergence ?? null,
   };
 }
@@ -104,9 +105,12 @@ function buildScoreboard(rows) {
     const rs = rows.filter((r) => r.task === t.slug && armKey({ harness: r.harness, model: r.model, profile: { name: r.profile } }) === a.key);
     if (!rs.length) continue;
     cells[`${t.slug}::${a.key}`] = {
-      runs: rs.map((r) => ({ id: r.id, allPass: r.allPass, graded: r.graded, status: r.status, passed: r.passed, total: r.total, unresolved: r.unresolved })),
+      runs: rs.map((r) => ({ id: r.id, allPass: r.allPass, graded: r.graded, status: r.status, passed: r.passed, total: r.total, unresolved: r.unresolved,
+        pointsEarned: r.pointsEarned, pointsPossible: r.pointsPossible, score: r.score })),
       n: rs.length, passedRuns: rs.filter((r) => r.allPass).length,
-      medianScore: median(rs.filter((r) => r.graded).map((r) => (r.total ? r.passed / r.total : 0))),
+      // Points tasks (18+) score by points earned / possible; older tasks by checks passed.
+      points: rs.some((r) => r.score != null),
+      medianScore: median(rs.filter((r) => r.graded).map((r) => (r.score != null ? r.score : r.total ? r.passed / r.total : 0))),
       medianMs: median(rs.map((r) => r.durationMs)), medianOut: median(rs.map((r) => r.outputTokens)),
       fake: rs.filter((r) => r.fakeConvergence).length, judged: rs.some((r) => r.judged),
     };
@@ -133,6 +137,8 @@ function runPageData(run, steps) {
     return { rel, size, isHtml: /\.html?$/i.test(rel), text: isText && size < 400_000 ? readFileSync(p, "utf8") : null };
   });
   const shots = existsSync(join(run.dir, "grade")) ? readdirSync(join(run.dir, "grade")).filter((f) => f.endsWith(".png")) : [];
+  const frames = existsSync(join(run.dir, "grade", "frames")) ? readdirSync(join(run.dir, "grade", "frames")).filter((f) => f.endsWith(".png")).map((f) => `frames/${f}`) : [];
+  shots.push(...frames);
   return { meta: run.meta, result: run.result, steps: capSteps(steps), outputs, shots };
 }
 
@@ -161,6 +167,7 @@ export async function buildReport({ outDir }) {
       mkdirSync(join(dir, "grade"), { recursive: true });
       copyFileSync(join(run.dir, "grade", f), join(dir, "grade", f));
     }
+    if (existsSync(join(run.dir, "grade", "frames"))) cpSync(join(run.dir, "grade", "frames"), join(dir, "grade", "frames"), { recursive: true }); // judge frames
     const data = runPageData(run, stepsFor(run));
     data.task = taskInfo(run.meta.task);
     data.prompt = existsSync(join(run.dir, "prompt.md")) ? readFileSync(join(run.dir, "prompt.md"), "utf8") : null;

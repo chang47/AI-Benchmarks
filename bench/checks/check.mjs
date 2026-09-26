@@ -45,9 +45,15 @@ for (const [f, e] of Object.entries(expect)) {
 // ---------------------------------------------------------------- B: grader controls
 const wired = readdirSync(join(ROOT, "tasks")).filter((d) => existsSync(join(taskDir(d), "bench.json")));
 for (const slug of wired) {
-  const slow = /15-|17-/.test(slug);
+  const slow = /^(15|15b|17|18)-/.test(slug); // browser graders (15/15b grab the real mouse); `15-` alone missed 15b
   if (quick && slow) continue;
   const r = await gradeReference(slug, { log: quiet });
+  if (r.pointsPossible) { // points checklists (task 18): the reference must earn >= 95% of the scripted points (spec)
+    const scripted = r.checks.filter((c) => c.method !== "judge-checklist");
+    const e = scripted.reduce((a, c) => a + (c.earned || 0), 0), p = scripted.reduce((a, c) => a + c.points, 0);
+    record("B1", e / p >= 0.95, `${slug} reference → ${e}/${p} scripted points (${r.pointsEarned}/${r.pointsPossible} with judge)${e < p ? `; lost: ${scripted.filter((c) => c.earned < c.points).map((c) => c.id).join(", ")}` : ""}`);
+    continue;
+  }
   // The reference must pass every check of the frozen rubric (incl. bench re-measurements of those items).
   // Checks the bench ADDED for prompt requirements the rubric never graded are reported, not required.
   const frozen = r.checks.filter((c) => c.method !== "bench-check");

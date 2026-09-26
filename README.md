@@ -65,7 +65,13 @@ npm run check                                 # the regression gate (see below)
 
 **Grading** re-hashes the answer key against its `FREEZE_MANIFEST.json` (refuses on mismatch), runs the task's frozen grader **unmodified** in a sandbox that mirrors the task layout, and normalizes the checks. Items a script can't decide go to a local **AI judge** (`claude -p`, clean, blind to the model, prompt hash recorded, tagged "AI judge" in the report). The judge also classifies the agent's final message (claimed / hedged / blocked) → **fake convergence** = claimed done but failed the key.
 
-**Wired tasks** (have `tasks/<slug>/bench.json`): 07 bowling, 08 poker, 09 forth, 10 zebra (vitest) · 15 Minecraft-3D (autochecks + visual judge) · 17 budget dashboard (verify-reference). Wiring another task = one `bench.json`.
+**Task inputs.** If `tasks/<slug>/inputs/` exists it is copied into the agent's workspace as `inputs/` (task 18: the vendored Three.js); the input hashes are recorded in `meta.json`. `bench.json` can set `artifactDirs` (collect a whole folder, e.g. `src/`, not just the entry file) and `timeoutMin` (overrides the profile's 30 min).
+
+**Points checklists** (task 18 on). The grader emits checks with `points` / `earned`; `result.json` gets `pointsEarned`, `pointsPossible`, `score` and per-group totals, and the scoreboard shows "% of points". Measured values become points through bands frozen in the grader. Subjective items are **yes/no judge questions** (`judgeItems: "checklist"`): answered blind from fixed frames the grader saves, 3 votes, strict majority, a tie scores 0, never an overall rating. A points run counts as a false "done" when the agent claimed done and scored under 90%.
+
+**Wired tasks** (have `tasks/<slug>/bench.json`): 07 bowling, 08 poker, 09 forth, 10 zebra (vitest) · 15 Minecraft-3D (autochecks + visual judge) · 17 budget dashboard (verify-reference) · 18 Wonders landing page (82-point checklist: 74 scripted + 8 yes/no judge). Wiring another task = one `bench.json`.
+
+**Task 18 probe validation:** `node bench/checks/mutations-18.mjs` grades the reference, then broken copies of it (frozen volcano, broken pin, never-pausing scenes, no cursor, no validation, no reduced motion, a console error, no scrims, galaxy ignores the mouse) and checks each loses exactly its own checks. Slow (~1 h, one Chrome at a time); not part of `npm run check`.
 
 **`npm run check`** — parser fixtures per harness; every wired task's reference passes its key; a broken bowling scorer fails with named checks; a 1-byte holdout edit is caught; task 17's July realistic build still grades 7/8 (V6); every report number equals its JSON; tool-call counts agree across page / steps / raw; browser render has zero console errors and no horizontal scroll at 1440px and 390px; no home paths leak into the site. `--quick` skips the slow browser tasks.
 

@@ -46,6 +46,17 @@ export const NORMALIZERS = {
     };
   },
 
+  // points checklists (task 18 grade-wonders.mjs): { pointsPossible, checks[{id, group, name, points, earned, status, detail, frames?}], notes }
+  points(raw, proc) {
+    if (!raw || !Array.isArray(raw.checks)) return crashed(proc, "points grader");
+    return {
+      checks: raw.checks.map((c) => ({ id: c.id, name: c.name, group: c.group, points: c.points, earned: c.earned, status: c.status,
+        method: c.method || "scripted", frames: c.frames, detail: String(c.detail ?? "").slice(0, 600) })),
+      error: raw.notes?.filter((n) => /crash|error/i.test(n)).join("; ") || undefined,
+      version: raw.version,
+    };
+  },
+
   // autochecks.mjs (tasks 12/13/15/16): { summary, results[{id, name?, status, detail}] }
   autochecks(raw, proc) {
     if (!raw || !Array.isArray(raw.results)) return crashed(proc, "autochecks.mjs");

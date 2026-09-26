@@ -1,0 +1,19 @@
+{
+  "frozen_at": "2026-09-26T23:13:57.086Z",
+  "algorithm": "sha256",
+  "excludes": [
+    "node_modules",
+    "package-lock.json",
+    "frames",
+    "FREEZE_MANIFEST.json (self)"
+  ],
+  "files": {
+    "grade-wonders.mjs": "3a718a6768aacfd01a44a65f9c2d67ca88b0de2e2f8febf20db78edad02ba0e3",
+    "probes-scene.mjs": "6155d973e6efaffdc1ace5dfea601e96d0c3e244a264813f437fd229cb20be6d",
+    "probes-ux.mjs": "60b099103cff749e83d383b9f0edb0cd27ed9f83c3b42fea9b796ba43e167288",
+    "lib/helpers.mjs": "6d9062dbd9e8ea49d601386e849c09395e9d384b828c6fa94cdf732cd04992c4",
+    "lib/legibility.mjs": "5edcaf37974eb84d5504ceec3ba75f271d463d6831a9b5bed0bb328d1da9b18e",
+    "judge-questions.json": "6f845bee6ba510d0c96b4da6c5aa3900112fffb50e4c5dd142cc2a0e03109596",
+    "package.json": "42dabb3fe13ad8d74d1bce7791fa5218a741f074830d59974cbd9a9c3575756d"
+  }
+}

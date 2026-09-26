@@ -41,7 +41,7 @@
         h += `<td><a class="cell" href="${target}"><span class="ticks">${c.runs.map(tick).join("")}</span>
           ${c.runs.some((r) => r.graded) ? `<span class="frac">${c.passedRuns}<span class="of">/${c.n}</span></span>
           <span class="sub"> fully passed</span><br>` : `<span class="sub">awaiting grade</span><br>`}
-          <span class="sub">${c.medianScore != null ? Math.round(c.medianScore * 100) + "% of checks, " : ""}${dur(c.medianMs)}, ${num(c.medianOut)} out</span>
+          <span class="sub">${c.medianScore != null ? Math.round(c.medianScore * 100) + (c.points ? "% of points, " : "% of checks, ") : ""}${dur(c.medianMs)}, ${num(c.medianOut)} out</span>
           ${c.fake ? `<br><span class="flag fake">${c.fake} false “done”</span>` : ""}
           ${c.judged ? `<br><span class="flag judged">AI-judged checks</span>` : ""}</a></td>`;
       }
@@ -91,12 +91,14 @@
 
   function tick(r) {
     let cls = "";
-    if (r.graded) cls = r.allPass ? "pass" : r.total && r.passed / r.total >= 0.5 ? "partial" : "fail";
+    if (r.graded && r.score != null) cls = r.score >= 0.9 ? "pass" : r.score >= 0.5 ? "partial" : "fail";
+    else if (r.graded) cls = r.allPass ? "pass" : r.total && r.passed / r.total >= 0.5 ? "partial" : "fail";
     else if (r.status && r.status !== "ok") cls = "fail";
-    return `<i class="tick ${cls}" title="${esc(r.id)}: ${r.graded ? `${r.passed}/${r.total}` : esc(r.status)}"></i>`;
+    return `<i class="tick ${cls}" title="${esc(r.id)}: ${r.graded ? (r.score != null ? `${r.pointsEarned}/${r.pointsPossible} pts` : `${r.passed}/${r.total}`) : esc(r.status)}"></i>`;
   }
   function resultPill(r) {
     if (!r.graded) return `<span class="pill muted">${esc(r.status === "ok" ? "ungraded" : r.status)}</span>`;
+    if (r.score != null) return `<span class="pill ${r.score >= 0.9 ? "pass" : "fail"}">${r.pointsEarned}/${r.pointsPossible} pts</span>`;
     return `<span class="pill ${r.allPass ? "pass" : "fail"}">${r.passed}/${r.total}</span>${r.unresolved ? ` <span class="sub">(${r.unresolved} unresolved)</span>` : ""}`;
   }
 
@@ -109,7 +111,9 @@
     if (!result) verdict = `<div class="verdict none"><span class="score">${viewOnly ? "Transcript" : "Not graded"}</span>${meta.status && meta.status !== "ok" ? `<span class="said">run status: ${esc(meta.status)}${meta.errorDetail ? ` (${esc(meta.errorDetail)})` : ""}</span>` : ""}</div>`;
     else {
       const said = result.claim ? { claimed: "The agent said it was done.", hedged: "The agent delivered with caveats.", blocked: "The agent said it could not finish." }[result.claim.label] : "";
-      verdict = `<div class="verdict ${result.allPass ? "pass" : "fail"}"><span class="score">${result.passed}/${result.total} checks passed</span>
+      const pts = result.pointsPossible != null;
+      verdict = `<div class="verdict ${(pts ? result.score >= 0.9 : result.allPass) ? "pass" : "fail"}"><span class="score">${pts ? `${result.pointsEarned}/${result.pointsPossible} points (${Math.round(result.score * 100)}%)` : `${result.passed}/${result.total} checks passed`}</span>
+        ${pts && result.groups ? `<span class="said">${Object.entries(result.groups).map(([g, v]) => `${esc(g)} ${v.earned}/${v.possible}`).join(" · ")}</span>` : ""}
         <span class="said ${result.fakeConvergence ? "fake" : ""}">${esc(said)}${result.fakeConvergence ? " The answer key disagrees: this is a false “done”." : ""}${result.unresolved ? ` ${result.unresolved} check(s) unresolved.` : ""}</span></div>`;
     }
     let h = `<div class="wrap">
@@ -138,7 +142,7 @@
       const sorted = result.checks.slice().sort((a, b) => rank(a.status) - rank(b.status));
       h += `<section class="panel"><h3>Answer-key checks</h3>
         ${result.notes?.length ? result.notes.map((n) => `<p class="sub">${esc(n)}</p>`).join("") : ""}
-        <ul class="checks">${sorted.map((c) => `<li class="${esc(c.status)}"><span class="mark">${c.status === "pass" ? "pass" : c.status === "fail" ? "fail" : "?"}</span>${esc(c.name)}${c.flaky ? `<span class="by">flaky: ${esc(c.flaky.join("/"))}</span>` : ""}${c.method === "judged" ? `<span class="by">AI judge</span>` : c.method === "resolver" || c.method === "bench-probe" ? `<span class="by">bench probe${c.frozenStatus ? `, frozen said ${esc(c.frozenStatus)}` : ""}</span>` : c.method === "bench-check" ? `<span class="by">added check</span>` : ""}
+        <ul class="checks">${sorted.map((c) => `<li class="${esc(c.status)}"><span class="mark">${c.status === "pass" ? "pass" : c.status === "fail" ? "fail" : "?"}</span>${typeof c.points === "number" ? `<b>${c.earned ?? 0}/${c.points}</b> ` : ""}${esc(c.name)}${c.flaky ? `<span class="by">flaky: ${esc(c.flaky.join("/"))}</span>` : ""}${c.method === "judged" || c.method === "judge-checklist" ? `<span class="by">AI judge</span>` : c.method === "resolver" || c.method === "bench-probe" ? `<span class="by">bench probe${c.frozenStatus ? `, frozen said ${esc(c.frozenStatus)}` : ""}</span>` : c.method === "bench-check" ? `<span class="by">added check</span>` : ""}
           ${c.detail ? `<details><summary>detail</summary><pre>${esc(c.detail)}</pre></details>` : ""}</li>`).join("")}</ul>
         ${result.judge ? `<p class="sub">Judge: ${esc(result.judge.model)}, blind to which model built this.</p>` : ""}</section>`;
     }

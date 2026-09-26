@@ -38,6 +38,14 @@ tool-call counts page==steps==raw, browser render clean at 1440/390, no path lea
 - Task 15's scripted grader SKIPs R05 on a clipped probe window; the visual judge prompt must not
   treat skip-note numbers as failure (it did once; reference now 22/22 = the human resolution).
 
+## Task 18 grader (added 2026-09-26)
+- `tasks/18-wonders-landing/holdout/grade-wonders.mjs` (frozen, own node_modules: playwright 1.63 + axe-core + pngjs). ~7 min per grade,
+  one Chrome at a time — legibility alone is ~3 min. `WONDERS_ONLY=title,scenes node grade-wonders.mjs <index.html>` runs a subset (dev only).
+- Pixel probes hide all text + the custom cursor first. Film grain swamps per-pixel diffs; the galaxy-mouse probe uses 8×8 block
+  averages, threshold calibrated against the `no-mouse` mutation (null 1.08×, reference 1.5–2.0×).
+- `node bench/checks/mutations-18.mjs [names]` = probe validation (~1 h). Mutation anchors must survive CRLF sources.
+- Memory: 3 parallel agent runs + a grading Chrome got both jobs killed by Claude Code's low-memory reaper. Run 18 serially.
+
 ## Public showcase
 - Task 18 reference page → https://wonders-of-the-universe.iamjoshchang.workers.dev. Redeploy with
   `npx wrangler deploy --config deploy/wonders/wrangler.jsonc` (Workers static assets; `wrangler pages`
