@@ -1,0 +1,2 @@
+# Frozen answer keys are hash-checked byte-for-byte: never let git rewrite their line endings.
+tasks/*/holdout/** -text

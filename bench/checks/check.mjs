@@ -48,7 +48,12 @@ for (const slug of wired) {
   const slow = /15-|17-/.test(slug);
   if (quick && slow) continue;
   const r = await gradeReference(slug, { log: quiet });
-  record("B1", r.allPass, `${slug} reference → ${r.passed}/${r.total}${r.unresolved ? `, ${r.unresolved} unresolved` : ""}`);
+  // The reference must pass every check of the frozen rubric (incl. bench re-measurements of those items).
+  // Checks the bench ADDED for prompt requirements the rubric never graded are reported, not required.
+  const frozen = r.checks.filter((c) => c.method !== "bench-check");
+  const added = r.checks.filter((c) => c.method === "bench-check");
+  const ok = frozen.length > 0 && frozen.every((c) => c.status === "pass");
+  record("B1", ok, `${slug} reference → ${frozen.filter((c) => c.status === "pass").length}/${frozen.length} frozen-rubric checks${added.length ? `; added checks: ${added.map((c) => `${c.id} ${c.status}`).join(", ")}` : ""}`);
 }
 
 {
