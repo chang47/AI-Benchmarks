@@ -1,0 +1,10 @@
+{
+  // Public showcase of the task-18 starter page ("Wonders of the Universe"): static files only, no Worker code.
+  // Deploy: npx wrangler deploy --config deploy/wonders/wrangler.jsonc
+  "name": "wonders-of-the-universe",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "../../tasks/18-wonders-landing/src",
+    "not_found_handling": "single-page-application"
+  }
+}

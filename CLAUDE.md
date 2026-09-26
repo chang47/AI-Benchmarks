@@ -37,3 +37,9 @@ tool-call counts page==steps==raw, browser render clean at 1440/390, no path lea
   records how it was collected).
 - Task 15's scripted grader SKIPs R05 on a clipped probe window; the visual judge prompt must not
   treat skip-note numbers as failure (it did once; reference now 22/22 = the human resolution).
+
+## Public showcase
+- Task 18 reference page → https://wonders-of-the-universe.iamjoshchang.workers.dev. Redeploy with
+  `npx wrangler deploy --config deploy/wonders/wrangler.jsonc` (Workers static assets; `wrangler pages`
+  now delegates to Workers and fails for a plain static folder). Only the reference page (`src/`) is
+  public. Never deploy run data: `runs/` holds absolute local paths.
