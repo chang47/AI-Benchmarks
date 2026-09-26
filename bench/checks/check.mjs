@@ -125,9 +125,9 @@ if (!noBrowser) {
     for (const f of readdirSync(d, { withFileTypes: true })) {
       const p = join(d, f.name);
       if (f.isDirectory()) walk(p);
-      else if (/\.(html|js|css|json)$/.test(f.name)) {
+      else if (/\.(html|m?js|css|json|svg|txt|md)$/.test(f.name)) {
         const t = readFileSync(p, "utf8");
-        for (const probe of REDACT_PROBES) if (probe && new RegExp(`[\\\\/]${probe}[\\\\/]|Users[\\\\/]+${probe}`, "i").test(t)) hits.push(`${p.slice(site.length + 1)} (${probe})`);
+        for (const probe of REDACT_PROBES) if (probe && t.toLowerCase().includes(probe.toLowerCase())) hits.push(`${p.slice(site.length + 1)} (${probe})`);
       }
     }
   };
