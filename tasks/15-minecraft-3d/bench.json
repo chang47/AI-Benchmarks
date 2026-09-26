@@ -1,0 +1,8 @@
+{
+  "artifacts": ["src/index.html"],
+  "extractFromFinal": true,
+  "grader": { "kind": "node-script", "cwd": "holdout", "script": "autochecks.mjs", "parse": "autochecks", "timeoutMin": 12 },
+  "judgeItems": "skipped-autochecks",
+  "judgeRubric": "holdout/rubric.md",
+  "screenshots": { "keys": ["w", "a", "d"], "waitMs": 3000 }
+}

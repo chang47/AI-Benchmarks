@@ -1,0 +1,6 @@
+{
+  "artifacts": ["src/index.html"],
+  "extractFromFinal": true,
+  "grader": { "kind": "node-script", "cwd": "holdout", "script": "verify-reference.mjs", "parse": "scenarios" },
+  "judgeItems": []
+}

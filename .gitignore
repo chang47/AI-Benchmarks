@@ -1,3 +1,10 @@
 node_modules/
 *.log
 .DS_Store
+runs/*/raw.jsonl
+runs/*/steps.json
+runs/*/stderr.log
+runs/*/grade/
+runs/_controls/
+.bench-cache/
+reports/site/

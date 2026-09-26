@@ -1,0 +1,11 @@
+{
+  "name": "clean-room",
+  "description": "Default benchmark profile: empty temp workspace outside the repo, harness in its bare setup (no user CLAUDE.md/AGENTS.md, skills, hooks, plugins or MCP), all tools allowed.",
+  "isolation": "tmp",
+  "harnessSetup": "clean",
+  "tools": { "allow": null, "deny": [] },
+  "skill": null,
+  "effort": null,
+  "contextPrefill": null,
+  "timeoutMin": 30
+}

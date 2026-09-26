@@ -1,0 +1,11 @@
+{
+  "name": "josh",
+  "description": "Josh's real harness setup (his CLAUDE.md, skills, hooks, plugins, MCP) in an empty temp workspace — the 'harness outlives the model' arm.",
+  "isolation": "tmp",
+  "harnessSetup": "josh",
+  "tools": { "allow": null, "deny": [] },
+  "skill": null,
+  "effort": null,
+  "contextPrefill": null,
+  "timeoutMin": 30
+}
