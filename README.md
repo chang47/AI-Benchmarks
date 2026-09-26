@@ -140,3 +140,13 @@ Each task's answer key (`holdout/`) is frozen and committed *before* the candida
 ## Relocation note (2026-07-12)
 
 The wave-1 overnight orchestrator had an args bug: the base path reached agents as the literal string `"undefined"`, so five tasks self-resolved into the `vetted-bench` folder and one (03-sudoku) wrote to a stray `undefined/` dir. Post-run the two run commits were ported here via `git format-patch`/`git am` (author timestamps preserved — the freeze-before-build ordering is still verifiable), the sudoku research recovered, and `vetted-bench` restored to its pre-run state (backup branch `overnight-run-mislocated` kept there until reviewed). Wave 2 hardcoded the base path, so it stayed clean.
+
+---
+
+## Showcase: task 18 "Wonders of the Universe" (live)
+
+The task-18 reference page is public at **https://wonders-of-the-universe.iamjoshchang.workers.dev**. It's a cinematic, code-only WebGL world (Three.js r186 + custom GLSL) and the flagship benchmark page. It's served as Cloudflare Workers static assets straight from `tasks/18-wonders-landing/src/`. Redeploy after a change with:
+
+```
+npx wrangler deploy --config deploy/wonders/wrangler.jsonc
+```
