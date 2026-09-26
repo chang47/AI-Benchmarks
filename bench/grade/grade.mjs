@@ -1,13 +1,13 @@
 // Step 2 — the grader. For a run: tamper-check the frozen answer key, build a sandbox that
 // mirrors the task layout (holdout copy + the run's output as src/), run the task's frozen
 // grader UNMODIFIED, normalize to result.json, then add AI-judged items and the claim check.
-import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
+import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { join } from "node:path";
 import {
   CACHE_DIR, ROOT, RUNS_DIR, ensureDir, listFiles, loadBenchConfig, nowIso, rand4, readJson, resolveTask,
   runProcess, sha256File, taskDir, writeJson,
 } from "../lib/util.mjs";
-import { classifyClaim, judgeVisualItems, JUDGE_MODEL } from "./judge.mjs";
+import { classifyClaim, judgeChecklist, judgeVisualItems, JUDGE_MODEL } from "./judge.mjs";
 import { NORMALIZERS } from "./normalize.mjs";
 
 /** Verify every file in a holdout dir against FREEZE_MANIFEST.json. */
@@ -60,7 +60,8 @@ async function runGrader(slug, cfg, hold, gradeDir) {
   }
   if (g.kind === "node-script") {
     const p = await runProcess(process.execPath, [g.script], {
-      cwd: hold, env: { ...process.env }, stdoutPath: join(gradeDir, "grader-stdout.txt"), stderrPath: join(gradeDir, "grader-stderr.txt"), timeoutMs,
+      // points graders save their judge frames to VBENCH_FRAMES_DIR
+      cwd: hold, env: { ...process.env, VBENCH_FRAMES_DIR: join(gradeDir, "frames") }, stdoutPath: join(gradeDir, "grader-stdout.txt"), stderrPath: join(gradeDir, "grader-stderr.txt"), timeoutMs,
     });
     let raw = null;
     try { raw = JSON.parse(readFileSync(join(gradeDir, "grader-stdout.txt"), "utf8")); } catch { /* grader crashed */ }
@@ -158,6 +159,21 @@ export async function gradeRun(runDir, { judge = true, log = console.log } = {})
       }
     }
 
+    // Judge checklist (points tasks): blind yes/no questions answered from the grader's fixed frames.
+    const questions = result.checks.filter((c) => c.status === "skip" && c.method === "judge-checklist");
+    if (cfg.judgeItems === "checklist" && questions.length) {
+      if (judge && !missing.length) {
+        const j = await judgeChecklist({ slug, cfg, gradeDir, items: questions, log });
+        result.judge = j.meta;
+        for (const c of questions) {
+          const v = j.verdicts[c.id];
+          c.status = v.verdict === "yes" ? "pass" : v.verdict === "no" ? "fail" : "unclear";
+          c.earned = v.verdict === "yes" ? c.points : 0; // a tie or no majority scores 0 (spec: contain the subjectivity)
+          c.detail = `JUDGE: ${v.verdict} — ${v.reasoning}`;
+        }
+      } else for (const c of questions) { c.earned = 0; c.status = "fail"; c.detail = missing.length ? "no artifact to judge" : "judge disabled (--no-judge): scored 0"; }
+    }
+
     // AI judge for items still undecided.
     const skipped = result.checks.filter((c) => c.status === "skip");
     if (judge && skipped.length && cfg.judgeItems === "skipped-autochecks" && !missing.length) {
@@ -179,32 +195,46 @@ export async function gradeRun(runDir, { judge = true, log = console.log } = {})
   result.passRate = result.total ? Number((result.passed / result.total).toFixed(4)) : 0;
   result.allPass = result.total > 0 && result.passed === result.total;
   result.unresolved = result.checks.filter((c) => c.status === "skip" || c.status === "unclear").length;
+  // Points checklists: the score is points earned / points possible, next to the k/n count.
+  if (result.checks.some((c) => typeof c.points === "number")) {
+    result.pointsPossible = result.checks.reduce((a, c) => a + (c.points || 0), 0);
+    result.pointsEarned = result.checks.reduce((a, c) => a + (c.earned || 0), 0);
+    result.score = result.pointsPossible ? Number((result.pointsEarned / result.pointsPossible).toFixed(4)) : 0;
+    const groups = {};
+    for (const c of result.checks) { const g = (groups[c.group || "other"] ||= { earned: 0, possible: 0 }); g.earned += c.earned || 0; g.possible += c.points || 0; }
+    result.groups = groups;
+  }
 
   if (judge && meta.finalText != null && !meta.reference) {
     result.claim = await classifyClaim({ finalText: meta.finalText, gradeDir, log });
-    result.fakeConvergence = result.claim.label === "claimed" && !result.allPass;
+    // Points tasks: nobody is expected to hit 82/82, so a "done" claim is false only below the 90% pass line.
+    result.fakeConvergence = result.claim.label === "claimed" && (result.pointsPossible ? result.score < 0.9 : !result.allPass);
   }
   result.status = "graded";
   writeJson(join(runDir, "result.json"), result);
-  log(`[grade] ${meta.runId} → ${result.passed}/${result.total}${result.allPass ? " ALL PASS" : ""}${result.fakeConvergence ? " · FAKE CONVERGENCE" : ""}`);
+  log(`[grade] ${meta.runId} → ${result.passed}/${result.total}${result.pointsPossible ? ` · ${result.pointsEarned}/${result.pointsPossible} pts` : ""}${result.allPass ? " ALL PASS" : ""}${result.fakeConvergence ? " · FAKE CONVERGENCE" : ""}`);
   return result;
 }
 
 /** B1/B2 controls: grade the task's own reference src/ (or a supplied file) as a pseudo-run. */
-export async function gradeReference(task, { candidate, label = "reference", log = console.log } = {}) {
+export async function gradeReference(task, { candidate, label = "reference", judge = true, log = console.log } = {}) {
   const slug = resolveTask(task);
   const cfg = loadBenchConfig(slug);
   const runDir = ensureDir(join(RUNS_DIR, "_controls", `${slug}-${label}`));
   rmSync(join(runDir, "output"), { recursive: true, force: true });
   const artifacts = [];
-  for (const rel of cfg.artifacts) {
+  // Folder deliverables (task 18): the control is a whole src/ folder (reference, or a mutated copy of it).
+  if (cfg.artifactDirs?.length && (!candidate || statSync(candidate).isDirectory())) {
+    for (const dir of cfg.artifactDirs) cpSync(candidate || join(taskDir(slug), dir), join(runDir, "output", dir), { recursive: true });
+    artifacts.push(...cfg.artifacts.map((rel) => ({ path: rel, source: candidate ? `control:${label}` : "reference" })));
+  } else for (const rel of cfg.artifacts) {
     const from = candidate || join(taskDir(slug), rel);
     mkdirSync(join(runDir, "output", rel, ".."), { recursive: true });
     copyFileSync(from, join(runDir, "output", rel));
     artifacts.push({ path: rel, source: candidate ? `control:${label}` : "reference" });
   }
   writeJson(join(runDir, "meta.json"), { runId: `${slug}-${label}`, task: slug, reference: true, label, harness: "control", model: label, artifacts, finalText: null });
-  return gradeRun(runDir, { judge: true, log });
+  return gradeRun(runDir, { judge, log });
 }
 
 export const JUDGE_INFO = { model: JUDGE_MODEL };

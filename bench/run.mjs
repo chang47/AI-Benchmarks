@@ -2,13 +2,13 @@
 //   raw.jsonl (untouched harness stdout) · stderr.log · output/ (collected artifacts)
 //   workspace-files.txt · steps.json (normalized) · meta.json (+ prompt.md copy)
 import { spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join } from "node:path";
 import { getHarness, modelAlias } from "./harnesses/index.mjs";
 import {
   ROOT, RUNS_DIR, ensureDir, listFiles, loadBenchConfig, nowIso, rand4, readJson, resolveTask,
-  runProcess, sha256, stamp, taskDir, writeJson,
+  runProcess, sha256, sha256File, stamp, taskDir, writeJson,
 } from "./lib/util.mjs";
 import { parseFile } from "./trajectory/index.mjs";
 
@@ -81,7 +81,23 @@ function collectArtifacts(cfg, ws, outDir, finalText) {
     }
     found.push({ path: rel, source: null });
   }
+  // Multi-file deliverables (task 18: index.html + its own .js + vendor/): copy the whole folder. If the agent
+  // put the entry file somewhere else, take the folder it actually lives in.
+  for (const dir of cfg.artifactDirs || []) {
+    const entry = found.find((f) => f.path.startsWith(`${dir}/`));
+    const from = existsSync(join(ws, dir)) ? join(ws, dir)
+      : entry?.source?.startsWith("file:") ? join(ws, dirname(entry.source.slice(5))) : null;
+    if (from && from !== ws) cpSync(from, join(outDir, dir), { recursive: true, force: false, errorOnExist: false });
+  }
   return found;
+}
+
+/** Copy tasks/<slug>/inputs/** into the workspace (vendored libs, screenshots) and record their hashes. */
+function copyInputs(slug, ws) {
+  const src = join(taskDir(slug), "inputs");
+  if (!existsSync(src)) return null;
+  cpSync(src, join(ws, "inputs"), { recursive: true });
+  return Object.fromEntries(listFiles(src).map((rel) => [rel, sha256File(join(src, rel))]));
 }
 
 export async function runOne({ task, harness: harnessId, model, profile: profileName = "clean-room", attempt = 1, of = 1, keep = false, profileOverrides = {}, log = console.log }) {
@@ -98,6 +114,7 @@ export async function runOne({ task, harness: harnessId, model, profile: profile
 
   const { ws, cleanup } = makeWorkspace(runId, profile);
   for (const d of new Set(cfg.artifacts.map((a) => dirname(a)).filter((d) => d !== "."))) mkdirSync(join(ws, d), { recursive: true });
+  const inputs = copyInputs(slug, ws);
   if (profile.skill && harnessId === "codex") copyFileSync(profile.skill, join(ws, "AGENTS.md"));
 
   const cmd = harness.command({ model, profile, prompt });
@@ -107,7 +124,7 @@ export async function runOne({ task, harness: harnessId, model, profile: profile
   const proc = await runProcess(cmd.cmd, args, {
     cwd: ws, env: cmd.env, stdin: cmd.promptInArgs ? null : prompt,
     stdoutPath: join(runDir, "raw.jsonl"), stderrPath: join(runDir, "stderr.log"),
-    timeoutMs: (profile.timeoutMin || 30) * 60_000,
+    timeoutMs: (cfg.timeoutMin || profile.timeoutMin || 30) * 60_000, // a task may need longer than the profile default
   });
   const endedAt = nowIso();
 
@@ -133,7 +150,7 @@ export async function runOne({ task, harness: harnessId, model, profile: profile
     modelMismatch: !!(parsed.info.modelReported && !parsed.info.modelReported.includes(model.split("/").pop().replace(/\[.*\]$/, ""))),
     profile, attempt, of, startedAt, endedAt, status,
     exitCode: proc.code, timedOut: proc.timedOut, errorDetail: parsed.info.errorDetail || null,
-    promptFile: cfg.prompt || "frozen-prompt.md", promptSha256: sha256(prompt),
+    promptFile: cfg.prompt || "frozen-prompt.md", promptSha256: sha256(prompt), inputs,
     parserVersion: parsed.parserVersion, command: [cmd.cmd === process.execPath ? "node" : cmd.cmd, ...safeArgs],
     init: parsed.info.init || null, sessionId: parsed.info.sessionId || null,
     artifacts, finalText: clipEnds(parsed.info.finalText),

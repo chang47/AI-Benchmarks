@@ -11,5 +11,5 @@
     "https://arxiv.org/abs/2603.13391"
   ],
   "contamination": "low — original theme, copy and test contract written for this bench on 2026-09-26",
-  "grading": "points checklist (78 pts, 70 scripted / 8 judged yes-no) — design/2026-09-26-web-3d-sheet-tasks-spec.md, Task 18. Grader not built yet."
+  "grading": "points checklist (82 pts: 74 scripted / 8 judged yes-no) — holdout/grade-wonders.mjs (frozen), spec design/2026-09-26-web-3d-sheet-tasks-spec.md Task 18. Reference: 74/74 scripted."
 }

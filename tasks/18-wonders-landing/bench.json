@@ -1,0 +1,9 @@
+{
+  "artifacts": ["src/index.html"],
+  "artifactDirs": ["src"],
+  "extractFromFinal": true,
+  "timeoutMin": 60,
+  "grader": { "kind": "node-script", "cwd": "holdout", "script": "grade-wonders.mjs", "parse": "points", "timeoutMin": 15 },
+  "judgeItems": "checklist",
+  "judgeQuestions": "holdout/judge-questions.json"
+}

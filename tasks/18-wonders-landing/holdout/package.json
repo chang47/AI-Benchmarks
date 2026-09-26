@@ -1,0 +1,11 @@
+{
+  "name": "wonders-grader",
+  "private": true,
+  "type": "module",
+  "description": "Frozen grader for task 18 (Wonders of the Universe): 82-point checklist.",
+  "dependencies": {
+    "axe-core": "4.10.3",
+    "playwright": "1.63.0",
+    "pngjs": "7.0.0"
+  }
+}

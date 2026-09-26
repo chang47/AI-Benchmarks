@@ -1,0 +1,13 @@
+{
+  "instructions": "You are looking at still frames of a web page called 'Wonders of the Universe' (a scroll-story landing page). Answer each question with yes or no, judging ONLY what the named frames show. Answer yes only when the frames clearly show it. Do not rate overall quality.",
+  "questions": [
+    { "id": "J1", "q": "Does the hero background read as a spiral galaxy (glowing particles or light arranged in spiral arms around a bright core)?", "frames": ["d-hero.png"] },
+    { "id": "J2", "q": "Does this frame show meteors (streaks of light) over a recognizable mountain silhouette in a night sky?", "frames": ["d-meteors.png"] },
+    { "id": "J3", "q": "Is a volcano visibly erupting (glow, lava, fire or ash) in the 80% frame, while it is NOT erupting (or clearly much less) in the start frame?", "frames": ["d-volcano-start.png", "d-volcano-80.png"] },
+    { "id": "J4", "q": "Does this frame show a waterfall that reads as falling water, together with a forest?", "frames": ["d-waterfall.png"] },
+    { "id": "J5", "q": "Across these frames of the horizontal wonders strip, are there at least 5 cards whose visuals are clearly different from each other (not the same picture recoloured)?", "frames": ["d-wonders-0.png", "d-wonders-25.png", "d-wonders-50.png", "d-wonders-75.png", "d-wonders-100.png"] },
+    { "id": "J6", "q": "Across all of these desktop frames, is every piece of text free of overlaps with other text and free of clipping (cut-off words or lines)?", "frames": ["d-hero.png", "d-meteors.png", "d-volcano-80.png", "d-waterfall.png", "d-wonders-50.png", "d-ocean.png", "d-voices.png", "d-join.png"] },
+    { "id": "J7", "q": "Is the phone-width (390px) layout readable in all of these frames: text fits the screen, is large enough, and does not overlap?", "frames": ["m-hero.png", "m-volcano.png", "m-wonders.png", "m-join.png"] },
+    { "id": "J8", "q": "Does the page hold one coherent palette and mood across these sections (a night / cosmic theme), rather than looking like unrelated pages stitched together?", "frames": ["d-hero.png", "d-meteors.png", "d-volcano-80.png", "d-waterfall.png", "d-wonders-50.png", "d-ocean.png", "d-join.png"] }
+  ]
+}
