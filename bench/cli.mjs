@@ -79,7 +79,11 @@ async function main() {
   if (cmd === "reparse") {
     // Raw is the source of truth: regenerate steps.json + parsed metrics for every run (or the named ones).
     const { reparseRun } = await import("./run.mjs");
-    for (const id of a._.length ? a._ : allRunDirs()) console.log(`[reparse] ${id} → ${reparseRun(join(RUNS_DIR, id))}`);
+    const done = new Set(allRunDirs());
+    for (const id of (a._.length ? a._ : [...done]).map((x) => x.replace(/[\/]$/, ""))) {
+      if (!done.has(id)) { console.log(`[reparse] ${id} skipped (no meta.json yet — still running?)`); continue; }
+      console.log(`[reparse] ${id} → ${reparseRun(join(RUNS_DIR, id))}`);
+    }
     return;
   }
 

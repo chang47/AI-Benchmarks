@@ -136,7 +136,7 @@ export async function runOne({ task, harness: harnessId, model, profile: profile
     promptFile: cfg.prompt || "frozen-prompt.md", promptSha256: sha256(prompt),
     parserVersion: parsed.parserVersion, command: [cmd.cmd === process.execPath ? "node" : cmd.cmd, ...safeArgs],
     init: parsed.info.init || null, sessionId: parsed.info.sessionId || null,
-    artifacts, finalText: parsed.info.finalText ? parsed.info.finalText.slice(0, 4000) : null,
+    artifacts, finalText: clipEnds(parsed.info.finalText),
     rawBadLines: parsed.badLines?.length || 0,
     metrics: { durationMs: proc.ms, ...parsed.metrics, artifactProduced },
   };
@@ -161,6 +161,16 @@ export async function runPool(jobs, parallel = 1, log = console.log) {
   return results;
 }
 
+/** Keep the head AND tail of a long final message: code-only replies put their "done / caveats" at the end. */
+export function clipEnds(t, head = 1500, tail = 2500) {
+  if (t == null) return null;
+  return t.length <= head + tail ? t : `${t.slice(0, head)}
+
+[… ${t.length - head - tail} characters omitted …]
+
+${t.slice(-tail)}`;
+}
+
 /** Re-derive steps.json and the parsed metrics from raw.jsonl (e.g. after a parser fix). */
 export function reparseRun(runDir) {
   const meta = readJson(join(runDir, "meta.json"));
@@ -170,6 +180,7 @@ export function reparseRun(runDir) {
   meta.metrics = { ...keep, ...parsed.metrics };
   meta.parserVersion = parsed.parserVersion;
   meta.modelReported = parsed.info.modelReported || meta.modelReported || null;
+  meta.finalText = clipEnds(parsed.info.finalText);
   writeJson(join(runDir, "meta.json"), meta);
   return `${parsed.steps.length} steps (${parsed.parserVersion})`;
 }

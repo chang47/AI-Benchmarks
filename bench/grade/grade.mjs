@@ -4,7 +4,7 @@
 import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import {
-  CACHE_DIR, RUNS_DIR, ensureDir, listFiles, loadBenchConfig, nowIso, readJson, resolveTask,
+  CACHE_DIR, ROOT, RUNS_DIR, ensureDir, listFiles, loadBenchConfig, nowIso, readJson, resolveTask,
   runProcess, sha256File, taskDir, writeJson,
 } from "../lib/util.mjs";
 import { classifyClaim, judgeVisualItems, JUDGE_MODEL } from "./judge.mjs";
@@ -97,7 +97,22 @@ export async function gradeRun(runDir, { judge = true, log = console.log } = {})
   if (parsed.error) result.notes.push(parsed.error);
   if (proc.timedOut) result.notes.push("grader timed out");
 
-  // AI judge for items the scripted grader could not decide (e.g. autochecks `skip`).
+  // Deterministic resolvers first (bench-side probes for items the frozen grader skips), then the AI judge.
+  for (const c of result.checks.filter((x) => x.status === "skip" && cfg.resolvers?.[x.id])) {
+    const script = join(ROOT, "bench", "grade", "resolvers", cfg.resolvers[c.id]);
+    copyFileSync(script, join(hold, "_bench-resolver.mjs"));
+    const out = join(gradeDir, `resolver-${c.id}.json`);
+    await runProcess(process.execPath, ["_bench-resolver.mjs", join(hold, "..", "src", "index.html")], { cwd: hold, stdoutPath: out, timeoutMs: 5 * 60_000 });
+    let r = null;
+    try { r = JSON.parse(readFileSync(out, "utf8")); } catch { /* resolver crashed: leave the skip for the judge */ }
+    if (r && r.status !== "skip") {
+      c.status = r.status;
+      c.method = "resolver";
+      c.detail = `${c.detail} ⟶ RESOLVER (${cfg.resolvers[c.id]}): ${r.status} — ${r.detail}`;
+    }
+  }
+
+  // AI judge for items still undecided.
   const skipped = result.checks.filter((c) => c.status === "skip");
   if (judge && skipped.length && cfg.judgeItems === "skipped-autochecks" && !missing.length) {
     const j = await judgeVisualItems({ slug, cfg, hold, gradeDir, items: skipped, log });

@@ -138,7 +138,7 @@
       const sorted = result.checks.slice().sort((a, b) => rank(a.status) - rank(b.status));
       h += `<section class="panel"><h3>Answer-key checks</h3>
         ${result.notes?.length ? result.notes.map((n) => `<p class="sub">${esc(n)}</p>`).join("") : ""}
-        <ul class="checks">${sorted.map((c) => `<li class="${esc(c.status)}"><span class="mark">${c.status === "pass" ? "pass" : c.status === "fail" ? "fail" : "?"}</span>${esc(c.name)}${c.method === "judged" ? `<span class="by">AI judge</span>` : ""}
+        <ul class="checks">${sorted.map((c) => `<li class="${esc(c.status)}"><span class="mark">${c.status === "pass" ? "pass" : c.status === "fail" ? "fail" : "?"}</span>${esc(c.name)}${c.method === "judged" ? `<span class="by">AI judge</span>` : c.method === "resolver" ? `<span class="by">bench probe</span>` : ""}
           ${c.detail ? `<details><summary>detail</summary><pre>${esc(c.detail)}</pre></details>` : ""}</li>`).join("")}</ul>
         ${result.judge ? `<p class="sub">Judge: ${esc(result.judge.model)}, blind to which model built this.</p>` : ""}</section>`;
     }

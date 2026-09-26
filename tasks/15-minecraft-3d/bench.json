@@ -1,8 +1,26 @@
 {
-  "artifacts": ["src/index.html"],
+  "artifacts": [
+    "src/index.html"
+  ],
   "extractFromFinal": true,
-  "grader": { "kind": "node-script", "cwd": "holdout", "script": "autochecks.mjs", "parse": "autochecks", "timeoutMin": 12 },
+  "grader": {
+    "kind": "node-script",
+    "cwd": "holdout",
+    "script": "autochecks.mjs",
+    "parse": "autochecks",
+    "timeoutMin": 12
+  },
   "judgeItems": "skipped-autochecks",
   "judgeRubric": "holdout/rubric.md",
-  "screenshots": { "keys": ["w", "a", "d"], "waitMs": 3000 }
+  "screenshots": {
+    "keys": [
+      "w",
+      "a",
+      "d"
+    ],
+    "waitMs": 3000
+  },
+  "resolvers": {
+    "R05": "15-R05-footprint.mjs"
+  }
 }

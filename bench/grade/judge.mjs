@@ -8,6 +8,7 @@ import { join } from "node:path";
 import { ROOT, runProcess, sha256, taskDir } from "../lib/util.mjs";
 
 export const JUDGE_MODEL = process.env.VBENCH_JUDGE_MODEL || "claude-sonnet-5";
+export const VOTES = Number(process.env.VBENCH_JUDGE_VOTES || 3);
 
 async function askClaude({ prompt, cwd, outPath, allowRead = false, timeoutMs = 5 * 60_000 }) {
   const args = ["-p", "--model", JUDGE_MODEL, "--output-format", "json", "--no-session-persistence",
@@ -92,10 +93,23 @@ export async function judgeVisualItems({ slug, cfg, hold, gradeDir, items, log =
     .replace("{{ITEMS}}", items.map((c) => rubricItem(rubric, c.id)).join("\n\n"))
     .replace("{{NOTES}}", items.map((c) => `- ${c.id}: ${c.detail}`).join("\n"));
   writeFileSync(join(gradeDir, "judge-visual-prompt.md"), prompt);
-  log(`[judge] visual: ${items.length} item(s) · ${shots.length} screenshot(s) · ${JUDGE_MODEL}`);
-  const r = await askClaude({ prompt, cwd: gradeDir, outPath: join(gradeDir, "judge-visual.json"), allowRead: true, timeoutMs: 8 * 60_000 });
+  // One judge call is not stable (measured 2026-09-26: the same reference item went pass/unclear/pass),
+  // so take VOTES independent calls in parallel and keep only a strict majority; anything else = unclear.
+  log(`[judge] visual: ${items.length} item(s) · ${shots.length} screenshot(s) · ${JUDGE_MODEL} × ${VOTES} votes`);
+  const calls = await Promise.all(Array.from({ length: VOTES }, (_, k) =>
+    askClaude({ prompt, cwd: gradeDir, outPath: join(gradeDir, `judge-visual-${k + 1}.json`), allowRead: true, timeoutMs: 8 * 60_000 })));
+  const verdicts = {};
+  for (const c of items) {
+    const votes = calls.map((r) => r.json?.verdicts?.[c.id]).filter(Boolean);
+    const tally = {};
+    for (const v of votes) tally[v.verdict] = (tally[v.verdict] || 0) + 1;
+    const [top, n] = Object.entries(tally).sort((a, b) => b[1] - a[1])[0] || ["unclear", 0];
+    const verdict = n > VOTES / 2 ? top : "unclear";
+    const why = votes.find((v) => v.verdict === verdict)?.reasoning || "judges disagreed";
+    verdicts[c.id] = { verdict, reasoning: `${why} [votes: ${votes.map((v) => v.verdict).join("/") || "none"}]`, votes: tally };
+  }
   return {
-    verdicts: r.json?.verdicts || {},
-    meta: { model: JUDGE_MODEL, promptSha256: sha256(VISUAL_PROMPT), screenshots: shots, parsed: !!r.json },
+    verdicts,
+    meta: { model: JUDGE_MODEL, promptSha256: sha256(VISUAL_PROMPT), screenshots: shots, votes: VOTES, parsedVotes: calls.filter((r) => r.json).length },
   };
 }
