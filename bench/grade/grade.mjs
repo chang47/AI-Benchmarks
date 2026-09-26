@@ -97,6 +97,20 @@ export async function gradeRun(runDir, { judge = true, log = console.log } = {})
     log(`[grade] ${meta.runId} · ${cfg.grader.kind}${cfg.grader.script ? " " + cfg.grader.script : ""}`);
     const { proc, parsed } = await runGrader(slug, cfg, hold, gradeDir);
     result.checks = parsed.checks;
+    // Some frozen browser checks are timing-sensitive (measured 2026-09-26: task 15 R10 passed 2 of 3 grades of
+    // the same build). With grader.repeat N, re-run the frozen grader and mark any check whose verdict
+    // disagrees across runs as "unclear (flaky)" instead of letting one run's luck decide it.
+    for (let k = 2; k <= (cfg.grader.repeat || 1); k++) {
+      const again = await runGrader(slug, cfg, hold, gradeDir);
+      for (const c of result.checks) {
+        const o = again.parsed.checks.find((x) => x.id === c.id);
+        if (o && o.status !== c.status) {
+          c.flaky = [...(c.flaky || [c.status]), o.status];
+          c.detail = `${c.detail} ⟶ FLAKY across frozen-grader runs (${c.flaky.join("/")}): ${o.detail}`;
+          c.status = "unclear";
+        }
+      }
+    }
     if (parsed.error) result.notes.push(parsed.error);
     if (proc.timedOut) result.notes.push("grader timed out");
 
@@ -112,6 +126,35 @@ export async function gradeRun(runDir, { judge = true, log = console.log } = {})
         c.status = r.status;
         c.method = "resolver";
         c.detail = `${c.detail} ⟶ RESOLVER (${cfg.resolvers[c.id]}): ${r.status} — ${r.detail}`;
+      }
+    }
+
+    // Grader-v2 world probe (bench-side, one page load): OVERRIDE frozen checks that graded an assumption the
+    // prompt never stated, FILL checks the frozen grader skipped, ADD checks for prompt requirements the frozen
+    // rubric never graded. The frozen verdict is always kept on the check (frozenStatus) — nothing is hidden.
+    if (cfg.benchProbe) {
+      const bp = cfg.benchProbe;
+      copyFileSync(join(ROOT, "bench", "grade", "resolvers", bp.script), join(hold, "_bench-world-probe.mjs"));
+      const out = join(gradeDir, "world-probe.json");
+      await runProcess(process.execPath, ["_bench-world-probe.mjs", join(hold, "..", "src", "index.html")], { cwd: hold, stdoutPath: out, stderrPath: join(gradeDir, "world-probe-stderr.txt"), timeoutMs: 8 * 60_000 });
+      let items = {};
+      try { items = JSON.parse(readFileSync(out, "utf8")).items || {}; } catch { result.notes.push("world probe produced no output — frozen verdicts kept (see grade/world-probe-stderr.txt)"); }
+      const apply = (c, v, why) => {
+        c.frozenStatus = c.status; c.frozenDetail = c.detail;
+        c.status = v.status; c.method = "bench-probe";
+        c.detail = `${v.detail} [grader v2 — ${why}; frozen check said ${c.frozenStatus}: ${c.frozenDetail}]`;
+      };
+      for (const id of bp.override || []) {
+        const c = result.checks.find((x) => x.id === id), v = items[id];
+        if (c && v && v.status !== "skip") apply(c, v, bp.why?.[id] || "re-measured over the whole world");
+      }
+      for (const id of bp.fillSkip || []) {
+        const c = result.checks.find((x) => x.id === id), v = items[id];
+        if (c && v && c.status === "skip" && v.status !== "skip") apply(c, v, bp.why?.[id] || "frozen check could not decide");
+      }
+      for (const [id, name] of Object.entries(bp.add || {})) {
+        const v = items[id] || { status: "skip", detail: "world probe did not report this check" };
+        result.checks.push({ id, name, status: v.status, method: "bench-check", detail: `${v.detail} [grader v2 — added: a prompt requirement the frozen rubric never graded]` });
       }
     }
 
