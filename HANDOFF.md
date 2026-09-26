@@ -137,6 +137,8 @@
 - **`claude --bare` for the clean profile:** refuses subscription auth.
 
 ## Next Steps
+_(The 4 benchmark ideas after task 18 — clone page, Three.js scene, spreadsheet, context flooding — are written up in `design/benchmark-backlog.md`.)_
+
 1. **Runner:** copy `tasks/<slug>/inputs/**` into the workspace in `bench/run.mjs::runOne` (after `makeWorkspace`). Hash-check inputs like holdouts.
 2. **Build the task-18 grader:**
    - `tasks/18-wonders-landing/bench.json` + a web-probe grader implementing the 82-point checklist (spec Task 18 table).
