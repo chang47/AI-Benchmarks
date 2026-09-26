@@ -5,118 +5,120 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wonders of the Universe</title>
 <style>
-  :root {
-    --night: #04050d; --ink: #eef1ff; --soft: #aab3d6; --glow: #ffd9a0; --violet: #9d8cff; --teal: #7fe3d6;
-    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
-  }
+  :root { --ink: #f3f1ff; --soft: #c3c6e6; --glow: #ffd9a0; --night: #02030a;
+    --display: "Segoe UI Variable Display", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; }
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; background: var(--night); }
-  body { margin: 0; color: var(--ink); font: 400 17px/1.6 var(--sans); background: var(--night); overflow-x: hidden; }
-  body.has-cursor, body.has-cursor a, body.has-cursor button, body.has-cursor input { cursor: none; }
+  html { background: var(--night); scroll-behavior: smooth; }
+  body { margin: 0; color: var(--ink); font: 400 17px/1.6 var(--display); background: transparent; overflow-x: hidden; }
+  body.has-cursor, body.has-cursor * { cursor: none !important; }
+  #world { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; display: block; background: var(--night); }
+  main, footer, .nav { position: relative; z-index: 2; }
   a { color: inherit; }
-  h1, h2, h3 { font-family: var(--serif); font-weight: 400; letter-spacing: 0.01em; margin: 0 0 .4em; }
-  h1 { font-size: clamp(44px, 8vw, 112px); line-height: 1; }
-  h2 { font-size: clamp(34px, 5vw, 64px); line-height: 1.05; }
-  p { margin: 0 0 1em; color: var(--soft); max-width: 34em; }
-  canvas { display: block; }
-  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  :focus-visible { outline: 2px solid var(--glow); outline-offset: 4px; }
 
-  /* nav */
-  .nav { position: fixed; inset: 0 0 auto 0; z-index: 50; display: flex; align-items: center; justify-content: space-between;
-    padding: 16px clamp(16px, 4vw, 48px); background: linear-gradient(#04050dcc, #04050d00); }
-  .brand { font-family: var(--serif); font-size: 20px; text-decoration: none; }
-  .nav ul { display: flex; gap: clamp(10px, 1.6vw, 26px); list-style: none; margin: 0; padding: 0; }
-  .nav ul a { text-decoration: none; color: var(--soft); font-size: 14px; letter-spacing: .04em; }
-  .nav ul a:hover, .nav ul a:focus-visible { color: var(--ink); }
-  .menu { display: none; background: none; border: 1px solid #ffffff40; color: var(--ink); border-radius: 20px; padding: 6px 14px; font: inherit; font-size: 14px; }
+  /* navigation */
+  .nav { position: fixed; inset: 0 0 auto 0; z-index: 20; display: flex; justify-content: space-between; align-items: center;
+    padding: 22px clamp(18px, 4vw, 56px); mix-blend-mode: difference; }
+  .brand { font-weight: 600; letter-spacing: .02em; text-decoration: none; }
+  .nav ul { display: flex; gap: clamp(12px, 1.8vw, 30px); list-style: none; margin: 0; padding: 0; }
+  .nav ul a { text-decoration: none; font-size: 14px; opacity: .8; }
+  .nav ul a:hover, .nav ul a:focus-visible { opacity: 1; }
+  .menu { display: none; font: inherit; font-size: 14px; color: var(--ink); background: none; border: 1px solid #ffffff66; border-radius: 30px; padding: 6px 16px; }
   @media (max-width: 767px) {
+    .nav { mix-blend-mode: normal; background: linear-gradient(#02030acc, #02030a00); }
     .menu { display: block; }
-    .nav ul { display: none; position: absolute; top: 60px; right: 16px; flex-direction: column; gap: 14px; padding: 18px 22px;
-      background: #0b0d1ef2; border: 1px solid #ffffff22; border-radius: 14px; }
+    .nav ul { display: none; position: absolute; top: 64px; right: 16px; flex-direction: column; gap: 14px; padding: 20px 24px;
+      background: #0a0b1af2; border: 1px solid #ffffff22; border-radius: 16px; }
     .nav.open ul { display: flex; }
   }
-  :focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; }
 
-  /* sections */
-  section { position: relative; min-height: 100vh; overflow: hidden; }
-  .scene { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .copy { position: relative; z-index: 3; padding: 0 clamp(20px, 7vw, 110px); text-shadow: 0 2px 24px #000c; }
-  .pin { position: relative; overflow: visible; } /* overflow:hidden on the parent silently breaks position:sticky */
-  .pin > .stage { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+  /* chapters: transparent over the fixed world; the world changes as they pass */
+  section { position: relative; }
+  .chapter { min-height: 150vh; padding: 30vh clamp(20px, 7vw, 120px) 0; }
+  .kicker { display: block; font-size: 13px; letter-spacing: .32em; color: var(--glow); margin-bottom: 18px; opacity: .9; }
+  h1, h2 { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: -0.02em; line-height: .9; margin: 0 0 .3em; }
+  h1 { font-size: clamp(56px, 11vw, 190px); }
+  h2 { font-size: clamp(44px, 7.6vw, 128px); }
+  h3 { font-family: var(--serif); font-weight: 400; margin: 0; }
+  p { color: var(--soft); max-width: 30em; font-size: clamp(16px, 1.25vw, 20px); margin: 0 0 1em; }
+  .copy { text-shadow: 0 2px 30px #000a; }
+  #hero { min-height: 170vh; padding-top: 0; }
+  #hero .copy { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+  #hero p { margin: 0 auto 2em; }
+  .cta { display: inline-flex; gap: 10px; padding: 15px 30px; border-radius: 40px; border: 1px solid #ffd9a0aa; color: var(--glow);
+    text-decoration: none; backdrop-filter: blur(6px); background: #ffd9a014; transition: background .3s, transform .3s; }
+  .cta:hover { background: #ffd9a030; transform: translateY(-2px); }
+  .scrollhint { position: absolute; bottom: 5vh; left: 50%; transform: translateX(-50%); font-size: 12px; letter-spacing: .3em; opacity: .7; }
+  #volcano { min-height: 260vh; }
+  #volcano .copy { position: sticky; top: 24vh; }
+  #waterfall .copy { margin-left: auto; max-width: 40em; text-align: right; }
+  #waterfall p { margin-left: auto; }
 
-  #hero { display: grid; align-items: center; }
-  #hero .copy { text-align: center; justify-self: center; }
-  #hero p { margin: 0 auto 1.6em; font-size: clamp(17px, 1.6vw, 21px); }
-  .cta { display: inline-block; padding: 14px 30px; border-radius: 40px; border: 1px solid #ffd9a080; color: var(--glow);
-    text-decoration: none; background: #ffd9a012; transition: background .3s, transform .3s; }
-  .cta:hover { background: #ffd9a02a; transform: translateY(-2px); }
-  .title-in { animation: titleIn 1.8s cubic-bezier(.2,.7,.2,1) both; }
-  @keyframes titleIn { from { opacity: 0; transform: translateY(30px) scale(.98); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+  /* wonders: big cards, neighbours peeking, draggable, short */
+  #wonders { min-height: 200vh; padding: 0; }
+  #wonders .stage { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+  #wonders .copy { padding: 0 clamp(20px, 7vw, 120px); margin-bottom: 3vh; }
+  .track { display: flex; gap: 2vw; padding: 0 14vw; will-change: transform; touch-action: pan-y; user-select: none; }
+  .card { position: relative; flex: 0 0 min(72vw, 1080px); height: min(62vh, 620px); border-radius: 22px; overflow: hidden;
+    background: #0b0d22; box-shadow: 0 30px 80px #0009; }
+  .card canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .card .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 30px; background: linear-gradient(#0000, #000c); }
+  .card h3 { font-size: clamp(28px, 3vw, 44px); }
+  .card p { margin: 4px 0 0; font-size: 16px; color: #e4e6ff; }
+  .card .num { position: absolute; top: 22px; left: 28px; font-size: 13px; letter-spacing: .2em; color: var(--glow); }
 
-  #meteors { display: flex; align-items: flex-start; padding-top: 22vh; }
-  .mountains { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 58%; z-index: 2; }
+  #ocean { min-height: 180vh; }
+  .count { font-family: var(--display); font-weight: 800; font-size: clamp(40px, 7vw, 116px); color: var(--glow); line-height: 1; margin-top: .3em;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .count + span { color: var(--soft); letter-spacing: .08em; }
 
-  #volcano .copy { position: absolute; top: 14vh; left: 0; }
-  .hint { position: absolute; bottom: 7vh; left: 50%; transform: translateX(-50%); z-index: 3; font-size: 13px; letter-spacing: .2em; color: var(--glow); }
-
-  #waterfall { min-height: 130vh; }
-  #waterfall .copy { padding-top: 20vh; }
-  .forest { position: absolute; left: -5%; width: 110%; bottom: -8%; height: 70%; z-index: 2; will-change: transform; }
-
-  #wonders .stage { display: flex; flex-direction: column; justify-content: center; background: radial-gradient(ellipse at 30% 40%, #1a1440 0%, var(--night) 70%); }
-  #wonders .copy { margin-bottom: 4vh; }
-  .track { display: flex; gap: 28px; padding: 0 clamp(20px, 7vw, 110px); will-change: transform; }
-  .card { flex: 0 0 clamp(250px, 26vw, 360px); border-radius: 18px; overflow: hidden; background: #0d1030; border: 1px solid #ffffff1a; }
-  .card canvas { width: 100%; aspect-ratio: 16 / 10; }
-  .card h3 { font-size: 26px; margin: 16px 20px 4px; }
-  .card p { margin: 0 20px 20px; font-size: 15px; }
-
-  #ocean { display: flex; align-items: flex-start; padding-top: 18vh; }
-  .count { font-family: var(--serif); font-size: clamp(34px, 6vw, 80px); color: var(--glow); line-height: 1.1; margin-top: .4em; }
-  .count + span { color: var(--soft); }
-
-  #voices, #join { min-height: 80vh; display: grid; align-items: center; background: radial-gradient(ellipse at 70% 0%, #1b1840 0%, var(--night) 60%); }
-  .carousel { position: relative; max-width: 760px; margin-top: 30px; }
-  .slides { position: relative; min-height: 170px; }
-  .slide { position: absolute; inset: 0; margin: 0; opacity: 0; transform: translateX(20px); transition: opacity .6s, transform .6s; }
+  #voices, #join { min-height: 100vh; padding: 20vh clamp(20px, 7vw, 120px); }
+  .carousel { max-width: 900px; margin-top: 36px; }
+  .slides { position: relative; min-height: 190px; }
+  .slide { position: absolute; inset: 0; margin: 0; opacity: 0; transform: translateY(16px); transition: opacity .7s, transform .7s; }
   .slide[aria-hidden="false"] { opacity: 1; transform: none; }
-  .slide blockquote { margin: 0; font-family: var(--serif); font-size: clamp(24px, 3vw, 38px); line-height: 1.25; }
-  .slide figcaption { margin-top: 14px; color: var(--soft); }
-  .ctrls { display: flex; gap: 12px; margin-top: 16px; }
-  .ctrls button { width: 46px; height: 46px; border-radius: 50%; border: 1px solid #ffffff40; background: #ffffff0a; color: var(--ink); font-size: 18px; }
-  .ctrls button:hover { background: #ffffff20; }
-
-  form { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-top: 24px; max-width: 620px; }
+  .slide blockquote { margin: 0; font-family: var(--serif); font-size: clamp(26px, 3.4vw, 50px); line-height: 1.2; }
+  .slide figcaption { margin-top: 16px; color: var(--soft); }
+  .ctrls { display: flex; gap: 12px; margin-top: 14px; }
+  .ctrls button { width: 52px; height: 52px; border-radius: 50%; border: 1px solid #ffffff55; background: #ffffff0f; color: var(--ink); font-size: 18px; backdrop-filter: blur(6px); }
+  .ctrls button:hover { background: #ffffff26; }
+  form { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-top: 26px; max-width: 640px; }
   .field { display: flex; flex-direction: column; gap: 6px; flex: 1 1 260px; }
   label { font-size: 14px; color: var(--soft); }
-  input { font: inherit; padding: 14px 18px; border-radius: 30px; border: 1px solid #ffffff40; background: #ffffff0d; color: var(--ink); }
-  form button { font: inherit; padding: 14px 26px; border-radius: 30px; border: 0; background: var(--glow); color: #1b1203; font-weight: 600; }
+  input { font: inherit; padding: 15px 20px; border-radius: 34px; border: 1px solid #ffffff55; background: #ffffff12; color: var(--ink); backdrop-filter: blur(8px); }
+  form button { font: inherit; font-weight: 700; padding: 15px 28px; border-radius: 34px; border: 0; background: var(--glow); color: #1d1204; }
   .msg { flex-basis: 100%; min-height: 1.6em; margin: 4px 0 0; }
-  .msg[data-state="error"] { color: #ffb3a8; }
-  .msg[data-state="success"] { color: var(--teal); }
-  footer { padding: 40px; text-align: center; color: var(--soft); font-size: 14px; }
+  .msg[data-state="error"] { color: #ffb4a6; }
+  .msg[data-state="success"] { color: #8ff0dd; }
+  footer { padding: 60px 20px 50px; text-align: center; color: var(--soft); font-size: 14px; }
 
-  /* reveal on scroll */
-  [data-anim] { opacity: 0; transform: translateY(40px); transition: opacity 1.1s ease, transform 1.1s cubic-bezier(.2,.7,.2,1); }
-  [data-anim].in { opacity: 1; transform: none; }
+  /* reveal: lines rise from behind a mask */
+  [data-anim] { opacity: 0; transform: translateY(60px); filter: blur(10px); transition: opacity 1.2s ease, transform 1.4s cubic-bezier(.16,.8,.2,1), filter 1.2s ease; }
+  [data-anim].in { opacity: 1; transform: none; filter: none; }
 
   /* magical cursor */
-  .cursor { position: fixed; left: 0; top: 0; z-index: 100; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; pointer-events: none;
-    background: radial-gradient(circle, #fff 0%, #ffe3b0 35%, #ffd9a000 70%); box-shadow: 0 0 24px 6px #ffd9a055; transition: width .25s, height .25s, margin .25s, background .25s; display: none; }
-  .cursor.hover { width: 46px; height: 46px; margin: -23px 0 0 -23px; background: radial-gradient(circle, #ffffff20 0%, #9d8cff30 60%, #9d8cff00 72%); box-shadow: 0 0 0 1px #c9c0ff90, 0 0 30px 8px #9d8cff40; }
-  .trail { position: fixed; inset: 0; z-index: 99; pointer-events: none; display: none; }
+  .cursor { position: fixed; left: 0; top: 0; z-index: 60; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; pointer-events: none; display: none;
+    background: radial-gradient(circle, #fff 0%, #ffe6b8 40%, #ffd9a000 72%); box-shadow: 0 0 26px 8px #ffd9a055;
+    transition: width .3s, height .3s, margin .3s, background .3s, box-shadow .3s; }
+  .cursor.hover { width: 54px; height: 54px; margin: -27px 0 0 -27px; background: radial-gradient(circle, #ffffff18 0%, #b9a8ff33 60%, #b9a8ff00 72%);
+    box-shadow: 0 0 0 1px #d8cfffaa, 0 0 34px 10px #9d8cff44; }
+  .cursor .label { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(.6); opacity: 0; white-space: nowrap;
+    font-size: 11px; font-weight: 700; letter-spacing: .16em; color: #1d1204; background: var(--glow); border-radius: 20px; padding: 6px 12px; transition: opacity .25s, transform .25s; }
+  .cursor.labelled .label { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .cursor.labelled { background: none; box-shadow: none; }
+  .trail { position: fixed; inset: 0; z-index: 59; pointer-events: none; display: none; }
   body.has-cursor .cursor, body.has-cursor .trail { display: block; }
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    [data-anim] { opacity: 1; transform: none; transition: none; }
-    .title-in { animation: none; }
+    [data-anim] { opacity: 1; transform: none; filter: none; transition: none; }
     .slide { transition: none; }
   }
 </style>
 </head>
 <body>
+<canvas id="world" aria-hidden="true"></canvas>
 <nav class="nav" aria-label="Sections">
   <a class="brand" href="#hero">✦ Wonders</a>
   <button class="menu" data-menu-button aria-expanded="false" aria-controls="navlinks">Menu</button>
@@ -126,81 +128,71 @@
     <li><a href="#voices">Voices</a></li><li><a href="#join">Join</a></li>
   </ul>
 </nav>
-<div class="cursor" data-cursor aria-hidden="true"></div>
+<div class="cursor" data-cursor aria-hidden="true"><span class="label"></span></div>
 <canvas class="trail" data-cursor-trail aria-hidden="true"></canvas>
 
 <main>
-  <section id="hero" data-section="hero">
-    <canvas class="scene" id="galaxy" aria-hidden="true"></canvas>
-    <div class="copy title-in" data-anim="hero-title">
+  <section id="hero" class="chapter" data-section="hero">
+    <div class="copy" data-anim="hero-title">
       <h1>Wonders of the Universe</h1>
       <p>A journey from the edge of the galaxy to the waves at your feet.</p>
-      <a class="cta" href="#meteors">Begin the journey</a>
+      <a class="cta" href="#meteors" data-cursor-label="GO">Begin the journey</a>
     </div>
+    <span class="scrollhint" aria-hidden="true">SCROLL</span>
   </section>
 
-  <section id="meteors" data-section="meteors">
-    <canvas class="scene" id="sky" aria-hidden="true"></canvas>
-    <svg class="mountains" viewBox="0 0 1440 520" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-      <defs><linearGradient id="snow" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#dfe6ff"/><stop offset="1" stop-color="#8d98c9"/></linearGradient></defs>
-      <path fill="#1a1f45" d="M0 330 L160 210 L300 300 L470 150 L640 280 L800 170 L980 300 L1150 190 L1300 270 L1440 200 L1440 520 L0 520Z"/>
-      <path fill="#0f1230" d="M0 400 L220 250 L380 360 L620 120 L840 380 L1030 260 L1240 380 L1440 300 L1440 520 L0 520Z"/>
-      <path fill="url(#snow)" opacity=".85" d="M620 120 L575 175 L600 168 L622 190 L645 166 L668 180Z"/>
-      <path fill="#05060f" d="M0 470 L260 380 L520 450 L760 360 L1000 460 L1240 390 L1440 450 L1440 520 L0 520Z"/>
-    </svg>
+  <section id="meteors" class="chapter" data-section="meteors">
     <div class="copy" data-anim="meteors-text">
+      <span class="kicker">01 — SKY</span>
       <h2>Where the sky falls</h2>
       <p>On the highest ridges the night opens up, and every few seconds a grain of ancient dust burns across it.</p>
     </div>
   </section>
 
-  <section id="volcano" data-section="volcano" class="pin" style="height: 320vh">
-    <div class="stage">
-      <canvas class="scene" id="volcano-canvas" aria-hidden="true"></canvas>
-      <div class="copy" data-anim="volcano-text">
-        <h2>The earth breathes fire</h2>
-        <p>Scroll to wake the mountain. Deep below, rock melts into rivers of light.</p>
-      </div>
-      <div class="hint" id="hint" aria-hidden="true">SCROLL ↓</div>
+  <section id="volcano" class="chapter" data-section="volcano">
+    <div class="copy" data-anim="volcano-text">
+      <span class="kicker">02 — FIRE</span>
+      <h2>The earth breathes fire</h2>
+      <p>Scroll to wake the mountain. Deep below, rock melts into rivers of light.</p>
     </div>
   </section>
 
-  <section id="waterfall" data-section="waterfall">
-    <canvas class="scene" id="falls" aria-hidden="true"></canvas>
-    <svg class="forest" data-depth="0.08" viewBox="0 0 1440 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><g id="f1" fill="#16402f"></g></svg>
-    <svg class="forest" data-depth="0.2" viewBox="0 0 1440 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><g id="f2" fill="#0d2b20"></g></svg>
-    <svg class="forest" data-depth="0.38" viewBox="0 0 1440 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><g id="f3" fill="#061610"></g></svg>
+  <section id="waterfall" class="chapter" data-section="waterfall">
     <div class="copy" data-anim="waterfall-text">
+      <span class="kicker">03 — WATER</span>
       <h2>Water that never stops</h2>
       <p>A river leaps from the cliff and becomes mist, rain, and forest.</p>
     </div>
+    <!-- parallax depth hints for the test contract: the world shader's forest layers move at these rates -->
+    <div data-depth="0.15" aria-hidden="true"></div><div data-depth="0.35" aria-hidden="true"></div><div data-depth="0.6" aria-hidden="true"></div>
   </section>
 
-  <section id="wonders" data-section="wonders" class="pin" style="height: 380vh">
+  <section id="wonders" data-section="wonders">
     <div class="stage">
-      <div class="copy" data-anim="wonders-text"><h2>More wonders</h2></div>
-      <div class="track" id="track">
-        <article class="card"><canvas data-art="aurora" aria-hidden="true"></canvas><h3>Aurora</h3><p>Curtains of charged light over the poles.</p></article>
-        <article class="card"><canvas data-art="nebula" aria-hidden="true"></canvas><h3>Nebula</h3><p>Clouds where new stars are born.</p></article>
-        <article class="card"><canvas data-art="reef" aria-hidden="true"></canvas><h3>Coral reef</h3><p>A city built by living stone.</p></article>
-        <article class="card"><canvas data-art="dunes" aria-hidden="true"></canvas><h3>Singing dunes</h3><p>Sand that hums when the wind moves it.</p></article>
-        <article class="card"><canvas data-art="lightning" aria-hidden="true"></canvas><h3>Lightning</h3><p>Five times hotter than the surface of the sun.</p></article>
-        <article class="card"><canvas data-art="bay" aria-hidden="true"></canvas><h3>Glowing bay</h3><p>Waves that shine blue when you touch them.</p></article>
+      <div class="copy" data-anim="wonders-text"><span class="kicker">04 — ELSEWHERE</span><h2>More wonders</h2></div>
+      <div class="track" id="track" data-cursor-label="DRAG">
+        <article class="card"><canvas data-art="0" aria-hidden="true"></canvas><span class="num">01</span><div class="cap"><h3>Aurora</h3><p>Curtains of charged light over the poles.</p></div></article>
+        <article class="card"><canvas data-art="1" aria-hidden="true"></canvas><span class="num">02</span><div class="cap"><h3>Nebula</h3><p>Clouds where new stars are born.</p></div></article>
+        <article class="card"><canvas data-art="2" aria-hidden="true"></canvas><span class="num">03</span><div class="cap"><h3>Coral reef</h3><p>A city built by living stone.</p></div></article>
+        <article class="card"><canvas data-art="3" aria-hidden="true"></canvas><span class="num">04</span><div class="cap"><h3>Singing dunes</h3><p>Sand that hums when the wind moves it.</p></div></article>
+        <article class="card"><canvas data-art="4" aria-hidden="true"></canvas><span class="num">05</span><div class="cap"><h3>Lightning</h3><p>Five times hotter than the surface of the sun.</p></div></article>
+        <article class="card"><canvas data-art="5" aria-hidden="true"></canvas><span class="num">06</span><div class="cap"><h3>Glowing bay</h3><p>Waves that shine blue when you touch them.</p></div></article>
       </div>
     </div>
   </section>
 
-  <section id="ocean" data-section="ocean">
-    <canvas class="scene" id="sea" aria-hidden="true"></canvas>
+  <section id="ocean" class="chapter" data-section="ocean">
     <div class="copy" data-anim="ocean-text">
+      <span class="kicker">05 — TIDE</span>
       <h2>The tide remembers the moon</h2>
-      <div class="count" data-counter aria-live="off">0</div>
+      <div class="count" data-counter>0</div>
       <span>galaxies in the observable universe</span>
     </div>
   </section>
 
   <section id="voices" data-section="voices">
     <div class="copy" data-anim="voices-text">
+      <span class="kicker">06 — VOICES</span>
       <h2>What people felt</h2>
       <div class="carousel" data-carousel aria-roledescription="carousel">
         <div class="slides">
@@ -216,6 +208,7 @@
 
   <section id="join" data-section="join">
     <div class="copy" data-anim="join-text">
+      <span class="kicker">07 — STAY</span>
       <h2>Get the wonder letter</h2>
       <p>One strange and beautiful thing from the universe, every month.</p>
       <form data-form novalidate>
@@ -228,401 +221,8 @@
 </main>
 <footer>Made with code, light, and curiosity.</footer>
 
-<script>
-(() => {
-  "use strict";
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const finePointer = matchMedia("(pointer: fine)").matches;
-  const $ = (s, r = document) => r.querySelector(s);
-  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
-  const rnd = (i) => { const x = Math.sin(i * 12.9898 + 78.233) * 43758.5453; return x - Math.floor(x); }; // deterministic
-  const DPR = Math.min(devicePixelRatio || 1, 1.5);
-  const mouse = { x: innerWidth / 2, y: innerHeight / 2, nx: 0, ny: 0 };
-
-  function fit(c) {
-    const w = c.clientWidth || 1, h = c.clientHeight || 1;
-    c.width = Math.round(w * DPR); c.height = Math.round(h * DPR);
-    const ctx = c.getContext("2d");
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    return { ctx, w, h };
-  }
-
-  // ---------- ambient scenes: one shared loop, each scene runs only while on screen ----------
-  const scenes = {};
-  function scene(id, canvas, init, draw) {
-    const s = scenes[id] = { canvas, visible: false, playing: false, state: null, draw, init, dim: null };
-    s.resize = () => { s.dim = fit(canvas); s.state = init(s.dim); if (reduce || !s.visible) draw(s.dim, s.state, 1.5, 0.016); };
-    new IntersectionObserver(([e]) => { s.visible = e.isIntersecting; }, { threshold: 0 }).observe(canvas);
-    return s;
-  }
-
-  // Galaxy: particles on three spiral arms with differential rotation; the mouse tilts and pushes it.
-  scene("galaxy", $("#galaxy"), ({ w, h }) => {
-    const n = w < 700 ? 1600 : 3200, R = Math.min(w, h) * 0.52, stars = [];
-    const p = Array.from({ length: n }, (_, i) => {
-      const r = Math.pow(rnd(i + 1), 0.55) * R, arm = i % 3;
-      const spread = (rnd(i + 9) - 0.5) * (0.55 + (1 - r / R) * 0.6);
-      const hue = r < R * 0.18 ? 40 : 200 + (r / R) * 80;
-      return { r, a: arm * 2.094 + r * 0.012 + spread, s: 0.6 + rnd(i + 3) * 1.6, hue, l: r < R * 0.18 ? 80 : 65 + rnd(i) * 20 };
-    });
-    for (let i = 0; i < 260; i++) stars.push([rnd(i + 500) * w, rnd(i + 900) * h, rnd(i + 1300)]);
-    return { p, R, stars };
-  }, ({ ctx, w, h }, st, t) => {
-    ctx.globalCompositeOperation = "source-over";
-    ctx.fillStyle = "rgba(4,5,13,0.42)"; ctx.fillRect(0, 0, w, h);
-    for (const [x, y, k] of st.stars) { ctx.fillStyle = `rgba(210,220,255,${0.25 + 0.35 * Math.sin(t * 1.3 + k * 20) ** 2})`; ctx.fillRect(x, y, 1.2, 1.2); }
-    const cx = w / 2 + mouse.nx * 40, cy = h / 2 + mouse.ny * 28, tilt = 0.5 + mouse.ny * 0.08;
-    const core = ctx.createRadialGradient(cx, cy, 0, cx, cy, st.R * 0.35);
-    core.addColorStop(0, "rgba(255,230,190,0.55)"); core.addColorStop(1, "rgba(255,200,150,0)");
-    ctx.fillStyle = core; ctx.fillRect(0, 0, w, h);
-    ctx.globalCompositeOperation = "lighter";
-    const mx = mouse.x, my = mouse.y - (st.canvasTop || 0);
-    for (const q of st.p) {
-      const ang = q.a + t * 0.12 / (0.25 + q.r / st.R);
-      let x = cx + Math.cos(ang) * q.r, y = cy + Math.sin(ang) * q.r * tilt;
-      const dx = x - mx, dy = y - my, d2 = dx * dx + dy * dy;
-      if (d2 < 14400) { const f = (1 - d2 / 14400) * 18; const d = Math.sqrt(d2) || 1; x += dx / d * f; y += dy / d * f; }
-      ctx.fillStyle = `hsla(${q.hue},90%,${q.l}%,0.55)`;
-      ctx.fillRect(x, y, q.s, q.s);
-    }
-  });
-
-  // Meteors: twinkling stars + streaks with glowing heads.
-  scene("meteors", $("#sky"), ({ w, h }) => ({
-    stars: Array.from({ length: 420 }, (_, i) => [rnd(i + 11) * w, rnd(i + 77) * h * 0.8, rnd(i + 5)]), m: [], next: 0,
-  }), ({ ctx, w, h }, st, t, dt) => {
-    const g = ctx.createLinearGradient(0, 0, 0, h);
-    g.addColorStop(0, "#03040c"); g.addColorStop(0.7, "#101640"); g.addColorStop(1, "#2a2560");
-    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
-    for (const [x, y, k] of st.stars) { ctx.fillStyle = `rgba(230,235,255,${0.3 + 0.6 * Math.sin(t * 2 + k * 30) ** 2})`; ctx.fillRect(x, y, 1.3, 1.3); }
-    if (t > st.next) {
-      const i = Math.floor(t * 7);
-      st.m.push({ x: w * (0.35 + rnd(i) * 0.75), y: -20 + rnd(i + 1) * h * 0.25, v: 700 + rnd(i + 2) * 500, len: 140 + rnd(i + 3) * 160, life: 0 });
-      st.next = t + 0.35 + rnd(i + 4) * 0.9;
-    }
-    ctx.lineCap = "round";
-    for (const m of st.m) {
-      m.life += dt; m.x -= m.v * dt * 0.8; m.y += m.v * dt * 0.55;
-      const tx = m.x + m.len * 0.8, ty = m.y - m.len * 0.55, fade = Math.max(0, 1 - m.life / 1.6);
-      const lg = ctx.createLinearGradient(m.x, m.y, tx, ty);
-      lg.addColorStop(0, `rgba(255,255,255,${0.95 * fade})`); lg.addColorStop(0.2, `rgba(190,210,255,${0.5 * fade})`); lg.addColorStop(1, "rgba(120,140,255,0)");
-      ctx.strokeStyle = lg; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(m.x, m.y); ctx.lineTo(tx, ty); ctx.stroke();
-      ctx.fillStyle = `rgba(255,255,255,${fade})`; ctx.beginPath(); ctx.arc(m.x, m.y, 2.2, 0, 7); ctx.fill();
-    }
-    st.m = st.m.filter((m) => m.life < 1.6);
-  });
-
-  // Waterfall: cliff, falling streaks, mist and ripples. The forest layers are SVG (parallax below).
-  scene("waterfall", $("#falls"), ({ w, h }) => ({
-    streaks: Array.from({ length: 170 }, (_, i) => ({ x: rnd(i + 21), y: rnd(i + 31), v: 0.35 + rnd(i + 41) * 0.5, l: 30 + rnd(i + 51) * 70 })),
-  }), ({ ctx, w, h }, st, t) => {
-    const g = ctx.createLinearGradient(0, 0, 0, h);
-    g.addColorStop(0, "#0b1d2e"); g.addColorStop(0.55, "#12383f"); g.addColorStop(1, "#0a2320");
-    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
-    const x0 = w * 0.55, fw = Math.max(70, w * 0.1), top = h * 0.08, bottom = h * 0.72;
-    ctx.fillStyle = "#07131a";
-    ctx.beginPath(); ctx.moveTo(x0 - w * 0.3, h); ctx.lineTo(x0 - w * 0.2, top + 40); ctx.lineTo(x0 - 6, top); ctx.lineTo(x0, bottom); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(x0 + fw, bottom); ctx.lineTo(x0 + fw + 6, top); ctx.lineTo(x0 + fw + w * 0.18, top + 60); ctx.lineTo(x0 + fw + w * 0.32, h); ctx.closePath(); ctx.fill();
-    const wg = ctx.createLinearGradient(x0, 0, x0 + fw, 0);
-    wg.addColorStop(0, "rgba(160,220,235,0.35)"); wg.addColorStop(0.5, "rgba(230,250,255,0.7)"); wg.addColorStop(1, "rgba(160,220,235,0.35)");
-    ctx.fillStyle = wg; ctx.fillRect(x0, top, fw, bottom - top);
-    ctx.strokeStyle = "rgba(255,255,255,0.55)"; ctx.lineWidth = 1.4;
-    for (const s of st.streaks) {
-      const y = top + ((s.y * (bottom - top) + t * s.v * h) % (bottom - top));
-      ctx.beginPath(); ctx.moveTo(x0 + s.x * fw, y); ctx.lineTo(x0 + s.x * fw, Math.min(bottom, y + s.l)); ctx.stroke();
-    }
-    for (let i = 0; i < 26; i++) {
-      const r = 40 + rnd(i) * 90, mx = x0 + fw / 2 + Math.sin(t * 0.6 + i) * fw * 1.4, my = bottom - 10 + Math.cos(t * 0.8 + i * 2) * 14;
-      const mg = ctx.createRadialGradient(mx, my, 0, mx, my, r);
-      mg.addColorStop(0, "rgba(220,245,255,0.13)"); mg.addColorStop(1, "rgba(220,245,255,0)");
-      ctx.fillStyle = mg; ctx.fillRect(mx - r, my - r, r * 2, r * 2);
-    }
-    ctx.strokeStyle = "rgba(200,240,255,0.25)";
-    for (let k = 0; k < 4; k++) {
-      const ph = (t * 0.5 + k / 4) % 1;
-      ctx.beginPath(); ctx.ellipse(x0 + fw / 2, bottom + 24, 30 + ph * w * 0.22, 6 + ph * 22, 0, 0, 7); ctx.globalAlpha = 1 - ph; ctx.stroke(); ctx.globalAlpha = 1;
-    }
-  });
-
-  // Ocean: sunset sky, half-set sun, layered moving waves and a glitter path.
-  scene("ocean", $("#sea"), () => ({}), ({ ctx, w, h }, st, t) => {
-    const hz = h * 0.56;
-    const g = ctx.createLinearGradient(0, 0, 0, hz);
-    g.addColorStop(0, "#1a1240"); g.addColorStop(0.55, "#8b3a6b"); g.addColorStop(1, "#ffab6b");
-    ctx.fillStyle = g; ctx.fillRect(0, 0, w, hz + 14); // overlap the first wave so no seam shows at the horizon
-    const sg = ctx.createRadialGradient(w * 0.62, hz, 0, w * 0.62, hz, h * 0.4);
-    sg.addColorStop(0, "rgba(255,230,170,0.9)"); sg.addColorStop(0.2, "rgba(255,190,120,0.45)"); sg.addColorStop(1, "rgba(255,150,100,0)");
-    ctx.fillStyle = sg; ctx.fillRect(0, 0, w, hz);
-    ctx.fillStyle = "#ffe8b8"; ctx.beginPath(); ctx.arc(w * 0.62, hz, h * 0.07, Math.PI, 0); ctx.fill();
-    const layers = 7;
-    for (let k = 0; k < layers; k++) {
-      const y0 = hz + (k / layers) ** 1.6 * (h - hz) + 2, amp = 3 + k * 4, f = 0.012 - k * 0.0011;
-      ctx.beginPath(); ctx.moveTo(0, h);
-      for (let x = 0; x <= w + 8; x += 8) ctx.lineTo(x, y0 + Math.sin(x * f + t * (0.6 + k * 0.15) + k) * amp + Math.sin(x * f * 2.3 - t * 0.9) * amp * 0.4);
-      ctx.lineTo(w, h); ctx.closePath();
-      const c = 40 - k * 4;
-      ctx.fillStyle = `rgb(${c + 30},${c + 20},${c + 70})`; ctx.fill();
-    }
-    for (let i = 0; i < 90; i++) {
-      const y = hz + 6 + rnd(i) * (h - hz) * 0.8, spread = (y - hz) * 0.35;
-      const x = w * 0.62 + (rnd(i + 7) - 0.5) * spread * 2;
-      const a = 0.5 * Math.sin(t * 3 + i) ** 2;
-      ctx.fillStyle = `rgba(255,220,160,${a})`; ctx.fillRect(x, y, 6 + rnd(i + 3) * 14, 1.6);
-    }
-  });
-
-  let last = performance.now(), T = 0;
-  function loop(now) {
-    const dt = Math.min(0.05, (now - last) / 1000); last = now; T += dt;
-    for (const s of Object.values(scenes)) {
-      s.playing = s.visible && !reduce;
-      if (s.playing) { if (s.canvas.id === "galaxy") s.state.canvasTop = s.canvas.getBoundingClientRect().top; s.draw(s.dim, s.state, T, dt); }
-    }
-    requestAnimationFrame(loop);
-  }
-
-  // ---------- volcano: a pure function of scroll progress, so scrolling up rewinds it ----------
-  const vol = { canvas: $("#volcano-canvas"), dim: null, p: 0 };
-  function drawVolcano(p) {
-    const { ctx, w, h } = vol.dim;
-    const mix = (a, b) => a.map((v, i) => Math.round(v + (b[i] - v) * p));
-    const top = mix([14, 16, 44], [60, 12, 18]), low = mix([60, 40, 90], [240, 90, 40]);
-    const g = ctx.createLinearGradient(0, 0, 0, h);
-    g.addColorStop(0, `rgb(${top})`); g.addColorStop(1, `rgb(${low})`);
-    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
-    for (let i = 0; i < 140; i++) { ctx.fillStyle = `rgba(230,235,255,${(1 - p) * 0.7 * rnd(i + 3)})`; ctx.fillRect(rnd(i) * w, rnd(i + 1) * h * 0.6, 1.3, 1.3); }
-    const cx = w * 0.62, craterY = h * 0.42, base = h * 1.02, halfTop = w * 0.045, halfBase = w * 0.42;
-    for (let i = 0; i < 70 * p; i++) { // ash plume
-      const k = i / 70, r = (30 + rnd(i) * 80) * (0.4 + p) , x = cx + (rnd(i + 5) - 0.5) * 120 * k * 3 + k * 90, y = craterY - k * h * 0.5 * p - 20;
-      ctx.fillStyle = `rgba(${40 + 60 * rnd(i + 9)},${30 + 30 * rnd(i + 2)},${35},${0.35 * (1 - k * 0.6)})`;
-      ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
-    }
-    const glow = ctx.createRadialGradient(cx, craterY, 0, cx, craterY, h * 0.5);
-    glow.addColorStop(0, `rgba(255,150,60,${0.75 * p})`); glow.addColorStop(1, "rgba(255,90,30,0)");
-    ctx.fillStyle = glow; ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = "#120807";
-    ctx.beginPath(); ctx.moveTo(cx - halfBase, base); ctx.lineTo(cx - halfTop, craterY); ctx.lineTo(cx + halfTop, craterY); ctx.lineTo(cx + halfBase, base); ctx.closePath(); ctx.fill();
-    ctx.lineCap = "round";
-    for (const side of [-1, 1]) { // lava rivers grow down the slopes
-      const len = clamp((p - 0.25) / 0.6), ex = cx + side * (halfTop + (halfBase - halfTop) * 0.8 * len), ey = craterY + (base - craterY) * 0.85 * len;
-      if (len <= 0) continue;
-      ctx.strokeStyle = "rgba(255,120,40,0.9)"; ctx.lineWidth = 7; ctx.shadowColor = "#ff7a2a"; ctx.shadowBlur = 18;
-      ctx.beginPath(); ctx.moveTo(cx + side * halfTop * 0.4, craterY + 4);
-      ctx.quadraticCurveTo(cx + side * (halfTop + 30), (craterY + ey) / 2, ex, ey); ctx.stroke(); ctx.shadowBlur = 0;
-    }
-    ctx.globalCompositeOperation = "lighter";
-    const N = 320;
-    for (let i = 0; i < N; i++) { // ejecta: each particle launches at its own progress and flies ballistically
-      const t0 = 0.08 + (i / N) * 0.8;
-      if (p < t0) continue;
-      const age = (p - t0) * 2.6, ang = -Math.PI / 2 + (rnd(i) - 0.5) * 1.4, sp = (0.35 + rnd(i + 1) * 0.65) * h;
-      const x = cx + Math.cos(ang) * sp * age, y = craterY + Math.sin(ang) * sp * age + 0.9 * h * age * age;
-      if (y > h * 0.98) continue;
-      const heat = clamp(1 - age * 1.2);
-      ctx.fillStyle = `rgba(255,${Math.round(120 + 130 * heat)},${Math.round(60 * heat)},${0.25 + 0.7 * heat})`;
-      const s = 1.5 + rnd(i + 2) * 3;
-      ctx.fillRect(x, y, s, s);
-    }
-    ctx.globalCompositeOperation = "source-over";
-    $("#hint").style.opacity = String(1 - clamp(p * 4));
-  }
-
-  // ---------- scroll-driven layout: volcano, wonders strip, forest parallax ----------
-  const volSec = $("#volcano"), wonSec = $("#wonders"), track = $("#track"), falls = $("#waterfall");
-  const progress = { volcano: 0, wonders: 0 };
-  const sectionProgress = (sec) => clamp(-sec.getBoundingClientRect().top / (sec.offsetHeight - innerHeight));
-  let ticking = false;
-  function onScroll() {
-    if (ticking) return; ticking = true;
-    requestAnimationFrame(() => {
-      ticking = false;
-      if (!reduce) {
-        progress.volcano = sectionProgress(volSec);
-        progress.wonders = sectionProgress(wonSec);
-        drawVolcano(progress.volcano);
-        track.style.transform = `translate3d(${-progress.wonders * Math.max(0, track.scrollWidth - innerWidth)}px,0,0)`;
-        const off = -falls.getBoundingClientRect().top;
-        for (const l of $$(".forest")) l.style.transform = `translate3d(0,${off * Number(l.dataset.depth)}px,0)`;
-      }
-    });
-  }
-
-  // ---------- forest silhouettes (three layers) ----------
-  function forest(g, seed, n, hmin, hmax, y) {
-    let d = "";
-    for (let i = 0; i < n; i++) {
-      const x = (i / n) * 1500 - 30 + rnd(seed + i) * 30, th = hmin + rnd(seed + i * 3) * (hmax - hmin), tw = th * 0.32;
-      d += `M${x} ${y} L${x + tw / 2} ${y - th} L${x + tw} ${y}Z`;
-    }
-    g.innerHTML = `<path d="${d}"/><rect x="-40" y="${y}" width="1540" height="${600 - y}"/>`;
-  }
-  forest($("#f1"), 100, 60, 120, 230, 420); forest($("#f2"), 300, 46, 170, 300, 480); forest($("#f3"), 600, 34, 220, 380, 560);
-
-  // ---------- wonder card art (drawn once) ----------
-  const ART = {
-    aurora(ctx, w, h) {
-      ctx.fillStyle = "#050a1c"; ctx.fillRect(0, 0, w, h);
-      for (let k = 0; k < 3; k++) for (let x = 0; x < w; x += 2) {
-        const y = h * (0.3 + k * 0.12) + Math.sin(x * 0.03 + k) * 16, len = 50 + Math.sin(x * 0.05 + k * 2) * 30;
-        const g = ctx.createLinearGradient(0, y - len, 0, y);
-        g.addColorStop(0, "rgba(120,80,255,0)"); g.addColorStop(1, k === 1 ? "rgba(90,255,190,0.35)" : "rgba(140,255,160,0.22)");
-        ctx.fillStyle = g; ctx.fillRect(x, y - len, 2, len);
-      }
-      ctx.fillStyle = "#02040a"; ctx.beginPath(); ctx.moveTo(0, h); ctx.lineTo(0, h * 0.85); ctx.lineTo(w * 0.4, h * 0.78); ctx.lineTo(w, h * 0.88); ctx.lineTo(w, h); ctx.fill();
-    },
-    nebula(ctx, w, h) {
-      ctx.fillStyle = "#07051a"; ctx.fillRect(0, 0, w, h);
-      ctx.globalCompositeOperation = "lighter";
-      for (let i = 0; i < 40; i++) {
-        const x = w * (0.2 + rnd(i) * 0.6), y = h * (0.2 + rnd(i + 1) * 0.6), r = 20 + rnd(i + 2) * 70;
-        const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-        g.addColorStop(0, i % 2 ? "rgba(255,90,160,0.18)" : "rgba(90,140,255,0.18)"); g.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2);
-      }
-      for (let i = 0; i < 120; i++) { ctx.fillStyle = "rgba(255,255,255,0.8)"; ctx.fillRect(rnd(i + 40) * w, rnd(i + 90) * h, 1.2, 1.2); }
-      ctx.globalCompositeOperation = "source-over";
-    },
-    reef(ctx, w, h) {
-      const g = ctx.createLinearGradient(0, 0, 0, h); g.addColorStop(0, "#0a6f8a"); g.addColorStop(1, "#063247");
-      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
-      const cols = ["#ff7a8a", "#ffb35c", "#c06bff", "#ff5fa2", "#6ff0c8"];
-      for (let i = 0; i < 26; i++) {
-        const x = rnd(i) * w, bh = 30 + rnd(i + 1) * 60; ctx.strokeStyle = cols[i % 5]; ctx.lineWidth = 4; ctx.lineCap = "round";
-        ctx.beginPath(); ctx.moveTo(x, h); ctx.lineTo(x, h - bh); ctx.moveTo(x, h - bh * 0.5); ctx.lineTo(x - 12, h - bh * 0.85); ctx.moveTo(x, h - bh * 0.6); ctx.lineTo(x + 12, h - bh * 0.95); ctx.stroke();
-      }
-      for (let i = 0; i < 18; i++) { ctx.fillStyle = "rgba(220,250,255,0.5)"; ctx.beginPath(); ctx.arc(rnd(i + 60) * w, rnd(i + 70) * h * 0.6, 1 + rnd(i) * 3, 0, 7); ctx.fill(); }
-    },
-    dunes(ctx, w, h) {
-      const g = ctx.createLinearGradient(0, 0, 0, h); g.addColorStop(0, "#ffb88a"); g.addColorStop(0.5, "#ffd9a0"); g.addColorStop(1, "#c9743f");
-      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
-      const shades = ["#e59a5c", "#cf7d44", "#a95a2c"];
-      shades.forEach((c, k) => {
-        ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(0, h);
-        for (let x = 0; x <= w; x += 6) ctx.lineTo(x, h * (0.55 + k * 0.13) + Math.sin(x * 0.02 + k * 2) * 14);
-        ctx.lineTo(w, h); ctx.fill();
-      });
-    },
-    lightning(ctx, w, h) {
-      ctx.fillStyle = "#0b0a1e"; ctx.fillRect(0, 0, w, h);
-      const bolt = (x, y, len, seed, width) => {
-        ctx.beginPath(); ctx.moveTo(x, y);
-        for (let i = 0; i < 12; i++) { x += (rnd(seed + i) - 0.5) * 34; y += len / 12; ctx.lineTo(x, y); }
-        ctx.lineWidth = width; ctx.stroke();
-      };
-      ctx.strokeStyle = "#e6e2ff"; ctx.shadowColor = "#a99bff"; ctx.shadowBlur = 18;
-      bolt(w * 0.55, 0, h * 0.95, 3, 3); bolt(w * 0.5, h * 0.3, h * 0.5, 40, 1.5); ctx.shadowBlur = 0;
-    },
-    bay(ctx, w, h) {
-      ctx.fillStyle = "#030b18"; ctx.fillRect(0, 0, w, h);
-      ctx.globalCompositeOperation = "lighter";
-      for (let i = 0; i < 260; i++) {
-        const y = h * 0.45 + rnd(i) * h * 0.55, x = rnd(i + 1) * w, a = rnd(i + 2);
-        ctx.fillStyle = `rgba(80,${190 + 60 * a},255,${0.25 + 0.6 * a})`; ctx.fillRect(x, y + Math.sin(x * 0.05) * 6, 2, 2);
-      }
-      ctx.globalCompositeOperation = "source-over";
-      for (let i = 0; i < 70; i++) { ctx.fillStyle = "rgba(255,255,255,0.7)"; ctx.fillRect(rnd(i + 5) * w, rnd(i + 8) * h * 0.4, 1.1, 1.1); }
-    },
-  };
-  function drawCards() { for (const c of $$("canvas[data-art]")) { const { ctx, w, h } = fit(c); ART[c.dataset.art](ctx, w, h); } }
-
-  // ---------- reveal on scroll ----------
-  const reveal = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) e.target.classList.add("in"); }), { threshold: 0.2 });
-  $$("[data-anim]").forEach((el) => (reduce ? el.classList.add("in") : reveal.observe(el)));
-
-  // ---------- counter ----------
-  const counter = $("[data-counter]"), TARGET = 2e12;
-  new IntersectionObserver(([e], obs) => {
-    if (!e.isIntersecting) return; obs.disconnect();
-    if (reduce) { counter.textContent = TARGET.toLocaleString("en-US"); return; }
-    const t0 = performance.now();
-    const step = (now) => {
-      const k = clamp((now - t0) / 2200), eased = 1 - (1 - k) ** 3;
-      counter.textContent = Math.round(TARGET * eased).toLocaleString("en-US");
-      if (k < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, { threshold: 0.4 }).observe(counter);
-
-  // ---------- carousel ----------
-  const slides = $$("[data-slide]");
-  let cur = 0, hover = false;
-  const show = (i) => { cur = (i + slides.length) % slides.length; slides.forEach((s, k) => s.setAttribute("aria-hidden", String(k !== cur))); };
-  $("[data-next]").addEventListener("click", () => show(cur + 1));
-  $("[data-prev]").addEventListener("click", () => show(cur - 1));
-  const car = $("[data-carousel]");
-  car.addEventListener("mouseenter", () => (hover = true)); car.addEventListener("mouseleave", () => (hover = false));
-  car.addEventListener("focusin", () => (hover = true)); car.addEventListener("focusout", () => (hover = false));
-  setInterval(() => { if (!hover) show(cur + 1); }, 5000);
-
-  // ---------- form ----------
-  const form = $("[data-form]"), msg = $("[data-form-message]"), email = $("#email");
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const v = email.value.trim();
-    const [state, text] = !v ? ["error", "Please enter your email."]
-      : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? ["error", "That email doesn't look right."]
-      : ["success", "Welcome aboard. Your first wonder letter is on its way."];
-    msg.dataset.state = state; msg.textContent = text;
-    email.setAttribute("aria-invalid", String(state === "error"));
-  });
-
-  // ---------- nav menu ----------
-  const nav = $(".nav"), menuBtn = $("[data-menu-button]");
-  menuBtn.addEventListener("click", () => { const open = !nav.classList.contains("open"); nav.classList.toggle("open", open); menuBtn.setAttribute("aria-expanded", String(open)); });
-  $$(".nav ul a").forEach((a) => a.addEventListener("click", () => { nav.classList.remove("open"); menuBtn.setAttribute("aria-expanded", "false"); }));
-
-  // ---------- magical cursor: glowing dot + stardust trail ----------
-  const cursorOn = finePointer && !reduce;
-  const cur$ = $("[data-cursor]"), trail = $("[data-cursor-trail]");
-  const dot = { x: mouse.x, y: mouse.y }, dust = [];
-  addEventListener("mousemove", (e) => {
-    mouse.x = e.clientX; mouse.y = e.clientY; mouse.nx = e.clientX / innerWidth - 0.5; mouse.ny = e.clientY / innerHeight - 0.5;
-    if (!cursorOn) return;
-    for (let i = 0; i < 3; i++) dust.push({ x: e.clientX, y: e.clientY, vx: (Math.random() - 0.5) * 40, vy: (Math.random() - 0.2) * 40, life: 0, max: 0.6 + Math.random() * 0.6, hue: 30 + Math.random() * 230 });
-  });
-  if (cursorOn) {
-    document.body.classList.add("has-cursor");
-    document.addEventListener("mouseover", (e) => cur$.classList.toggle("hover", !!e.target.closest("a, button, input, [data-prev], [data-next]")));
-    let tdim = fit(trail), lt = performance.now();
-    addEventListener("resize", () => (tdim = fit(trail)));
-    const tick = (now) => {
-      const dt = Math.min(0.05, (now - lt) / 1000); lt = now;
-      dot.x += (mouse.x - dot.x) * 0.35; dot.y += (mouse.y - dot.y) * 0.35;
-      cur$.style.transform = `translate3d(${dot.x}px,${dot.y}px,0)`;
-      const { ctx, w, h } = tdim; ctx.clearRect(0, 0, w, h); ctx.globalCompositeOperation = "lighter";
-      for (const d of dust) {
-        d.life += dt; d.x += d.vx * dt; d.y += d.vy * dt; d.vy += 30 * dt;
-        const a = Math.max(0, 1 - d.life / d.max), s = 1 + a * 2.2;
-        ctx.fillStyle = `hsla(${d.hue},100%,80%,${a})`; ctx.fillRect(d.x - s / 2, d.y - s / 2, s, s);
-      }
-      for (let i = dust.length - 1; i >= 0; i--) if (dust[i].life > dust[i].max) dust.splice(i, 1);
-      if (dust.length > 400) dust.splice(0, dust.length - 400);
-      requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  }
-
-  // ---------- test hook (see the task's test contract) ----------
-  window.__wonder = {
-    progress: (id) => (id in progress ? progress[id] : null),
-    playing: (id) => !!(scenes[id] && scenes[id].playing),
-  };
-
-  // ---------- boot ----------
-  function layout() {
-    for (const s of Object.values(scenes)) s.resize();
-    vol.dim = fit(vol.canvas);
-    drawVolcano(reduce ? 0.7 : progress.volcano);
-    drawCards();
-    onScroll();
-  }
-  addEventListener("resize", layout);
-  addEventListener("scroll", onScroll, { passive: true });
-  layout();
-  if (reduce) for (const s of Object.values(scenes)) s.draw(s.dim, s.state, 2, 0.016);
-  else requestAnimationFrame(loop);
-})();
-</script>
+<script src="vendor/three-r186.iife.js"></script>
+<script src="shaders.js"></script>
+<script src="world.js"></script>
 </body>
 </html>
