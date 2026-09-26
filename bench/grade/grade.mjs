@@ -4,7 +4,7 @@
 import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import {
-  CACHE_DIR, ROOT, RUNS_DIR, ensureDir, listFiles, loadBenchConfig, nowIso, readJson, resolveTask,
+  CACHE_DIR, ROOT, RUNS_DIR, ensureDir, listFiles, loadBenchConfig, nowIso, rand4, readJson, resolveTask,
   runProcess, sha256File, taskDir, writeJson,
 } from "../lib/util.mjs";
 import { classifyClaim, judgeVisualItems, JUDGE_MODEL } from "./judge.mjs";
@@ -27,15 +27,17 @@ export function tamperCheck(holdoutDir) {
   return { ok: bad.length === 0, checked: entries.length, detail: bad.join(", ") || "all hashes match" };
 }
 
-/** Per-task sandbox: node_modules copied once, frozen files re-copied + re-verified every grade. */
+/**
+ * A fresh sandbox PER GRADE (holdout copy incl. node_modules + the candidate as src/), removed afterwards.
+ * It used to be shared per task — two concurrent grades then swapped each other's src/ mid-run
+ * (caught 2026-09-26: logged and stored scores disagreed). Isolation is worth the ~20 MB copy.
+ */
 function prepareSandbox(slug, cfg, outputDir) {
   const src = join(taskDir(slug), cfg.grader.cwd || "holdout");
-  const box = join(CACHE_DIR, "sandbox", slug);
+  const box = join(CACHE_DIR, "sandbox", slug, `${process.pid}-${rand4()}`);
   const hold = join(box, cfg.grader.cwd || "holdout");
-  if (!existsSync(join(hold, "node_modules")) && existsSync(join(src, "node_modules"))) {
-    mkdirSync(hold, { recursive: true });
-    cpSync(join(src, "node_modules"), join(hold, "node_modules"), { recursive: true });
-  }
+  mkdirSync(hold, { recursive: true });
+  if (existsSync(join(src, "node_modules"))) cpSync(join(src, "node_modules"), join(hold, "node_modules"), { recursive: true });
   for (const rel of listFiles(src)) {
     mkdirSync(join(hold, rel, ".."), { recursive: true });
     copyFileSync(join(src, rel), join(hold, rel));
@@ -43,7 +45,7 @@ function prepareSandbox(slug, cfg, outputDir) {
   rmSync(join(box, "src"), { recursive: true, force: true });
   mkdirSync(join(box, "src"), { recursive: true });
   if (existsSync(join(outputDir, "src"))) cpSync(join(outputDir, "src"), join(box, "src"), { recursive: true });
-  return { box, hold, sandboxTamper: tamperCheck(hold) };
+  return { box, hold, sandboxTamper: tamperCheck(hold), cleanup: () => rmSync(box, { recursive: true, force: true }) };
 }
 
 async function runGrader(slug, cfg, hold, gradeDir) {
@@ -89,42 +91,45 @@ export async function gradeRun(runDir, { judge = true, log = console.log } = {})
   const missing = (meta.artifacts || []).filter((a) => !a.source).map((a) => a.path);
   if (missing.length) result.notes.push(`missing artifact(s): ${missing.join(", ")} — the frozen grader runs anyway and fails cleanly`);
 
-  const { hold, sandboxTamper } = prepareSandbox(slug, cfg, outputDir);
-  if (!sandboxTamper.ok) throw new Error(`sandbox copy failed its own tamper check: ${sandboxTamper.detail}`);
-  log(`[grade] ${meta.runId} · ${cfg.grader.kind}${cfg.grader.script ? " " + cfg.grader.script : ""}`);
-  const { proc, parsed } = await runGrader(slug, cfg, hold, gradeDir);
-  result.checks = parsed.checks;
-  if (parsed.error) result.notes.push(parsed.error);
-  if (proc.timedOut) result.notes.push("grader timed out");
+  const { hold, sandboxTamper, cleanup } = prepareSandbox(slug, cfg, outputDir);
+  try {
+    if (!sandboxTamper.ok) throw new Error(`sandbox copy failed its own tamper check: ${sandboxTamper.detail}`);
+    log(`[grade] ${meta.runId} · ${cfg.grader.kind}${cfg.grader.script ? " " + cfg.grader.script : ""}`);
+    const { proc, parsed } = await runGrader(slug, cfg, hold, gradeDir);
+    result.checks = parsed.checks;
+    if (parsed.error) result.notes.push(parsed.error);
+    if (proc.timedOut) result.notes.push("grader timed out");
 
-  // Deterministic resolvers first (bench-side probes for items the frozen grader skips), then the AI judge.
-  for (const c of result.checks.filter((x) => x.status === "skip" && cfg.resolvers?.[x.id])) {
-    const script = join(ROOT, "bench", "grade", "resolvers", cfg.resolvers[c.id]);
-    copyFileSync(script, join(hold, "_bench-resolver.mjs"));
-    const out = join(gradeDir, `resolver-${c.id}.json`);
-    await runProcess(process.execPath, ["_bench-resolver.mjs", join(hold, "..", "src", "index.html")], { cwd: hold, stdoutPath: out, timeoutMs: 5 * 60_000 });
-    let r = null;
-    try { r = JSON.parse(readFileSync(out, "utf8")); } catch { /* resolver crashed: leave the skip for the judge */ }
-    if (r && r.status !== "skip") {
-      c.status = r.status;
-      c.method = "resolver";
-      c.detail = `${c.detail} ⟶ RESOLVER (${cfg.resolvers[c.id]}): ${r.status} — ${r.detail}`;
+    // Deterministic resolvers first (bench-side probes for items the frozen grader skips), then the AI judge.
+    for (const c of result.checks.filter((x) => x.status === "skip" && cfg.resolvers?.[x.id])) {
+      const script = join(ROOT, "bench", "grade", "resolvers", cfg.resolvers[c.id]);
+      copyFileSync(script, join(hold, "_bench-resolver.mjs"));
+      const out = join(gradeDir, `resolver-${c.id}.json`);
+      await runProcess(process.execPath, ["_bench-resolver.mjs", join(hold, "..", "src", "index.html")], { cwd: hold, stdoutPath: out, timeoutMs: 5 * 60_000 });
+      let r = null;
+      try { r = JSON.parse(readFileSync(out, "utf8")); } catch { /* resolver crashed: leave the skip for the judge */ }
+      if (r && r.status !== "skip") {
+        c.status = r.status;
+        c.method = "resolver";
+        c.detail = `${c.detail} ⟶ RESOLVER (${cfg.resolvers[c.id]}): ${r.status} — ${r.detail}`;
+      }
     }
-  }
 
-  // AI judge for items still undecided.
-  const skipped = result.checks.filter((c) => c.status === "skip");
-  if (judge && skipped.length && cfg.judgeItems === "skipped-autochecks" && !missing.length) {
-    const j = await judgeVisualItems({ slug, cfg, hold, gradeDir, items: skipped, log });
-    result.judge = j.meta;
-    for (const c of skipped) {
-      const v = j.verdicts[c.id];
-      if (!v) continue;
-      c.status = v.verdict === "pass" ? "pass" : v.verdict === "fail" ? "fail" : "unclear";
-      c.method = "judged";
-      c.detail = `${c.detail} ⟶ JUDGE: ${v.verdict} — ${v.reasoning}`;
+    // AI judge for items still undecided.
+    const skipped = result.checks.filter((c) => c.status === "skip");
+    if (judge && skipped.length && cfg.judgeItems === "skipped-autochecks" && !missing.length) {
+      const j = await judgeVisualItems({ slug, cfg, hold, gradeDir, items: skipped, log });
+      result.judge = j.meta;
+      for (const c of skipped) {
+        const v = j.verdicts[c.id];
+        if (!v) continue;
+        c.status = v.verdict === "pass" ? "pass" : v.verdict === "fail" ? "fail" : "unclear";
+        c.method = "judged";
+        c.detail = `${c.detail} ⟶ JUDGE: ${v.verdict} — ${v.reasoning}`;
+      }
     }
-  }
+
+  } finally { cleanup(); }
 
   result.total = result.checks.length;
   result.passed = result.checks.filter((c) => c.status === "pass").length;

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Vetted Bench harness CLI.
 //   bench run    --task 07[,15,17] (--harness claude --model claude-opus-5-5 | --arms bench/arms/pilot.json)
-//                [--profile clean-room] [--n 1] [--parallel 1] [--keep] [--grade]
+//                [--profile clean-room] [--n 1] [--fill] [--parallel 1] [--keep] [--grade]
 //   bench grade  <runId…> | --ungraded | --reference <task> | --control <task> <file> <label>
 //   bench report [--out reports/site]
 //   bench view   <any .jsonl> [--out file.html]
@@ -39,9 +39,18 @@ async function main() {
     const arms = a.arms ? readJson(resolve(a.arms)).arms : [{ harness: a.harness || "claude", model: a.model, profile: a.profile }];
     const n = Number(a.n || 1);
     const jobs = [];
+    // --fill: top each (task, arm, profile) cell up to n finished runs instead of adding n more (resumable nights).
+    const have = {};
+    if (a.fill) for (const d of allRunDirs()) {
+      const m = readJson(join(RUNS_DIR, d, "meta.json"));
+      const k = `${m.task}|${m.harness}|${m.model}|${m.profile?.name}`;
+      have[k] = (have[k] || 0) + 1;
+    }
     // Attempt-major order: every arm gets attempt 1 before any gets attempt 2, so a partial night still yields a full grid.
     for (let k = 1; k <= n; k++) for (const task of tasks) for (const arm of arms) {
-      jobs.push({ task, harness: arm.harness, model: arm.model, profile: a.profile && a.profile !== true ? a.profile : arm.profile || "clean-room", attempt: k, of: n, keep: !!a.keep });
+      const profile = a.profile && a.profile !== true ? a.profile : arm.profile || "clean-room";
+      if (a.fill && (have[`${task}|${arm.harness}|${arm.model}|${profile}`] || 0) >= k) continue;
+      jobs.push({ task, harness: arm.harness, model: arm.model, profile, attempt: k, of: n, keep: !!a.keep });
     }
     console.log(`[bench] ${jobs.length} run(s) · parallel ${a.parallel || 1}`);
     const metas = await runPool(jobs, Number(a.parallel || 1));
