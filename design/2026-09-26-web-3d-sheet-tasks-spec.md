@@ -173,7 +173,7 @@ The motion and layout gates stop a static screenshot-perfect shell from scoring 
 
 1. Harness items 1–3 (inputs, continuous score, web-probe lib).
 2. Task 18: prompt + reference + probes + mutation controls.
-3. Task 19a: freeze screenshots of the 18 reference + motion notes.
+3. Task 19a: freeze screenshots + motion notes of a clone target. The 18 reference's art is plain, so the better target may be the best-scoring MODEL page from the 18 pilot (prettier, harder to clone). Decide after the 18 pilot.
 4. Tasks 19b / 20 / 21: license and source check first, then the same pattern.
 5. Run the pilot grid on 18 and 19a first. They reuse the web-probe lib, and they're the ones Josh wants on camera.
 
