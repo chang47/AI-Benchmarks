@@ -1,0 +1,15 @@
+{
+  "slug": "18-wonders-landing",
+  "type": "visual",
+  "difficulty": "hard",
+  "status": "candidate",
+  "created": "2026-09-26",
+  "theme": "Wonders of the Universe — immersive scroll-story landing page (Josh: 'mystical, wonderful, and pretty'; feel inspired by leoparpeix.com, not copied)",
+  "authorities": [
+    "research/landscape-2026-09/benchmark-landscape-memo.md (task idea #1: scroll-driven landing page; the gap no public benchmark grades reproducibly)",
+    "https://arena.ai/leaderboard/code/webdev/",
+    "https://arxiv.org/abs/2603.13391"
+  ],
+  "contamination": "low — original theme, copy and test contract written for this bench on 2026-09-26",
+  "grading": "points checklist (78 pts, 70 scripted / 8 judged yes-no) — design/2026-09-26-web-3d-sheet-tasks-spec.md, Task 18. Grader not built yet."
+}
