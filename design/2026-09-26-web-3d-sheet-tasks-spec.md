@@ -47,39 +47,70 @@ Grading runs a real Chrome, so it grabs the mouse (pointer lock or focus). Run g
 
 ---
 
-## Task 18 — scroll-driven portfolio landing page (flagship)
+## Task 18 — "Wonders of the Universe": immersive scroll-story landing page (flagship)
 
-**Prompt, frozen.** A one-page portfolio for a fictional designer, with **all copy provided verbatim** in the prompt (so content can be checked and 19a can reuse it). It needs:
+**Theme (Josh, 2026-09-26).** The feeling Josh wants is "mystical, wonderful and pretty", like walking into a teamLab-style exhibit in Japan.
+- **Inspiration for feel only:** leoparpeix.com's fluid motion, scroll effects and cursor effects. We don't copy its design, and there is no audio.
+- **All visuals are generated in code:** canvas/WebGL particles and shaders, plus layered SVG. There are no image, video or font files, so it's one offline file with nothing to license.
+- **What it tests:** generative art from code, scroll choreography, and performance with many animated scenes. This is where frontier models differ most.
+- **Possible later variant (18b):** supply a NASA public-domain image pack in `inputs/`, to test layout and motion instead of generative art.
 
-1. A hero with an animated canvas/WebGL background and a headline that animates in on load.
-2. A sticky nav whose links smooth-scroll to sections; it collapses to a menu button under 768px.
-3. Four content sections whose elements **reveal on scroll** (fade + translate).
-4. A **pinned horizontal gallery**: the section pins for about 3 viewport heights while cards slide sideways.
-5. An animated number counter that counts up when visible.
-6. A testimonials carousel: prev/next buttons plus auto-advance, pausing on hover.
-7. A contact form with inline validation (empty or invalid email → error message; valid → success message, no page reload).
-8. `prefers-reduced-motion`: no scroll or reveal motion, and everything visible immediately.
+**Prompt, frozen.** One page, with **all copy provided verbatim** in the prompt (so content is checkable and 19a can reuse the page).
 
-It must be one self-contained `src/index.html` with no network: no CDNs or web fonts, and GSAP only if inlined. It must have zero console errors.
+| # | `data-section` | Scene | Motion |
+|---|---|---|---|
+| 1 | `hero` | A swirling **spiral galaxy** of particles that reacts to the mouse; the title animates in on load | always animating |
+| 2 | `meteors` | Night sky over a **mountain** silhouette with a **meteor shower** | always animating |
+| 3 | `volcano` | A **volcano eruption scrubbed by scroll**: it erupts as you scroll down and rewinds as you scroll up. The section pins while it plays | scroll-scrubbed |
+| 4 | `waterfall` | A **waterfall** falling into a **lush forest**; forest layers move at different speeds | parallax |
+| 5 | `wonders` | A pinned **horizontal strip** of ≥5 wonder cards (e.g. aurora, nebula, coral reef, dunes, lightning), each with a small generated visual | pinned horizontal scroll |
+| 6 | `ocean` | **Ocean waves** at sunset, plus a stat that counts up (e.g. "2 trillion galaxies") | animating + counter |
+| 7 | `voices` | A quote **carousel**: prev/next, auto-advance, pause on hover | interaction |
+| 8 | `join` | A "Get the wonder letter" **signup form** with inline validation (empty / invalid email → error; valid → success, no reload) | interaction |
 
-**Test contract (in the prompt).** Every animated element carries `data-anim="<id>"` from a fixed list, and sections carry `data-section="<id>"`. This is the landing-page equivalent of `window.__voxel`.
+**The page must also have:**
+- **Magical cursor:** a custom glowing cursor that follows the mouse with a sparkle/stardust trail, and grows or changes when over clickable things. It is turned off on touch devices and under reduced motion (Josh: "the cursor effects too, it's really magical").
+- **Sticky nav:** links smooth-scroll to sections; it collapses to a menu button under 768px.
+- **Reveal-on-scroll text** in every section (fade + translate).
+- **`prefers-reduced-motion`:** no scroll-driven or ambient motion, no custom cursor, and all content visible immediately.
+- **Performance:** scenes pause their animation loops while off-screen.
+- **Packaging:** one self-contained `src/index.html`, no network (no CDNs, web fonts or media files; libraries only if inlined), zero console errors.
+
+**Test contract (in the prompt), the landing-page equivalent of `window.__voxel`:**
+- `data-section="<id>"` on each section; `data-anim="<id>"` on each reveal element (fixed list); `data-cursor` on the custom cursor element.
+- `window.__wonder = { progress(id) → 0..1, playing(id) → boolean }`:
+  - `progress` = how far that section's scroll-driven animation has advanced (volcano, wonders strip);
+  - `playing` = whether that scene's animation loop is currently running (galaxy, meteors, waterfall, ocean).
 
 **Checklist (points):**
 
 | Group | Pts | Criteria (each a true/false statement; bands where noted) |
 |---|---|---|
-| Loads clean | 6 | no console errors (2) · no network requests (2) · all 8 required `data-section`s exist (2) |
-| Content | 6 | every frozen copy string present (1 per section, 5) · every nav link lands on its section (1) |
-| Motion | 24 | each of the 8 `data-anim` reveals changes opacity/transform between its before/after scroll offsets (1 each, 8) · hero headline animates on load (2) · hero canvas pixels change over 1 s (2) · gallery stays pinned (top within 2px) across its range (3) · gallery cards move on X while pinned (3) · counter reaches its frozen target number (2) · reduced-motion: no transforms change on scroll (2) · reduced-motion: all content visible without scrolling triggers (2) |
-| Interaction | 12 | carousel next (1) · prev (1) · auto-advances within 8 s (1) · pauses on hover (1) · empty submit shows an error (2) · bad email shows an error (2) · good email shows success, no reload (2) · mobile menu opens and closes at 375px (2) |
-| Quality | 12 | no horizontal overflow at 375 (1) · 768 (1) · 1440 (1) · axe serious+critical: 0 → 3 pts, 1–2 → 2, 3–5 → 1, else 0 · CLS < 0.1 (2) · frame-time p95 during auto-scroll: ≤ 20 ms → 3, ≤ 33 ms → 2, ≤ 50 ms → 1 (bands) |
-| Judge checklist | 6 | yes/no, majority of 3, from 6 scroll frames + 1 mobile frame: headline readable over the hero (1) · no overlapping or clipped text (1) · consistent alignment/spacing between sections (1) · gallery cards fully visible while sliding (1) · mobile layout is single-column and readable (1) · form fields and messages clearly labelled (1) |
+| Loads clean | 6 | no console errors (2) · no network requests (2) · all 8 `data-section`s exist (2) |
+| Content | 6 | every frozen copy string present (1 per 2 sections, 4) · every nav link lands on its section (2) |
+| Scenes animate | 12 | galaxy, meteors, waterfall, ocean: each scene's canvas/SVG pixels change over 1 s while visible (2 each, 8) · galaxy responds to mouse movement: pixels near the cursor differ from a no-mouse run (2) · title animates on load (2) |
+| Scroll choreography | 16 | volcano: `progress` rises with scroll (3) and falls back when scrolling up (2) · volcano section stays pinned while progress runs 0→1 (2) · wonders strip pins (2) and its cards move on X with scroll (2) · forest parallax: two forest layers move by different amounts over the same scroll (2) · each of 8 `data-anim` reveals changes opacity/transform between its before/after offsets (3 pts, banded: 8/8 → 3, ≥6 → 2, ≥4 → 1) |
+| Cursor | 6 | custom cursor within 20px of the mouse after a move (2) · trail appears along the path (1) · cursor changes state over a link or button (1) · hidden or disabled under reduced motion (1) · no custom cursor on touch emulation (1) |
+| Interaction | 10 | carousel next, prev, auto-advance within 8 s and hover-pause (1 each, 4) · empty submit error (2) · bad email error (1) · good email success, no reload (1) · mobile menu opens and closes at 375px (2) |
+| Quality & performance | 14 | no horizontal overflow at 375 / 768 / 1440 (1 each) · axe serious+critical: 0 → 3, 1–2 → 2, 3–5 → 1 · CLS < 0.1 (1) · frame-time p95 during a scripted full-page scroll: ≤ 20 ms → 3, ≤ 33 ms → 2, ≤ 50 ms → 1 · off-screen scenes paused: `playing()` is false for ≥ 3 of the 4 ambient scenes when scrolled away (2) · reduced motion: `progress` and transforms static, all content visible (2) |
+| Judge checklist | 8 | yes/no, majority of 3, blind, from fixed frames: hero reads as a spiral galaxy (1) · meteors streak over a recognizable mountain (1) · volcano visibly erupting at 80% progress and not at 0% (1) · waterfall reads as falling water (1) · ≥ 5 visually distinct wonders in the strip (1) · no overlapping or clipped text (1) · mobile layout readable (1) · overall palette coherent (night / cosmic theme holds across sections) (1) |
 
-Total 66 points. Scripted = 60 (91%); judged = 6 (9%).
+Total 78 points. Scripted = 70 (90%); judged = 8 (10%).
 
-**Reference.** I write one reference that scores ≥ 95% on the scripted groups. Mutation controls: no reveal animation, broken pin, no validation, no reduced-motion handling, a console error. Each must drop its own group.
+**Reference.** I build one reference page (its art can be plain; it exists to prove the probes) that scores ≥ 95% on the scripted groups. Mutation controls, each of which must drop only its own group:
+- a frozen volcano (`progress` stuck);
+- a broken pin;
+- scenes that never pause;
+- the cursor removed;
+- no form validation;
+- no reduced-motion handling;
+- one console error.
 
-**Expected spread.** Motion + quality is where models split: "pretty but static", "pretty but janky", pins that fight the scroll, broken reduced-motion.
+**Expected spread.**
+- Art quality (the judge questions): gorgeous galaxy vs a grey dot cloud.
+- Keeping 5+ animated scenes smooth (frame-time bands and pausing off-screen).
+- Getting the scroll-scrubbed volcano to rewind cleanly.
+- The cursor trail without jank.
 
 ---
 
