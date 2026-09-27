@@ -1,0 +1,11 @@
+{
+  "slug": "21-inventory",
+  "type": "office",
+  "difficulty": "hard",
+  "status": "candidate",
+  "created": "2026-09-27",
+  "theme": "Pip's Outdoor Gear — turn a messy Q3 transaction log (576 rows) into a LIVE spreadsheet: FIFO inventory with backorders, monthly P&L, reorder report, exceptions",
+  "contamination": "none — generated data (research/generate.py, seeded), brief written for this bench on 2026-09-27",
+  "grading": "points checklist (45 pts, all scripted): LibreOffice recalculation, then the live test swaps in a hidden alternate log (12 pts). Answer key cross-checked 3 ways: event engine (holdout/engine.py) = live-formula reference workbook (src/) = blind solver written from the brief alone — 81/81 numbers identical.",
+  "controls": "reference 45/45; typed-in values 31/45 (fails live test + formula check); no duplicate removal 28/45; revenue on order date 31/45"
+}

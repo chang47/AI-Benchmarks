@@ -1,0 +1,4228 @@
+[
+{
+"id": "T1001",
+"date": "2025-07-01",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 2,
+"unit_price": 189.0
+},
+{
+"id": "T1003",
+"date": "2025-07-01",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 2,
+"unit_price": 299.0
+},
+{
+"id": "T1005",
+"date": "2025-07-01",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 3,
+"unit_price": 62.1
+},
+{
+"id": "T1007",
+"date": "2025-07-01",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 8,
+"unit_price": 29.0
+},
+{
+"id": "T1008",
+"date": "2025-07-01",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 18.0
+},
+{
+"id": "T1009",
+"date": "2025-07-01",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 1,
+"unit_price": 44.1
+},
+{
+"id": "T1010",
+"date": "2025-07-01",
+"type": "EXPENSE",
+"category": "Rent",
+"amount": 3200.0
+},
+{
+"id": "T1011",
+"date": "2025-07-02",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 4,
+"unit_price": 69.0
+},
+{
+"id": "T1012",
+"date": "2025-07-02",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 79.0
+},
+{
+"id": "T1013",
+"date": "2025-07-02",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 44.1
+},
+{
+"id": "T0999",
+"date": "2025-07-03",
+"type": "RETURN",
+"sku": "FILTER-H2O",
+"qty": 1,
+"unit_price": 89.0,
+"condition": "resellable"
+},
+{
+"id": "T1015",
+"date": "2025-07-03",
+"type": "SALE",
+"sku": "tent-2p",
+"qty": 4,
+"unit_price": 189.0
+},
+{
+"id": "T1016",
+"date": "2025-07-03",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 2,
+"unit_price": 299.0
+},
+{
+"id": "T1017",
+"date": "2025-07-03",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 8,
+"unit_price": 69.0
+},
+{
+"id": "T1018",
+"date": "2025-07-03",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 1,
+"unit_price": 59.0
+},
+{
+"id": "T1019",
+"date": "2025-07-03",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 79.0
+},
+{
+"id": "T1020",
+"date": "2025-07-03",
+"type": "RECEIPT",
+"sku": "BAG-WIN",
+"qty": 22,
+"unit_cost": 74.0
+},
+{
+"id": "T1021",
+"date": "2025-07-04",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 3,
+"unit_price": 189.0
+},
+{
+"id": "T1022",
+"date": "2025-07-04",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 4,
+"unit_price": 143.1
+},
+{
+"id": "T1023",
+"date": "2025-07-04",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 4,
+"unit_price": 24.0
+},
+{
+"id": "T1024",
+"date": "2025-07-04",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 4,
+"unit_price": 29.0
+},
+{
+"id": "T1025",
+"date": "2025-07-04",
+"type": "SALE",
+"sku": "PACK-65",
+"qty": 2,
+"unit_price": 219.0
+},
+{
+"id": "T1026",
+"date": "2025-07-04",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 6,
+"unit_price": 89.0
+},
+{
+"id": "T1027",
+"date": "2025-07-04",
+"type": "RETURN",
+"sku": "PACK-65",
+"qty": 1,
+"unit_price": 219.0,
+"condition": "resellable"
+},
+{
+"id": "T1028",
+"date": "2025-07-04",
+"type": "EXPENSE",
+"category": "Shipping",
+"amount": 306.41
+},
+{
+"id": "T1029",
+"date": "2025-07-05",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 6,
+"unit_price": 62.1
+},
+{
+"id": "T1030",
+"date": "2025-07-05",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 8,
+"unit_price": 20.4
+},
+{
+"id": "T1031",
+"date": "2025-07-05",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 8,
+"unit_price": 29.0
+},
+{
+"id": "T1033",
+"date": "2025-07-05",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 79.0
+},
+{
+"id": "T1034",
+"date": "2025-07-05",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 8,
+"unit_price": 18.0
+},
+{
+"id": "T1036",
+"date": "2025-07-05",
+"type": "WRITEOFF",
+"sku": "TENT-4P",
+"qty": 3,
+"note": "water damage"
+},
+{
+"id": "T1037",
+"date": "2025-07-06",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 4,
+"unit_price": 160.65
+},
+{
+"id": "T1038",
+"date": "2025-07-06",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 2,
+"unit_price": 135.15
+},
+{
+"id": "T1039",
+"date": "2025-07-06",
+"type": "SALE",
+"sku": "pad-foam",
+"qty": 4,
+"unit_price": 24.0
+},
+{
+"id": "T1040",
+"date": "2025-07-06",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 1,
+"unit_price": 59.0
+},
+{
+"id": "T1042",
+"date": "2025-07-06",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 4,
+"unit_price": 29.0
+},
+{
+"id": "T1043",
+"date": "2025-07-06",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 4,
+"unit_price": 79.0
+},
+{
+"id": "T1044",
+"date": "2025-07-06",
+"type": "RECEIPT",
+"sku": " Tent-2P",
+"qty": 40,
+"unit_cost": 88.0
+},
+{
+"id": "T1045",
+"date": "2025-07-07",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 4,
+"unit_price": 189.0
+},
+{
+"id": "T1046",
+"date": "2025-07-07",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 1,
+"unit_price": 299.0
+},
+{
+"id": "T1047",
+"date": "2025-07-07",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 1,
+"unit_price": 143.1
+},
+{
+"id": "T1049",
+"date": "2025-07-07",
+"type": "SALE",
+"sku": "lamp-led",
+"qty": 4,
+"unit_price": 24.65
+},
+{
+"id": "T1050",
+"date": "2025-07-07",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 8,
+"unit_price": 18.0
+},
+{
+"id": "T1051",
+"date": "2025-07-08",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 3,
+"unit_price": 189.0
+},
+{
+"id": "T1053",
+"date": "2025-07-08",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 1,
+"unit_price": 53.1
+},
+{
+"id": "T1054",
+"date": "2025-07-08",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 4,
+"unit_price": 29.0
+},
+{
+"id": "T1056",
+"date": "2025-07-08",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 79.0
+},
+{
+"id": "T1057",
+"date": "2025-07-08",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 6,
+"unit_price": 44.1
+},
+{
+"id": "T1058",
+"date": "2025-07-08",
+"type": "RECEIPT",
+"sku": "TENT-2P",
+"qty": 40,
+"unit_cost": 88.0
+},
+{
+"id": "T1059",
+"date": "2025-07-09",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 3,
+"unit_price": 189.0
+},
+{
+"id": "T1061",
+"date": "2025-07-09",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 8,
+"unit_price": 62.1
+},
+{
+"id": "T1062",
+"date": "2025-07-09",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 2,
+"unit_price": 159.0
+},
+{
+"id": "T1063",
+"date": "2025-07-09",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 4,
+"unit_price": 24.0
+},
+{
+"id": "T1064",
+"date": "2025-07-09",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 3,
+"unit_price": 59.0
+},
+{
+"id": "T1065",
+"date": "2025-07-09",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 71.1
+},
+{
+"id": "T1066",
+"date": "2025-07-09",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 18.0
+},
+{
+"id": "T1068",
+"date": "2025-07-09",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 44.1
+},
+{
+"id": "T1069",
+"date": "2025-07-10",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 4,
+"unit_price": 69.0
+},
+{
+"id": "T1071",
+"date": "2025-07-10",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 6,
+"unit_price": 135.15
+},
+{
+"id": "T1072",
+"date": "2025-07-10",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 79.0
+},
+{
+"id": "T1073",
+"date": "2025-07-10",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 8,
+"unit_price": 16.2
+},
+{
+"id": "T1074",
+"date": "2025-07-10",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 41.65
+},
+{
+"id": "T1076",
+"date": "2025-07-10",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 2,
+"unit_price": 80.1
+},
+{
+"id": "T1077",
+"date": "2025-07-11",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 3,
+"unit_price": 69.0
+},
+{
+"id": "T1079",
+"date": "2025-07-11",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 8,
+"unit_price": 24.65
+},
+{
+"id": "T1080",
+"date": "2025-07-11",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 1,
+"unit_price": 79.0
+},
+{
+"id": "T1081",
+"date": "2025-07-11",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 1,
+"unit_price": 89.0
+},
+{
+"id": "T1082",
+"date": "2025-07-11",
+"type": "EXPENSE",
+"category": "Shipping",
+"amount": 190.96
+},
+{
+"id": "T1084",
+"date": "2025-07-12",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 6,
+"unit_price": 160.65
+},
+{
+"id": "T1085",
+"date": "2025-07-12",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 2,
+"unit_price": 62.1
+},
+{
+"id": "T1086",
+"date": "2025-07-12",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 4,
+"unit_price": 29.0
+},
+{
+"id": "T1087",
+"date": "2025-07-12",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 79.0
+},
+{
+"id": "T1089",
+"date": "2025-07-12",
+"type": "SALE",
+"sku": "PACK-65",
+"qty": 4,
+"unit_price": 219.0
+},
+{
+"id": "T1090",
+"date": "2025-07-12",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 18.0
+},
+{
+"id": "T1091",
+"date": "2025-07-12",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 41.65
+},
+{
+"id": "T1093",
+"date": "2025-07-12",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 2,
+"unit_price": 80.1
+},
+{
+"id": "T1094",
+"date": "2025-07-13",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 2,
+"unit_price": 62.1
+},
+{
+"id": "T1096",
+"date": "2025-07-13",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 4,
+"unit_price": 24.0
+},
+{
+"id": "T1098",
+"date": "2025-07-13",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 18.0
+},
+{
+"id": "T1100",
+"date": "2025-07-13",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 49.0
+},
+{
+"id": "T1101",
+"date": "2025-07-13",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 2,
+"unit_price": 89.0
+},
+{
+"id": "T1103",
+"date": "2025-07-13",
+"type": "RECEIPT",
+"sku": "BAG-WIN",
+"qty": 22,
+"unit_cost": 74.0
+},
+{
+"id": "T1104",
+"date": "2025-07-14",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 1,
+"unit_price": 299.0
+},
+{
+"id": "T1105",
+"date": "2025-07-14",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 4,
+"unit_price": 24.0
+},
+{
+"id": "T1106",
+"date": "2025-07-14",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 4,
+"unit_price": 24.65
+},
+{
+"id": "T1107",
+"date": "2025-07-14",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 79.0
+},
+{
+"id": "T1109",
+"date": "2025-07-14",
+"type": "SALE",
+"sku": "PACK-65",
+"qty": 1,
+"unit_price": 219.0
+},
+{
+"id": "T1111",
+"date": "2025-07-14",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 16.2
+},
+{
+"id": "T1112",
+"date": "2025-07-15",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 4,
+"unit_price": 62.1
+},
+{
+"id": "T1114",
+"date": "2025-07-15",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 3,
+"unit_price": 24.0
+},
+{
+"id": "T1115",
+"date": "2025-07-15",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 1,
+"unit_price": 53.1
+},
+{
+"id": "T1116",
+"date": "2025-07-15",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 4,
+"unit_price": 29.0
+},
+{
+"id": "T1117",
+"date": "2025-07-15",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 1,
+"unit_price": 67.15
+},
+{
+"id": "T1118",
+"date": "2025-07-15",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 15.3
+},
+{
+"id": "T1119",
+"date": "2025-07-15",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 6,
+"unit_price": 49.0
+},
+{
+"id": "T1120",
+"date": "2025-07-15",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 6,
+"unit_price": 75.65
+},
+{
+"id": "T1122",
+"date": "2025-07-15",
+"type": "EXPENSE",
+"category": "Wages",
+"amount": 4265.45
+},
+{
+"id": "T1123",
+"date": "2025-07-16",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 1,
+"unit_price": 69.0
+},
+{
+"id": "T1124",
+"date": "2025-07-16",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 4,
+"unit_price": 24.0
+},
+{
+"id": "T1125",
+"date": "2025-07-16",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 8,
+"unit_price": 26.1
+},
+{
+"id": "T1126",
+"date": "2025-07-16",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 3,
+"unit_price": 79.0
+},
+{
+"id": "T1128",
+"date": "2025-07-16",
+"type": "SALE",
+"sku": "FILTER-H2O ",
+"qty": 1,
+"unit_price": 75.65
+},
+{
+"id": "T1129",
+"date": "2025-07-17",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 4,
+"unit_price": 69.0
+},
+{
+"id": "T1131",
+"date": "2025-07-17",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 2,
+"unit_price": 159.0
+},
+{
+"id": "T1132",
+"date": "2025-07-17",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 6,
+"unit_price": 24.0
+},
+{
+"id": "T1133",
+"date": "2025-07-17",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 4,
+"unit_price": 59.0
+},
+{
+"id": "T1135",
+"date": "2025-07-17",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 4,
+"unit_price": 26.1
+},
+{
+"id": "T1136",
+"date": "2025-07-17",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 18.0
+},
+{
+"id": "T1137",
+"date": "2025-07-17",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 41.65
+},
+{
+"id": "T1139",
+"date": "2025-07-17",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 2,
+"unit_price": 89.0
+},
+{
+"id": "T1140",
+"date": "2025-07-17",
+"type": "RECEIPT",
+"sku": "TENT-4P",
+"qty": 15,
+"unit_cost": 142.5
+},
+{
+"id": "T1141",
+"date": "2025-07-17",
+"type": "RECEIPT",
+"sku": "PACK-65",
+"qty": 10,
+"unit_cost": 97.0
+},
+{
+"id": "T1143",
+"date": "2025-07-18",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 4,
+"unit_price": 62.1
+},
+{
+"id": "T1144",
+"date": "2025-07-18",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 4,
+"unit_price": 20.4
+},
+{
+"id": "T1145",
+"date": "2025-07-18",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 1,
+"unit_price": 59.0
+},
+{
+"id": "T1146",
+"date": "2025-07-18",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 1,
+"unit_price": 79.0
+},
+{
+"id": "T1147",
+"date": "2025-07-18",
+"type": "SALE",
+"sku": "PACK-65",
+"qty": 1,
+"unit_price": 219.0
+},
+{
+"id": "T1148",
+"date": "2025-07-18",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 3,
+"unit_price": 41.65
+},
+{
+"id": "T1149",
+"date": "2025-07-18",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 2,
+"unit_price": 89.0
+},
+{
+"id": "T1151",
+"date": "2025-07-18",
+"type": "EXPENSE",
+"category": "Shipping",
+"amount": 358.53
+},
+{
+"id": "T1152",
+"date": "2025-07-19",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 1,
+"unit_price": 299.0
+},
+{
+"id": "T1153",
+"date": "2025-07-19",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 2,
+"unit_price": 143.1
+},
+{
+"id": "T1154",
+"date": "2025-07-19",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 4,
+"unit_price": 24.0
+},
+{
+"id": "T1155",
+"date": "2025-07-19",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 79.0
+},
+{
+"id": "T1157",
+"date": "2025-07-20",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 1,
+"unit_price": 269.1
+},
+{
+"id": "T1158",
+"date": "2025-07-20",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 2,
+"unit_price": 62.1
+},
+{
+"id": "T1159",
+"date": "2025-07-20",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 8,
+"unit_price": 24.0
+},
+{
+"id": "T1160",
+"date": "2025-07-20",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 4,
+"unit_price": 29.0
+},
+{
+"id": "T1161",
+"date": "2025-07-20",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 79.0
+},
+{
+"id": "T1162",
+"date": "2025-07-20",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 18.0
+},
+{
+"id": "T1164",
+"date": "2025-07-20",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 1,
+"unit_price": 41.65
+},
+{
+"id": "T1165",
+"date": "2025-07-20",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 1,
+"unit_price": 89.0
+},
+{
+"id": "T1166",
+"date": "2025-07-21",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 2,
+"unit_price": 170.1
+},
+{
+"id": "T1167",
+"date": "2025-07-21",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 2,
+"unit_price": 69.0
+},
+{
+"id": "T1169",
+"date": "2025-07-21",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 2,
+"unit_price": 59.0
+},
+{
+"id": "T1170",
+"date": "2025-07-21",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 8,
+"unit_price": 26.1
+},
+{
+"id": "T1171",
+"date": "2025-07-21",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 16.2
+},
+{
+"id": "T1172",
+"date": "2025-07-21",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 2,
+"unit_price": 75.65
+},
+{
+"id": "T1173",
+"date": "2025-07-21",
+"type": "RECEIPT",
+"sku": "BAG-WIN",
+"qty": 15,
+"unit_cost": 74.0
+},
+{
+"id": "T1174",
+"date": "2025-07-21",
+"type": "RECEIPT",
+"sku": "LAMP-LED",
+"qty": 75,
+"unit_cost": 11.6
+},
+{
+"id": "T1176",
+"date": "2025-07-21",
+"type": "RECEIPT",
+"sku": "CHAIR-FLD",
+"qty": 30,
+"unit_cost": 22.4
+},
+{
+"id": "T1177",
+"date": "2025-07-22",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 8,
+"unit_price": 24.0
+},
+{
+"id": "T1178",
+"date": "2025-07-22",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 3,
+"unit_price": 59.0
+},
+{
+"id": "T1179",
+"date": "2025-07-22",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 8,
+"unit_price": 29.0
+},
+{
+"id": "T1180",
+"date": "2025-07-22",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 6,
+"unit_price": 79.0
+},
+{
+"id": "T1182",
+"date": "2025-07-22",
+"type": "SALE",
+"sku": "PACK-65",
+"qty": 4,
+"unit_price": 219.0
+},
+{
+"id": "T1183",
+"date": "2025-07-22",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 15.3
+},
+{
+"id": "T1184",
+"date": "2025-07-23",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 2,
+"unit_price": 160.65
+},
+{
+"id": "T1186",
+"date": "2025-07-23",
+"type": "SALE",
+"sku": "bag-sum",
+"qty": 6,
+"unit_price": 58.65
+},
+{
+"id": "T1188",
+"date": "2025-07-23",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 4,
+"unit_price": 79.0
+},
+{
+"id": "T1189",
+"date": "2025-07-23",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 8,
+"unit_price": 18.0
+},
+{
+"id": "T1190",
+"date": "2025-07-23",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 6,
+"unit_price": 89.0
+},
+{
+"id": "T1191",
+"date": "2025-07-23",
+"type": "RECEIPT",
+"sku": "BAG-WIN",
+"qty": 22,
+"unit_cost": 74.0
+},
+{
+"id": "T1193",
+"date": "2025-07-24",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 4,
+"unit_price": 69.0
+},
+{
+"id": "T1195",
+"date": "2025-07-24",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 4,
+"unit_price": 24.0
+},
+{
+"id": "T1196",
+"date": "2025-07-24",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 2,
+"unit_price": 50.15
+},
+{
+"id": "T1197",
+"date": "2025-07-24",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 8,
+"unit_price": 29.0
+},
+{
+"id": "T1198",
+"date": "2025-07-24",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 49.0
+},
+{
+"id": "T1199",
+"date": "2025-07-24",
+"type": "RECEIPT",
+"sku": "TENT-2P",
+"qty": 40,
+"unit_cost": 88.0
+},
+{
+"id": "T1200",
+"date": "2025-07-24",
+"type": "RECEIPT",
+"sku": "PACK-65",
+"qty": 20,
+"unit_cost": 97.0
+},
+{
+"id": "T1201",
+"date": "2025-07-24",
+"type": "RECEIPT",
+"sku": "BOTTLE-1L",
+"qty": 112,
+"unit_cost": 6.1
+},
+{
+"id": "T1203",
+"date": "2025-07-25",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 2,
+"unit_price": 189.0
+},
+{
+"id": "T1204",
+"date": "2025-07-25",
+"type": "SALE",
+"sku": "TENT-4P ",
+"qty": 1,
+"unit_price": 299.0
+},
+{
+"id": "T1204",
+"date": "2025-07-25",
+"type": "SALE",
+"sku": "TENT-4P ",
+"qty": 1,
+"unit_price": 299.0
+},
+{
+"id": "T1206",
+"date": "2025-07-25",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 4,
+"unit_price": 24.0
+},
+{
+"id": "T1207",
+"date": "2025-07-25",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 8,
+"unit_price": 26.1
+},
+{
+"id": "T1209",
+"date": "2025-07-25",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 1,
+"unit_price": 67.15
+},
+{
+"id": "T1210",
+"date": "2025-07-25",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 8,
+"unit_price": 18.0
+},
+{
+"id": "T1211",
+"date": "2025-07-25",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 49.0
+},
+{
+"id": "T1213",
+"date": "2025-07-25",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 2,
+"unit_price": 89.0
+},
+{
+"id": "T1215",
+"date": "2025-07-25",
+"type": "EXPENSE",
+"category": "Shipping",
+"amount": 381.55
+},
+{
+"id": "T1216",
+"date": "2025-07-26",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 2,
+"unit_price": 189.0
+},
+{
+"id": "T1217",
+"date": "2025-07-26",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 1,
+"unit_price": 299.0
+},
+{
+"id": "T1218",
+"date": "2025-07-26",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 3,
+"unit_price": 69.0
+},
+{
+"id": "T1219",
+"date": "2025-07-26",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 2,
+"unit_price": 135.15
+},
+{
+"id": "T1221",
+"date": "2025-07-26",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 3,
+"unit_price": 79.0
+},
+{
+"id": "T1222",
+"date": "2025-07-26",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 18.0
+},
+{
+"id": "T1224",
+"date": "2025-07-26",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 44.1
+},
+{
+"id": "T1225",
+"date": "2025-07-26",
+"type": "WRITEOFF",
+"sku": "LAMP-LED",
+"qty": 2,
+"note": "breakage"
+},
+{
+"id": "T1226",
+"date": "2025-07-27",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 2,
+"unit_price": 299.0
+},
+{
+"id": "T1227",
+"date": "2025-07-27",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 3,
+"unit_price": 58.65
+},
+{
+"id": "T1228",
+"date": "2025-07-27",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 4,
+"unit_price": 59.0
+},
+{
+"id": "T1230",
+"date": "2025-07-27",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 79.0
+},
+{
+"id": "T1231",
+"date": "2025-07-28",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 2,
+"unit_price": 160.65
+},
+{
+"id": "T1232",
+"date": "2025-07-28",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 4,
+"unit_price": 69.0
+},
+{
+"id": "T1233",
+"date": "2025-07-28",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 4,
+"unit_price": 26.1
+},
+{
+"id": "T1235",
+"date": "2025-07-28",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 71.1
+},
+{
+"id": "T1236",
+"date": "2025-07-28",
+"type": "SALE",
+"sku": "PACK-65",
+"qty": 2,
+"unit_price": 219.0
+},
+{
+"id": "T1238",
+"date": "2025-07-28",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 8,
+"unit_price": 15.3
+},
+{
+"id": "T1239",
+"date": "2025-07-28",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 1,
+"unit_price": 89.0
+},
+{
+"id": "T1240",
+"date": "2025-07-28",
+"type": "RECEIPT",
+"sku": "PACK-35",
+"qty": 30,
+"unit_cost": 36.0
+},
+{
+"id": "T1241",
+"date": "2025-07-28",
+"type": "EXPENSE",
+"category": "Wages",
+"amount": 4146.61
+},
+{
+"id": "T1243",
+"date": "2025-07-29",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 6,
+"unit_price": 299.0
+},
+{
+"id": "T1244",
+"date": "2025-07-29",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 6,
+"unit_price": 58.65
+},
+{
+"id": "T1245",
+"date": "2025-07-29",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 1,
+"unit_price": 59.0
+},
+{
+"id": "T1247",
+"date": "2025-07-29",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 4,
+"unit_price": 29.0
+},
+{
+"id": "T1248",
+"date": "2025-07-29",
+"type": "SALE",
+"sku": "BOTTLE-1L ",
+"qty": 4,
+"unit_price": 15.3
+},
+{
+"id": "T1250",
+"date": "2025-07-29",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 41.65
+},
+{
+"id": "T1251",
+"date": "2025-07-29",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 2,
+"unit_price": 80.1
+},
+{
+"id": "T1253",
+"date": "2025-07-29",
+"type": "RECEIPT",
+"sku": "TENT-2P",
+"qty": 40,
+"unit_cost": 88.0
+},
+{
+"id": "T1254",
+"date": "2025-07-29",
+"type": "RECEIPT",
+"sku": "CHAIR-FLD",
+"qty": 22,
+"unit_cost": 22.4
+},
+{
+"id": "T1255",
+"date": "2025-07-30",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 2,
+"unit_price": 189.0
+},
+{
+"id": "T1256",
+"date": "2025-07-30",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 2,
+"unit_price": 254.15
+},
+{
+"id": "T1257",
+"date": "2025-07-30",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 8,
+"unit_price": 58.65
+},
+{
+"id": "T1258",
+"date": "2025-07-30",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 4,
+"unit_price": 29.0
+},
+{
+"id": "T1259",
+"date": "2025-07-30",
+"type": "SALE",
+"sku": "PACK-65",
+"qty": 2,
+"unit_price": 219.0
+},
+{
+"id": "T1260",
+"date": "2025-07-30",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 4,
+"unit_price": 44.1
+},
+{
+"id": "T1261",
+"date": "2025-07-31",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 6,
+"unit_price": 160.65
+},
+{
+"id": "T1263",
+"date": "2025-07-31",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 8,
+"unit_price": 69.0
+},
+{
+"id": "T1264",
+"date": "2025-07-31",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 79.0
+},
+{
+"id": "T1265",
+"date": "2025-07-31",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 16.2
+},
+{
+"id": "T1266",
+"date": "2025-07-31",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 41.65
+},
+{
+"id": "T1268",
+"date": "2025-08-01",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 6,
+"unit_price": 29.0
+},
+{
+"id": "T1269",
+"date": "2025-08-01",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 49.0
+},
+{
+"id": "T1271",
+"date": "2025-08-01",
+"type": "RECEIPT",
+"sku": "BAG-SUM",
+"qty": 60,
+"unit_cost": 31.25
+},
+{
+"id": "T1273",
+"date": "2025-08-01",
+"type": "EXPENSE",
+"category": "Rent",
+"amount": 3200.0
+},
+{
+"id": "T1274",
+"date": "2025-08-01",
+"type": "EXPENSE",
+"category": "Shipping",
+"amount": 387.1
+},
+{
+"id": "T1275",
+"date": "2025-08-02",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 4,
+"unit_price": 170.1
+},
+{
+"id": "T1276",
+"date": "2025-08-02",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 3,
+"unit_price": 62.1
+},
+{
+"id": "T1277",
+"date": "2025-08-02",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 3,
+"unit_price": 20.4
+},
+{
+"id": "T1278",
+"date": "2025-08-02",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 2,
+"unit_price": 59.0
+},
+{
+"id": "T1279",
+"date": "2025-08-02",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 3,
+"unit_price": 26.1
+},
+{
+"id": "T1280",
+"date": "2025-08-02",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 16.2
+},
+{
+"id": "T1281",
+"date": "2025-08-02",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 6,
+"unit_price": 44.1
+},
+{
+"id": "T1282",
+"date": "2025-08-02",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 2,
+"unit_price": 89.0
+},
+{
+"id": "T1283",
+"date": "2025-08-03",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 4,
+"unit_price": 189.0
+},
+{
+"id": "T1284",
+"date": "2025-08-03",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 1,
+"unit_price": 254.15
+},
+{
+"id": "T1285",
+"date": "2025-08-03",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 4,
+"unit_price": 24.0
+},
+{
+"id": "T1287",
+"date": "2025-08-03",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 6,
+"unit_price": 29.0
+},
+{
+"id": "T1288",
+"date": "2025-08-03",
+"type": "SALE",
+"sku": "PACK-65",
+"qty": 1,
+"unit_price": 219.0
+},
+{
+"id": "T1289",
+"date": "2025-08-03",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 16.2
+},
+{
+"id": "T1290",
+"date": "2025-08-03",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 4,
+"unit_price": 49.0
+},
+{
+"id": "T1291",
+"date": "2025-08-03",
+"type": "RECEIPT",
+"sku": "CHAIR-FLD",
+"qty": 22,
+"unit_cost": 22.4
+},
+{
+"id": "T1292",
+"date": "2025-08-04",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 2,
+"unit_price": 299.0
+},
+{
+"id": "T1293",
+"date": "2025-08-04",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 2,
+"unit_price": 29.0
+},
+{
+"id": "T1295",
+"date": "2025-08-04",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 18.0
+},
+{
+"id": "T1296",
+"date": "2025-08-04",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 1,
+"unit_price": 75.65
+},
+{
+"id": "T1297",
+"date": "2025-08-05",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 2,
+"unit_price": 189.0
+},
+{
+"id": "T1298",
+"date": "2025-08-05",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 3,
+"unit_price": 21.6
+},
+{
+"id": "T1299",
+"date": "2025-08-05",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 2,
+"unit_price": 59.0
+},
+{
+"id": "T1301",
+"date": "2025-08-05",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 67.15
+},
+{
+"id": "T1302",
+"date": "2025-08-05",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 8,
+"unit_price": 18.0
+},
+{
+"id": "T1303",
+"date": "2025-08-06",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 2,
+"unit_price": 69.0
+},
+{
+"id": "T1305",
+"date": "2025-08-06",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 8,
+"unit_price": 24.0
+},
+{
+"id": "T1307",
+"date": "2025-08-06",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 3,
+"unit_price": 26.1
+},
+{
+"id": "T1308",
+"date": "2025-08-06",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 1,
+"unit_price": 71.1
+},
+{
+"id": "T1309",
+"date": "2025-08-07",
+"type": "SALE",
+"sku": "TENT-2P ",
+"qty": 1,
+"unit_price": 189.0
+},
+{
+"id": "T1311",
+"date": "2025-08-07",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 2,
+"unit_price": 24.0
+},
+{
+"id": "T1312",
+"date": "2025-08-07",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 3,
+"unit_price": 29.0
+},
+{
+"id": "T1313",
+"date": "2025-08-07",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 18.0
+},
+{
+"id": "T1314",
+"date": "2025-08-08",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 79.0
+},
+{
+"id": "T1315",
+"date": "2025-08-08",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 1,
+"unit_price": 44.1
+},
+{
+"id": "T1316",
+"date": "2025-08-08",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 1,
+"unit_price": 89.0
+},
+{
+"id": "T1317",
+"date": "2025-08-08",
+"type": "EXPENSE",
+"category": "Shipping",
+"amount": 199.77
+},
+{
+"id": "T1318",
+"date": "2025-08-09",
+"type": "SALE",
+"sku": "TENT-4P ",
+"qty": 1,
+"unit_price": 254.15
+},
+{
+"id": "T1319",
+"date": "2025-08-09",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 1,
+"unit_price": 159.0
+},
+{
+"id": "T1320",
+"date": "2025-08-09",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 2,
+"unit_price": 20.4
+},
+{
+"id": "T1322",
+"date": "2025-08-09",
+"type": "SALE",
+"sku": "PACK-65",
+"qty": 1,
+"unit_price": 197.1
+},
+{
+"id": "T1324",
+"date": "2025-08-09",
+"type": "SALE",
+"sku": "BOTTLE-1L ",
+"qty": 8,
+"unit_price": 16.2
+},
+{
+"id": "T1325",
+"date": "2025-08-09",
+"type": "RECEIPT",
+"sku": "TENT-2P",
+"qty": 40,
+"unit_cost": 88.0
+},
+{
+"id": "T1326",
+"date": "2025-08-09",
+"type": "RECEIPT",
+"sku": "PAD-FOAM",
+"qty": 80,
+"unit_cost": 9.4
+},
+{
+"id": "T1328",
+"date": "2025-08-10",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 4,
+"unit_price": 189.0
+},
+{
+"id": "T1329",
+"date": "2025-08-10",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 1,
+"unit_price": 143.1
+},
+{
+"id": "T1330",
+"date": "2025-08-10",
+"type": "SALE",
+"sku": "stove-gas",
+"qty": 1,
+"unit_price": 59.0
+},
+{
+"id": "T1332",
+"date": "2025-08-10",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 18.0
+},
+{
+"id": "T1333",
+"date": "2025-08-11",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 1,
+"unit_price": 269.1
+},
+{
+"id": "T1335",
+"date": "2025-08-11",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 2,
+"unit_price": 59.0
+},
+{
+"id": "T1336",
+"date": "2025-08-11",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 2,
+"unit_price": 29.0
+},
+{
+"id": "T1337",
+"date": "2025-08-11",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 2,
+"unit_price": 75.65
+},
+{
+"id": "T1338",
+"date": "2025-08-12",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 2,
+"unit_price": 299.0
+},
+{
+"id": "T1339",
+"date": "2025-08-12",
+"type": "SALE",
+"sku": " Pad-Foam",
+"qty": 8,
+"unit_price": 21.6
+},
+{
+"id": "T1340",
+"date": "2025-08-12",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 2,
+"unit_price": 89.0
+},
+{
+"id": "T1341",
+"date": "2025-08-13",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 2,
+"unit_price": 160.65
+},
+{
+"id": "T1342",
+"date": "2025-08-13",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 4,
+"unit_price": 24.0
+},
+{
+"id": "T1344",
+"date": "2025-08-13",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 1,
+"unit_price": 59.0
+},
+{
+"id": "T1345",
+"date": "2025-08-13",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 79.0
+},
+{
+"id": "T1346",
+"date": "2025-08-13",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 16.2
+},
+{
+"id": "T1348",
+"date": "2025-08-13",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 44.1
+},
+{
+"id": "T1349",
+"date": "2025-08-14",
+"type": "SALE",
+"sku": "BAG-SUM ",
+"qty": 3,
+"unit_price": 58.65
+},
+{
+"id": "T1350",
+"date": "2025-08-14",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 4,
+"unit_price": 59.0
+},
+{
+"id": "T1351",
+"date": "2025-08-14",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 2,
+"unit_price": 29.0
+},
+{
+"id": "T1351",
+"date": "2025-08-14",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 2,
+"unit_price": 29.0
+},
+{
+"id": "T1353",
+"date": "2025-08-14",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 79.0
+},
+{
+"id": "T1354",
+"date": "2025-08-14",
+"type": "RECEIPT",
+"sku": "PACK-35",
+"qty": 40,
+"unit_cost": 36.0
+},
+{
+"id": "T1355",
+"date": "2025-08-15",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 3,
+"unit_price": 21.6
+},
+{
+"id": "T1357",
+"date": "2025-08-15",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 2,
+"unit_price": 29.0
+},
+{
+"id": "T1358",
+"date": "2025-08-15",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 1,
+"unit_price": 79.0
+},
+{
+"id": "T1359",
+"date": "2025-08-15",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 18.0
+},
+{
+"id": "T1360",
+"date": "2025-08-15",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 3,
+"unit_price": 41.65
+},
+{
+"id": "T1361",
+"date": "2025-08-15",
+"type": "EXPENSE",
+"category": "Wages",
+"amount": 4229.35
+},
+{
+"id": "T1362",
+"date": "2025-08-15",
+"type": "EXPENSE",
+"category": "Shipping",
+"amount": 328.63
+},
+{
+"id": "T1363",
+"date": "2025-08-16",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 1,
+"unit_price": 170.1
+},
+{
+"id": "T1364",
+"date": "2025-08-16",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 1,
+"unit_price": 159.0
+},
+{
+"id": "T1365",
+"date": "2025-08-16",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 3,
+"unit_price": 24.0
+},
+{
+"id": "T1366",
+"date": "2025-08-16",
+"type": "SALE",
+"sku": "pack-35",
+"qty": 1,
+"unit_price": 79.0
+},
+{
+"id": "T1368",
+"date": "2025-08-16",
+"type": "RECEIPT",
+"sku": "PAD-FOAM",
+"qty": 80,
+"unit_cost": 9.78
+},
+{
+"id": "T1369",
+"date": "2025-08-17",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 1,
+"unit_price": 170.1
+},
+{
+"id": "T1370",
+"date": "2025-08-17",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 2,
+"unit_price": 69.0
+},
+{
+"id": "T1371",
+"date": "2025-08-17",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 49.0
+},
+{
+"id": "T1372",
+"date": "2025-08-17",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 4,
+"unit_price": 89.0
+},
+{
+"id": "T1374",
+"date": "2025-08-18",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 2,
+"unit_price": 189.0
+},
+{
+"id": "T1375",
+"date": "2025-08-18",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 2,
+"unit_price": 53.1
+},
+{
+"id": "T1377",
+"date": "2025-08-18",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 3,
+"unit_price": 29.0
+},
+{
+"id": "T1378",
+"date": "2025-08-18",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 71.1
+},
+{
+"id": "T1380",
+"date": "2025-08-19",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 2,
+"unit_price": 20.4
+},
+{
+"id": "T1381",
+"date": "2025-08-19",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 18.0
+},
+{
+"id": "T1382",
+"date": "2025-08-19",
+"type": "RECEIPT",
+"sku": "PACK-35",
+"qty": 40,
+"unit_cost": 36.0
+},
+{
+"id": "T1383",
+"date": "2025-08-20",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 3,
+"unit_price": 170.1
+},
+{
+"id": "T1384",
+"date": "2025-08-20",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 4,
+"unit_price": 69.0
+},
+{
+"id": "T1385",
+"date": "2025-08-20",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 1,
+"unit_price": 159.0
+},
+{
+"id": "T1387",
+"date": "2025-08-20",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 8,
+"unit_price": 20.4
+},
+{
+"id": "T1388",
+"date": "2025-08-20",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 1,
+"unit_price": 71.1
+},
+{
+"id": "T1389",
+"date": "2025-08-20",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 1,
+"unit_price": 41.65
+},
+{
+"id": "T1391",
+"date": "2025-08-21",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 2,
+"unit_price": 69.0
+},
+{
+"id": "T1392",
+"date": "2025-08-21",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 2,
+"unit_price": 50.15
+},
+{
+"id": "T1393",
+"date": "2025-08-21",
+"type": "SALE",
+"sku": "LAMP-LED ",
+"qty": 3,
+"unit_price": 29.0
+},
+{
+"id": "T1394",
+"date": "2025-08-21",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 3,
+"unit_price": 79.0
+},
+{
+"id": "T1395",
+"date": "2025-08-21",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 8,
+"unit_price": 18.0
+},
+{
+"id": "T1396",
+"date": "2025-08-21",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 49.0
+},
+{
+"id": "T1398",
+"date": "2025-08-21",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 4,
+"unit_price": 80.1
+},
+{
+"id": "T1400",
+"date": "2025-08-22",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 4,
+"unit_price": 189.0
+},
+{
+"id": "T1401",
+"date": "2025-08-22",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 3,
+"unit_price": 69.0
+},
+{
+"id": "T1402",
+"date": "2025-08-22",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 2,
+"unit_price": 53.1
+},
+{
+"id": "T1403",
+"date": "2025-08-22",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 1,
+"unit_price": 49.0
+},
+{
+"id": "T1405",
+"date": "2025-08-22",
+"type": "EXPENSE",
+"category": "Shipping",
+"amount": 340.0
+},
+{
+"id": "T1407",
+"date": "2025-08-23",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 2,
+"unit_price": 160.65
+},
+{
+"id": "T1408",
+"date": "2025-08-23",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 1,
+"unit_price": 58.65
+},
+{
+"id": "T1409",
+"date": "2025-08-23",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 2,
+"unit_price": 50.15
+},
+{
+"id": "T1410",
+"date": "2025-08-23",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 2,
+"unit_price": 24.65
+},
+{
+"id": "T1411",
+"date": "2025-08-23",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 2,
+"unit_price": 89.0
+},
+{
+"id": "T1412",
+"date": "2025-08-24",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 3,
+"unit_price": 170.1
+},
+{
+"id": "T1413",
+"date": "2025-08-24",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 3,
+"unit_price": 24.0
+},
+{
+"id": "T1414",
+"date": "2025-08-24",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 2,
+"unit_price": 59.0
+},
+{
+"id": "T1415",
+"date": "2025-08-24",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 1,
+"unit_price": 79.0
+},
+{
+"id": "T1416",
+"date": "2025-08-24",
+"type": "SALE",
+"sku": "PACK-65",
+"qty": 1,
+"unit_price": 219.0
+},
+{
+"id": "T1417",
+"date": "2025-08-24",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 16.2
+},
+{
+"id": "T1419",
+"date": "2025-08-24",
+"type": "RETURN",
+"sku": "STOVE-GAS",
+"qty": 1,
+"unit_price": 59.0,
+"condition": "damaged"
+},
+{
+"id": "T1421",
+"date": "2025-08-25",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 3,
+"unit_price": 69.0
+},
+{
+"id": "T1422",
+"date": "2025-08-25",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 18.0
+},
+{
+"id": "T1423",
+"date": "2025-08-25",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 1,
+"unit_price": 44.1
+},
+{
+"id": "T1425",
+"date": "2025-08-25",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 4,
+"unit_price": 89.0
+},
+{
+"id": "T1426",
+"date": "2025-08-25",
+"type": "RECEIPT",
+"sku": "PACK-35",
+"qty": 30,
+"unit_cost": 37.44
+},
+{
+"id": "T1427",
+"date": "2025-08-26",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 1,
+"unit_price": 170.1
+},
+{
+"id": "T1428",
+"date": "2025-08-26",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 2,
+"unit_price": 269.1
+},
+{
+"id": "T1429",
+"date": "2025-08-26",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 4,
+"unit_price": 62.1
+},
+{
+"id": "T1430",
+"date": "2025-08-26",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 3,
+"unit_price": 20.4
+},
+{
+"id": "T1431",
+"date": "2025-08-26",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 16.2
+},
+{
+"id": "T1432",
+"date": "2025-08-26",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 49.0
+},
+{
+"id": "T1433",
+"date": "2025-08-27",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 2,
+"unit_price": 160.65
+},
+{
+"id": "T1434",
+"date": "2025-08-27",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 1,
+"unit_price": 59.0
+},
+{
+"id": "T1435",
+"date": "2025-08-27",
+"type": "SALE",
+"sku": " Lamp-Led",
+"qty": 3,
+"unit_price": 29.0
+},
+{
+"id": "T1436",
+"date": "2025-08-27",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 67.15
+},
+{
+"id": "T1437",
+"date": "2025-08-27",
+"type": "SALE",
+"sku": "PACK-65",
+"qty": 1,
+"unit_price": 186.15
+},
+{
+"id": "T1438",
+"date": "2025-08-27",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 1,
+"unit_price": 75.65
+},
+{
+"id": "T1439",
+"date": "2025-08-27",
+"type": "RECEIPT",
+"sku": "PAD-FOAM",
+"qty": 60,
+"unit_cost": 10.17
+},
+{
+"id": "T1441",
+"date": "2025-08-28",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 2,
+"unit_price": 254.15
+},
+{
+"id": "T1442",
+"date": "2025-08-28",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 3,
+"unit_price": 69.0
+},
+{
+"id": "T1443",
+"date": "2025-08-28",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 2,
+"unit_price": 24.0
+},
+{
+"id": "T1444",
+"date": "2025-08-28",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 3,
+"unit_price": 29.0
+},
+{
+"id": "T1445",
+"date": "2025-08-28",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 16.2
+},
+{
+"id": "T1446",
+"date": "2025-08-28",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 49.0
+},
+{
+"id": "T1447",
+"date": "2025-08-28",
+"type": "EXPENSE",
+"category": "Wages",
+"amount": 4220.28
+},
+{
+"id": "T1448",
+"date": "2025-08-29",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 2,
+"unit_price": 189.0
+},
+{
+"id": "T1449",
+"date": "2025-08-29",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 1,
+"unit_price": 69.0
+},
+{
+"id": "T1450",
+"date": "2025-08-29",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 2,
+"unit_price": 50.15
+},
+{
+"id": "T1451",
+"date": "2025-08-29",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 3,
+"unit_price": 26.1
+},
+{
+"id": "T1452",
+"date": "2025-08-29",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 8,
+"unit_price": 15.3
+},
+{
+"id": "T1453",
+"date": "2025-08-29",
+"type": "RECEIPT",
+"sku": "TENT-4P",
+"qty": 10,
+"unit_cost": 153.9
+},
+{
+"id": "T1454",
+"date": "2025-08-29",
+"type": "RECEIPT",
+"sku": "PACK-35",
+"qty": 40,
+"unit_cost": 40.44
+},
+{
+"id": "T1455",
+"date": "2025-08-29",
+"type": "RECEIPT",
+"sku": "PACK-65",
+"qty": 20,
+"unit_cost": 97.0
+},
+{
+"id": "T1456",
+"date": "2025-08-29",
+"type": "EXPENSE",
+"category": "Shipping",
+"amount": 214.09
+},
+{
+"id": "T1457",
+"date": "2025-08-30",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 4,
+"unit_price": 189.0
+},
+{
+"id": "T1459",
+"date": "2025-08-30",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 8,
+"unit_price": 24.0
+},
+{
+"id": "T1460",
+"date": "2025-08-30",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 71.1
+},
+{
+"id": "T1462",
+"date": "2025-08-30",
+"type": "SALE",
+"sku": "PACK-65",
+"qty": 1,
+"unit_price": 186.15
+},
+{
+"id": "T1464",
+"date": "2025-08-30",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 15.3
+},
+{
+"id": "T1465",
+"date": "2025-08-31",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 3,
+"unit_price": 170.1
+},
+{
+"id": "T1466",
+"date": "2025-08-31",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 1,
+"unit_price": 299.0
+},
+{
+"id": "T1468",
+"date": "2025-08-31",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 3,
+"unit_price": 69.0
+},
+{
+"id": "T1470",
+"date": "2025-08-31",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 3,
+"unit_price": 24.0
+},
+{
+"id": "T1471",
+"date": "2025-08-31",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 1,
+"unit_price": 53.1
+},
+{
+"id": "T1473",
+"date": "2025-08-31",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 3,
+"unit_price": 29.0
+},
+{
+"id": "T1474",
+"date": "2025-08-31",
+"type": "SALE",
+"sku": "PACK-65",
+"qty": 2,
+"unit_price": 219.0
+},
+{
+"id": "T1475",
+"date": "2025-08-31",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 16.2
+},
+{
+"id": "T1476",
+"date": "2025-09-01",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 3,
+"unit_price": 69.0
+},
+{
+"id": "T1477",
+"date": "2025-09-01",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 1,
+"unit_price": 21.6
+},
+{
+"id": "T1478",
+"date": "2025-09-01",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 3,
+"unit_price": 29.0
+},
+{
+"id": "T1479",
+"date": "2025-09-01",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 79.0
+},
+{
+"id": "T1480",
+"date": "2025-09-01",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 18.0
+},
+{
+"id": "T1481",
+"date": "2025-09-01",
+"type": "EXPENSE",
+"category": "Rent",
+"amount": 3200.0
+},
+{
+"id": "T1483",
+"date": "2025-09-02",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 2,
+"unit_price": 299.0
+},
+{
+"id": "T1484",
+"date": "2025-09-02",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 2,
+"unit_price": 20.4
+},
+{
+"id": "T1485",
+"date": "2025-09-02",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 1,
+"unit_price": 50.15
+},
+{
+"id": "T1486",
+"date": "2025-09-02",
+"type": "SALE",
+"sku": "PACK-65",
+"qty": 1,
+"unit_price": 219.0
+},
+{
+"id": "T1487",
+"date": "2025-09-02",
+"type": "RECEIPT",
+"sku": "STOVE-GAS",
+"qty": 36,
+"unit_cost": 27.8
+},
+{
+"id": "T1488",
+"date": "2025-09-03",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 4,
+"unit_price": 24.0
+},
+{
+"id": "T1489",
+"date": "2025-09-03",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 4,
+"unit_price": 29.0
+},
+{
+"id": "T1490",
+"date": "2025-09-03",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 1,
+"unit_price": 79.0
+},
+{
+"id": "T1491",
+"date": "2025-09-03",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 18.0
+},
+{
+"id": "T1492",
+"date": "2025-09-04",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 1,
+"unit_price": 58.65
+},
+{
+"id": "T1493",
+"date": "2025-09-04",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 1,
+"unit_price": 50.15
+},
+{
+"id": "T1494",
+"date": "2025-09-04",
+"type": "RECEIPT",
+"sku": "BAG-WIN",
+"qty": 15,
+"unit_cost": 79.92
+},
+{
+"id": "T1495",
+"date": "2025-09-04",
+"type": "RECEIPT",
+"sku": "STOVE-GAS",
+"qty": 18,
+"unit_cost": 27.8
+},
+{
+"id": "T1496",
+"date": "2025-09-04",
+"type": "RETURN",
+"sku": "BAG-WIN",
+"qty": 1,
+"unit_price": 159.0,
+"condition": "resellable"
+},
+{
+"id": "T1497",
+"date": "2025-09-05",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 2,
+"unit_price": 29.0
+},
+{
+"id": "T1498",
+"date": "2025-09-05",
+"type": "EXPENSE",
+"category": "Shipping",
+"amount": 192.92
+},
+{
+"id": "T1500",
+"date": "2025-09-06",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 3,
+"unit_price": 189.0
+},
+{
+"id": "T1502",
+"date": "2025-09-06",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 4,
+"unit_price": 26.1
+},
+{
+"id": "T1503",
+"date": "2025-09-06",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 79.0
+},
+{
+"id": "T1504",
+"date": "2025-09-06",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 8,
+"unit_price": 18.0
+},
+{
+"id": "T1505",
+"date": "2025-09-06",
+"type": "RETURN",
+"sku": "LAMP-LED",
+"qty": 1,
+"unit_price": 29.0,
+"condition": "damaged"
+},
+{
+"id": "T1506",
+"date": "2025-09-07",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 4,
+"unit_price": 170.1
+},
+{
+"id": "T1507",
+"date": "2025-09-07",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 2,
+"unit_price": 59.0
+},
+{
+"id": "T1509",
+"date": "2025-09-07",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 1,
+"unit_price": 71.1
+},
+{
+"id": "T1511",
+"date": "2025-09-08",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 2,
+"unit_price": 20.4
+},
+{
+"id": "T1512",
+"date": "2025-09-08",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 1,
+"unit_price": 49.0
+},
+{
+"id": "T1514",
+"date": "2025-09-08",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 2,
+"unit_price": 80.1
+},
+{
+"id": "T1515",
+"date": "2025-09-08",
+"type": "RETURN",
+"sku": "BAG-SUM",
+"qty": 1,
+"unit_price": 69.0,
+"condition": "resellable"
+},
+{
+"id": "T1516",
+"date": "2025-09-09",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 2,
+"unit_price": 69.0
+},
+{
+"id": "T1517",
+"date": "2025-09-09",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 2,
+"unit_price": 159.0
+},
+{
+"id": "T1518",
+"date": "2025-09-09",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 6,
+"unit_price": 24.0
+},
+{
+"id": "T1519",
+"date": "2025-09-09",
+"type": "SALE",
+"sku": "PACK-65",
+"qty": 2,
+"unit_price": 186.15
+},
+{
+"id": "T1520",
+"date": "2025-09-09",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 18.0
+},
+{
+"id": "T1521",
+"date": "2025-09-09",
+"type": "RECEIPT",
+"sku": "BAG-WIN",
+"qty": 22,
+"unit_cost": 83.12
+},
+{
+"id": "T1522",
+"date": "2025-09-10",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 4,
+"unit_price": 170.1
+},
+{
+"id": "T1523",
+"date": "2025-09-10",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 6,
+"unit_price": 24.0
+},
+{
+"id": "T1525",
+"date": "2025-09-10",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 1,
+"unit_price": 53.1
+},
+{
+"id": "T1526",
+"date": "2025-09-10",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 2,
+"unit_price": 26.1
+},
+{
+"id": "T1527",
+"date": "2025-09-10",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 18.0
+},
+{
+"id": "T1528",
+"date": "2025-09-11",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 4,
+"unit_price": 189.0
+},
+{
+"id": "T1530",
+"date": "2025-09-11",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 3,
+"unit_price": 58.65
+},
+{
+"id": "T1531",
+"date": "2025-09-11",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 4,
+"unit_price": 24.0
+},
+{
+"id": "T1532",
+"date": "2025-09-11",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 6,
+"unit_price": 26.1
+},
+{
+"id": "T1534",
+"date": "2025-09-11",
+"type": "SALE",
+"sku": "pack-65",
+"qty": 1,
+"unit_price": 219.0
+},
+{
+"id": "T1535",
+"date": "2025-09-11",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 16.2
+},
+{
+"id": "T1536",
+"date": "2025-09-11",
+"type": "RECEIPT",
+"sku": "TENT-2P",
+"qty": 20,
+"unit_cost": 91.52
+},
+{
+"id": "T1537",
+"date": "2025-09-11",
+"type": "RECEIPT",
+"sku": "STOVE-GAS",
+"qty": 36,
+"unit_cost": 27.8
+},
+{
+"id": "T1538",
+"date": "2025-09-12",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 2,
+"unit_price": 69.0
+},
+{
+"id": "T1539",
+"date": "2025-09-12",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 1,
+"unit_price": 59.0
+},
+{
+"id": "T1540",
+"date": "2025-09-12",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 71.1
+},
+{
+"id": "T1541",
+"date": "2025-09-12",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 16.2
+},
+{
+"id": "T1542",
+"date": "2025-09-12",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 4,
+"unit_price": 49.0
+},
+{
+"id": "T1543",
+"date": "2025-09-12",
+"type": "EXPENSE",
+"category": "Shipping",
+"amount": 326.13
+},
+{
+"id": "T1544",
+"date": "2025-09-13",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 2,
+"unit_price": 299.0
+},
+{
+"id": "T1545",
+"date": "2025-09-13",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 4,
+"unit_price": 62.1
+},
+{
+"id": "T1546",
+"date": "2025-09-13",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 4,
+"unit_price": 21.6
+},
+{
+"id": "T1548",
+"date": "2025-09-13",
+"type": "RECEIPT",
+"sku": "filter-h2o",
+"qty": 24,
+"unit_cost": 44.28
+},
+{
+"id": "T1549",
+"date": "2025-09-14",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 4,
+"unit_price": 170.1
+},
+{
+"id": "T1550",
+"date": "2025-09-14",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 4,
+"unit_price": 299.0
+},
+{
+"id": "T1552",
+"date": "2025-09-14",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 1,
+"unit_price": 159.0
+},
+{
+"id": "T1553",
+"date": "2025-09-14",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 79.0
+},
+{
+"id": "T1554",
+"date": "2025-09-14",
+"type": "RECEIPT",
+"sku": "CHAIR-FLD",
+"qty": 30,
+"unit_cost": 24.19
+},
+{
+"id": "T1555",
+"date": "2025-09-15",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 2,
+"unit_price": 189.0
+},
+{
+"id": "T1556",
+"date": "2025-09-15",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 1,
+"unit_price": 62.1
+},
+{
+"id": "T1557",
+"date": "2025-09-15",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 2,
+"unit_price": 29.0
+},
+{
+"id": "T1559",
+"date": "2025-09-15",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 4,
+"unit_price": 49.0
+},
+{
+"id": "T1560",
+"date": "2025-09-15",
+"type": "RECEIPT",
+"sku": "TENT-2P",
+"qty": 40,
+"unit_cost": 95.18
+},
+{
+"id": "T1562",
+"date": "2025-09-15",
+"type": "RECEIPT",
+"sku": "PACK-65",
+"qty": 20,
+"unit_cost": 102.82
+},
+{
+"id": "T1563",
+"date": "2025-09-15",
+"type": "EXPENSE",
+"category": "Wages",
+"amount": 4329.86
+},
+{
+"id": "T1565",
+"date": "2025-09-16",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 1,
+"unit_price": 189.0
+},
+{
+"id": "T1566",
+"date": "2025-09-16",
+"type": "SALE",
+"sku": " Tent-4P",
+"qty": 2,
+"unit_price": 254.15
+},
+{
+"id": "T1567",
+"date": "2025-09-16",
+"type": "SALE",
+"sku": "PACK-65",
+"qty": 1,
+"unit_price": 186.15
+},
+{
+"id": "T1568",
+"date": "2025-09-16",
+"type": "WRITEOFF",
+"sku": "PACK-35",
+"qty": 2,
+"note": "missing in count"
+},
+{
+"id": "T1569",
+"date": "2025-09-17",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 1,
+"unit_price": 159.0
+},
+{
+"id": "T1571",
+"date": "2025-09-17",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 1,
+"unit_price": 24.0
+},
+{
+"id": "T1572",
+"date": "2025-09-17",
+"type": "SALE",
+"sku": "STOVE-GAS",
+"qty": 1,
+"unit_price": 53.1
+},
+{
+"id": "T1573",
+"date": "2025-09-17",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 2,
+"unit_price": 67.15
+},
+{
+"id": "T1574",
+"date": "2025-09-17",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 8,
+"unit_price": 18.0
+},
+{
+"id": "T1575",
+"date": "2025-09-17",
+"type": "RECEIPT",
+"sku": "BAG-SUM",
+"qty": 30,
+"unit_cost": 31.25
+},
+{
+"id": "T1577",
+"date": "2025-09-18",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 2,
+"unit_price": 160.65
+},
+{
+"id": "T1578",
+"date": "2025-09-18",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 1,
+"unit_price": 29.0
+},
+{
+"id": "T1579",
+"date": "2025-09-18",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 8,
+"unit_price": 18.0
+},
+{
+"id": "T1580",
+"date": "2025-09-18",
+"type": "RETURN",
+"sku": "TENT-4P",
+"qty": 1,
+"unit_price": 299.0,
+"condition": "damaged"
+},
+{
+"id": "T1581",
+"date": "2025-09-19",
+"type": "SALE",
+"sku": "BAG-SUM ",
+"qty": 2,
+"unit_price": 58.65
+},
+{
+"id": "T1582",
+"date": "2025-09-19",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 6,
+"unit_price": 21.6
+},
+{
+"id": "T1584",
+"date": "2025-09-19",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 44.1
+},
+{
+"id": "T1585",
+"date": "2025-09-19",
+"type": "EXPENSE",
+"category": "Shipping",
+"amount": 349.47
+},
+{
+"id": "T1586",
+"date": "2025-09-20",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 1,
+"unit_price": 189.0
+},
+{
+"id": "T1587",
+"date": "2025-09-20",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 1,
+"unit_price": 299.0
+},
+{
+"id": "T1588",
+"date": "2025-09-20",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 3,
+"unit_price": 69.0
+},
+{
+"id": "T1589",
+"date": "2025-09-20",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 2,
+"unit_price": 135.15
+},
+{
+"id": "T1591",
+"date": "2025-09-20",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 2,
+"unit_price": 26.1
+},
+{
+"id": "T1592",
+"date": "2025-09-20",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 1,
+"unit_price": 79.0
+},
+{
+"id": "T1594",
+"date": "2025-09-20",
+"type": "SALE",
+"sku": "PACK-65",
+"qty": 1,
+"unit_price": 219.0
+},
+{
+"id": "T1596",
+"date": "2025-09-20",
+"type": "RECEIPT",
+"sku": "LAMP-LED",
+"qty": 75,
+"unit_cost": 12.06
+},
+{
+"id": "T1597",
+"date": "2025-09-21",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 2,
+"unit_price": 189.0
+},
+{
+"id": "T1598",
+"date": "2025-09-21",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 4,
+"unit_price": 24.0
+},
+{
+"id": "T1600",
+"date": "2025-09-21",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 1,
+"unit_price": 79.0
+},
+{
+"id": "T1601",
+"date": "2025-09-21",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 1,
+"unit_price": 75.65
+},
+{
+"id": "T1602",
+"date": "2025-09-21",
+"type": "RECEIPT",
+"sku": "BAG-SUM",
+"qty": 30,
+"unit_cost": 33.75
+},
+{
+"id": "T1604",
+"date": "2025-09-22",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 1,
+"unit_price": 189.0
+},
+{
+"id": "T1605",
+"date": "2025-09-22",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 2,
+"unit_price": 62.1
+},
+{
+"id": "T1607",
+"date": "2025-09-22",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 2,
+"unit_price": 89.0
+},
+{
+"id": "T1608",
+"date": "2025-09-23",
+"type": "SALE",
+"sku": "pad-foam",
+"qty": 3,
+"unit_price": 20.4
+},
+{
+"id": "T1609",
+"date": "2025-09-23",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 2,
+"unit_price": 26.1
+},
+{
+"id": "T1610",
+"date": "2025-09-23",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 1,
+"unit_price": 49.0
+},
+{
+"id": "T1611",
+"date": "2025-09-24",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 6,
+"unit_price": 24.0
+},
+{
+"id": "T1613",
+"date": "2025-09-24",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 2,
+"unit_price": 80.1
+},
+{
+"id": "T1614",
+"date": "2025-09-24",
+"type": "RECEIPT",
+"sku": "PACK-65",
+"qty": 10,
+"unit_cost": 106.93
+},
+{
+"id": "T1615",
+"date": "2025-09-25",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 1,
+"unit_price": 135.15
+},
+{
+"id": "T1617",
+"date": "2025-09-25",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 3,
+"unit_price": 24.0
+},
+{
+"id": "T1618",
+"date": "2025-09-25",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 3,
+"unit_price": 29.0
+},
+{
+"id": "T1619",
+"date": "2025-09-25",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 18.0
+},
+{
+"id": "T1620",
+"date": "2025-09-25",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 41.65
+},
+{
+"id": "T1621",
+"date": "2025-09-26",
+"type": "SALE",
+"sku": "TENT-2P",
+"qty": 4,
+"unit_price": 160.65
+},
+{
+"id": "T1623",
+"date": "2025-09-26",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 1,
+"unit_price": 299.0
+},
+{
+"id": "T1625",
+"date": "2025-09-26",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 1,
+"unit_price": 69.0
+},
+{
+"id": "T1626",
+"date": "2025-09-26",
+"type": "SALE",
+"sku": "LAMP-LED",
+"qty": 2,
+"unit_price": 29.0
+},
+{
+"id": "T1628",
+"date": "2025-09-26",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 8,
+"unit_price": 18.0
+},
+{
+"id": "T1629",
+"date": "2025-09-26",
+"type": "RETURN",
+"sku": "BAG-SUM",
+"qty": 1,
+"unit_price": 69.0,
+"condition": "damaged"
+},
+{
+"id": "T1631",
+"date": "2025-09-26",
+"type": "EXPENSE",
+"category": "Shipping",
+"amount": 331.0
+},
+{
+"id": "T1632",
+"date": "2025-09-27",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 1,
+"unit_price": 69.0
+},
+{
+"id": "T1633",
+"date": "2025-09-27",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 1,
+"unit_price": 143.1
+},
+{
+"id": "T1635",
+"date": "2025-09-27",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 1,
+"unit_price": 71.1
+},
+{
+"id": "T1636",
+"date": "2025-09-27",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 8,
+"unit_price": 16.2
+},
+{
+"id": "T1637",
+"date": "2025-09-27",
+"type": "SALE",
+"sku": "FILTER-H2O",
+"qty": 1,
+"unit_price": 89.0
+},
+{
+"id": "T1638",
+"date": "2025-09-27",
+"type": "RECEIPT",
+"sku": "PACK-35",
+"qty": 20,
+"unit_cost": 43.68
+},
+{
+"id": "T1640",
+"date": "2025-09-28",
+"type": "SALE",
+"sku": "PACK-35",
+"qty": 4,
+"unit_price": 79.0
+},
+{
+"id": "T1642",
+"date": "2025-09-28",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 15.3
+},
+{
+"id": "T1643",
+"date": "2025-09-28",
+"type": "SALE",
+"sku": "CHAIR-FLD",
+"qty": 2,
+"unit_price": 41.65
+},
+{
+"id": "T1644",
+"date": "2025-09-28",
+"type": "EXPENSE",
+"category": "Wages",
+"amount": 4227.43
+},
+{
+"id": "T1645",
+"date": "2025-09-29",
+"type": "SALE",
+"sku": "TENT-4P",
+"qty": 1,
+"unit_price": 254.15
+},
+{
+"id": "T1646",
+"date": "2025-09-29",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 2,
+"unit_price": 69.0
+},
+{
+"id": "T1647",
+"date": "2025-09-29",
+"type": "SALE",
+"sku": "BAG-WIN",
+"qty": 1,
+"unit_price": 135.15
+},
+{
+"id": "T1648",
+"date": "2025-09-29",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 2,
+"unit_price": 24.0
+},
+{
+"id": "T1649",
+"date": "2025-09-29",
+"type": "SALE",
+"sku": "BOTTLE-1L",
+"qty": 4,
+"unit_price": 16.2
+},
+{
+"id": "T1650",
+"date": "2025-09-30",
+"type": "SALE",
+"sku": "BAG-SUM",
+"qty": 2,
+"unit_price": 69.0
+},
+{
+"id": "T1651",
+"date": "2025-09-30",
+"type": "SALE",
+"sku": "PAD-FOAM",
+"qty": 1,
+"unit_price": 21.6
+},
+{
+"id": "T1652",
+"date": "2025-09-30",
+"type": "SALE",
+"sku": "LAMP-LED ",
+"qty": 2,
+"unit_price": 29.0
+},
+{
+"id": "T1653",
+"date": "2025-09-30",
+"type": "RECEIPT",
+"sku": "PACK-65",
+"qty": 15,
+"unit_cost": 115.48
+}
+]

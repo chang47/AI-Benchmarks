@@ -54,6 +54,14 @@ tool-call counts page==steps==raw, browser render clean at 1440/390, no path lea
 - Determinism is tested across two FRESH page loads at an off-grid time (t=1473): a page that caches checkpoints
   returns identical states for repeated seeks even when its sim is random.
 
+## Task 21 inventory (added 2026-09-27)
+- Needs LibreOffice (installed 2026-09-27 via winget; `soffice.com` in Program Files) + `pip install openpyxl`.
+- LibreOffice does NOT recalc .xlsx on load by default — `holdout/recalc.py` runs it with a private profile whose
+  OOXMLRecalcMode=0. openpyxl must write newer functions with the `_xlfn.` prefix (`_xlfn.MAXIFS`) or they are #NAME?.
+- Data is seeded (`research/generate.py`); the answer key is `holdout/engine.py`, cross-checked by the live-formula
+  reference (`research/build_reference.py` → `src/`) and a blind solver from the brief alone (81/81 identical). If you
+  change a rule, change all three and re-run that three-way check before freezing.
+
 ## Public showcase
 - Task 18 reference page → https://wonders-of-the-universe.iamjoshchang.workers.dev. Redeploy with
   `npx wrangler deploy --config deploy/wonders/wrangler.jsonc` (Workers static assets; `wrangler pages`

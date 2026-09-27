@@ -1,0 +1,19 @@
+{
+  "frozen_at": "2026-09-27T07:08:40.156Z",
+  "algorithm": "sha256",
+  "excludes": [
+    "__pycache__",
+    "FREEZE_MANIFEST.json (self)"
+  ],
+  "files": {
+    "grade-inventory.mjs": "d9f3fc77606c897161e54bca00d14ef13066adad7160dd61343f60fad10fb730",
+    "grade_core.py": "281e1b65e78283526c7fd8a8ad2727f8f4af461a3cb9e2ab096137fafa3337b7",
+    "engine.py": "b3587360c38446ce651112be84040d92e43f6f8ec706b9084d2880871975b1e2",
+    "recalc.py": "985879440acd40c4bb22b5500f22b3128a4757b6adbcfa4d6e991bbd70279e52",
+    "readout.py": "40b316a15c3bfbb98ccf7043d3a273ffac1c3874b213e197d8094d05092e0d38",
+    "swap.py": "8b24ee3415c580f205eddb7c33548adac0d4278a592a5af5a315462ce4cf1933",
+    "answer-given.json": "2d3e6632717a566d5f8b9cd8a5080d8e2f2af378e69acbf08f703b1aa82b5578",
+    "answer-hidden.json": "014836130dd70b966d72bc9078987aae38dee58b40b6198b6cae326be4a5dfcf",
+    "hidden-transactions.json": "4f5e809107ba5a9838d3bed13c861a9c02d8deb610a70ef9cbaf6eb0f796fc9d"
+  }
+}
