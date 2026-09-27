@@ -8,12 +8,12 @@
 
   const RULES = {
     dt: 1,                   // fixed step, seconds of battle time
-    duration: 3000,          // seconds of battle time
+    duration: 2400,          // seconds of battle time
     slot: 5,                 // perimeter slot length (m) — the unit of fighting frontage
     contact: 6,              // a slot is engaged when an enemy rectangle is within this distance (m)
     stopGap: 1,              // moving units stop when their front edge would come within this distance of an enemy
     K: 0.016,                // men killed per metre of engaged frontage per second, before modifiers
-    sideMult: { front: 1, left: 2.4, right: 2.4, rear: 2.4 },
+    sideMult: { front: 1, left: 6, right: 6, rear: 6 },
     giveGroundLossMult: 0.3, // the crescent (yielding or holding) fights defensively: it trades ground for lives
     compressedAttackMult: 0.01, // a unit engaged on >= 2 sides is being crushed and can barely fight back
     windRomanMult: 0.95,     // Volturnus dust in Roman faces
@@ -28,6 +28,8 @@
     maxGiveGround: 380,
     pressure: [0.7, 1.4],    // CAVALRY kill multiplier = sqrt(attacker men-per-metre-of-front ÷ defender's), clamped: weight of horse tells
     sideShare: 0.25,         // a side counts as engaged (for flank/encircled/compressed status) when >= 25% of its length is in contact
+    harassPeriod: 40,
+    squadronMinWidth: 40,    // m: a squadron never narrows below this, even on a crushed block        // s: Numidians ride in and out on this cycle
     flankAngleDeg: 45,
     cohesion: 40,            // m: a Roman block never gets further than this ahead of an adjacent Roman block
     closeRanks: 0.4,         // m/s: Roman blocks slide sideways to close gaps with their neighbours (the line stays shoulder to shoulder)       // contact on a flank/rear counts as a FLANK ATTACK only if the enemy faces >45° away from head-on      // the centre never falls back further than this from where it started (m)
@@ -207,9 +209,12 @@
       if (o.type === "skirmish") {
         const foe = s.units.find((e) => e.kind === "light" && e.side !== u.side && alive(e));
         if (foe && Math.abs(frontY(u) - frontY(foe)) > RULES.rangedRange - 10) u.y += fwd(u.h)[1] * S.light * RULES.dt;
-      } else if (o.type === "leave") { // skirmishers run back through their own lines and off the field
+      } else if (o.type === "leave") { // skirmishers fall back through the intervals of their own line and are gone behind it
         u.y += (u.side === "R" ? 1 : -1) * S.light * 3 * RULES.dt;
-        if (Math.abs(u.y) > 1300) { u.status = "left"; ev(s, "left", u.id, { men: Math.round(u.men) }); }
+        const own = s.units.filter((e) => e.side === u.side && e.kind === "inf" && alive(e));
+        const line = u.side === "R" ? Math.min(...own.map(frontY)) : Math.max(...own.map(frontY));
+        const back = u.side === "R" ? u.y - u.d / 2 >= line : u.y + u.d / 2 <= line;
+        if (!own.length || back) { u.status = "left"; ev(s, "left", u.id, { men: Math.round(u.men) }); }
       } else if (o.type === "charge") {
         const tg = s.byId[o.target];
         if (!tg || !alive(tg) || tg.status === "routing") { setOrder(s, u, { type: "hold" }); continue; }
@@ -225,7 +230,9 @@
         const tg = s.byId[o.target];
         if (!tg || !alive(tg)) { setOrder(s, u, { type: "hold" }); continue; }
         if (tg.status === "routing") { setOrder(s, u, { type: "pursue", target: tg.id }); continue; }
-        const f = fwd(tg.h), gx = tg.x + f[0] * (tg.d / 2 + u.d / 2 + 40), gy = tg.y + f[1] * (tg.d / 2 + u.d / 2 + 40);
+        // Dash in and out: the stand-off distance cycles between 15 and 95 m every RULES.harassPeriod seconds.
+        const off = 55 - 40 * Math.cos((2 * Math.PI * s.t) / RULES.harassPeriod);
+        const f = fwd(tg.h), gx = tg.x + f[0] * (tg.d / 2 + u.d / 2 + off), gy = tg.y + f[1] * (tg.d / 2 + u.d / 2 + off);
         moveToward(s, u, gx, gy, S.numidian, { turn: false }); turnTo(u, Math.atan2(tg.x - u.x, tg.y - u.y));
       } else if (o.type === "pursue") {
         const tg = s.byId[o.target];
@@ -305,13 +312,21 @@
           engagedSides: [], engagedWith: [], engagedBy: [], history: [], x: hc.x, y: hc.y, h: hc.h, w: r.w, d: 0, parent: hc.id, order: { type: "hold" } };
         reform(q, r.w); q.x0 = q.x; q.y0 = q.y;
         s.units.push(q); s.byId[q.id] = q;
-        setOrder(s, q, { type: "path", speed: "cavTrot", points: [[r.x, r.y + r.d / 2 + q.d / 2 + 60]], then: { type: "advanceRear" } });
+        setOrder(s, q, { type: "path", speed: "cavTrot", points: [[r.x, r.y + r.d / 2 + q.d / 2 + 60]], then: { type: "advanceRear", target: r.id } });
       });
       hc.men0 -= hc.men; hc.men = 0; hc.status = "split"; ev(s, "split", hc.id, { into: blocks.length }); // its men live on in the squadrons (men0 keeps only its own dead)
     }
     for (const u of s.units) if (u.order.type === "advanceRear" && alive(u) && u.status !== "routing") {
+      // Stay on the assigned block as it contracts: match its x and width, and keep pressing onto its rear.
+      let tg = s.byId[u.order.target];
+      if (!tg || !alive(tg)) { tg = romanInf.length ? romanInf.reduce((a, b) => (Math.abs(b.x - u.x) < Math.abs(a.x - u.x) ? b : a)) : null; if (tg) u.order.target = tg.id; }
       turnTo(u, Math.PI);
-      if (!u.engagedSides.includes("front")) { const my = -RULES.speed.cavTrot * RULES.dt; if (!blocked(s, u, 0, my)) u.y += my; }
+      if (!tg) continue;
+      const slide = Math.max(-RULES.speed.cavTrot * RULES.dt, Math.min(RULES.speed.cavTrot * RULES.dt, tg.x - u.x));
+      u.x += slide; const w = Math.max(RULES.squadronMinWidth, tg.w); if (Math.abs(u.w - w) > 0.5) reform(u, w);
+      // Close onto the block's rear edge — never ride past it.
+      const room = frontY(u) - (tg.y + tg.d / 2) - RULES.stopGap;
+      if (!u.engagedSides.includes("front") && room > 0) { const my = -Math.min(room, RULES.speed.cavTrot * RULES.dt); if (!blocked(s, u, 0, my)) u.y += my; }
     }
   }
   function pressure(a, d) {
@@ -366,9 +381,16 @@
       if (u.men < 1) { u.men = 0; u.status = "destroyed"; ev(s, "destroyed", u.id); continue; }
       // Depth follows strength (frontage kept), so a shrinking block visibly thins; a trapped block also narrows.
       // Losses thin the unit from the REAR: the front edge stays where it is (so contact is not broken by shrinking).
-      const nd = Math.max(RULES.minDepth[u.kind], u.men / (u.w * dens(u))), ff = fwd(u.h);
-      u.x += ff[0] * (u.d - nd) / 2; u.y += ff[1] * (u.d - nd) / 2; u.d = nd;
-      if (u.encircled && u.kind === "inf" && u.d <= RULES.minDepth.inf + 0.01) u.w = Math.max(20, u.men / (RULES.minDepth.inf * RULES.density.inf));
+      const ff = fwd(u.h);
+      if (u.compressed && u.kind === "inf") {
+        // A trapped block is crushed together: it shrinks in width AND depth (same shape), so the whole mass contracts.
+        const k = Math.sqrt(u.men / (u.w * u.d * dens(u)));
+        const nw = Math.max(RULES.minDepth.inf, u.w * k), nd = Math.max(RULES.minDepth.inf, u.d * k);
+        u.x += ff[0] * (u.d - nd) / 2; u.y += ff[1] * (u.d - nd) / 2; u.w = nw; u.d = nd;
+      } else {
+        const nd = Math.max(RULES.minDepth[u.kind], u.men / (u.w * dens(u)));
+        u.x += ff[0] * (u.d - nd) / 2; u.y += ff[1] * (u.d - nd) / 2; u.d = nd;
+      }
       if (u.kind === "cav" && u.status !== "routing" && (u.morale < RULES.cavRoutMorale || (u.engagedSides.includes("rear") && u.side === "R"))) {
         u.status = "routing"; ev(s, "rout", u.id, { men: Math.round(u.men) });
       }

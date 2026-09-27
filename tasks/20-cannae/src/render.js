@@ -10,7 +10,7 @@
     roman: 0xb3121f, alliedInf: 0x7d0f1a, romanCav: 0xe8364a, alliedCav: 0xd96a78, velites: 0xf0a3a8,
     gaul: 0x1f6fc2, spaniard: 0xf5f3ee, libyan: 0x5f7a2a, hasdrubal: 0x6b3fa0, numidian: 0xe0b44c, balearic: 0x9ab7c9,
   };
-  const SHIELD = { R: 0xe8b94a, C: 0x2b3440 };
+  const SHIELD = { R: 0x7a0d12, C: 0x2b3440 }; // Roman shields dark red so the legions read red, not orange, from afar
 
   // Deterministic hash → [0, 1)
   const hash = (a, b) => { let h = (a * 374761393 + b * 668265263) | 0; h = (h ^ (h >>> 13)) * 1274126177; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
@@ -121,6 +121,8 @@
     function update(state, clock) {
       let ni = 0, nc = 0, nf = 0;
       for (const k in counts) delete counts[k];
+      const routT = {};
+      for (const e of state.events) if (e.type === "rout" && routT[e.id] == null) routT[e.id] = e.t;
       for (const u of state.units) {
         if (u.status === "destroyed" || u.status === "left" || u.status === "split") continue;
         const n = Math.ceil(u.men / MEN_PER_FIGURE);
@@ -135,13 +137,25 @@
           const lx = ((colI + 0.5) / cols - 0.5) * u.w + (hash(hid, i) - 0.5) * sp * 0.5;
           const lf = u.d / 2 - ((row + 0.5) / rows) * u.d + (hash(i, hid) - 0.5) * sp * 0.4;
           let x = u.x + r[0] * lx + f[0] * lf, y = u.y + r[1] * lx + f[1] * lf;
-          const ph = hash(hid + 3, i) * 6.28;
-          if (routing) { x += Math.sin(ph) * 9; y += Math.cos(ph * 1.7) * 9; }
+          const ph = hash(hid + 3, i) * 6.28, rnd = hash(hid + 7, i);
+          let turn = 0;
+          if (routing) { // the formation dissolves into a fleeing cloud that spreads with time since the rout
+            const spread = Math.min(170, (state.t - (routT[u.id] ?? state.t)) * 3.5 + 10) * (0.3 + rnd);
+            x += Math.cos(ph) * spread; y += Math.sin(ph) * spread * 0.6; turn = (rnd - 0.5) * 0.9;
+          } else if (u.kind === "light") { // open order: a loose, wandering screen
+            x += (rnd - 0.5) * sp * 1.6 + Math.sin(clock * 0.6 + ph) * 3; y += (hash(i, hid + 11) - 0.5) * sp * 1.6 + Math.cos(clock * 0.5 + ph) * 3;
+          } else if (u.order === "harass") { // Numidians: riders dart in and out individually
+            const dart = Math.sin(clock * 1.1 + ph) * 28;
+            x += f[0] * dart + r[0] * Math.sin(clock * 0.7 + ph * 2) * 10; y += f[1] * dart + r[1] * Math.sin(clock * 0.7 + ph * 2) * 10; turn = Math.cos(clock * 1.1 + ph) > 0 ? 0 : Math.PI;
+          } else if (cav && fighting) { // cavalry melee: the rows break up, riders circle and mix
+            const rad = 6 + rnd * 10;
+            x += Math.cos(clock * 1.7 + ph) * rad; y += Math.sin(clock * 2.1 + ph) * rad; turn = Math.sin(clock * 1.3 + ph) * 1.1;
+          }
           const bob = routing ? Math.abs(Math.sin(clock * 11 + ph)) * 1.4 : moving ? Math.abs(Math.sin(clock * 8 + ph)) * 0.9 : fighting ? Math.abs(Math.sin(clock * 13 + ph)) * 0.7 : 0.05 * Math.sin(clock + ph);
           const lunge = fighting ? Math.sin(clock * 6.5 + ph) * 1.2 : 0;
           x += f[0] * lunge; y += f[1] * lunge;
           const X = x, Z = -y, Yb = terrainHeight(X, Z) + bob;
-          E.set(0, rot + (routing ? Math.PI : 0) + (hash(i, hid + 9) - 0.5) * 0.3, 0); Q.setFromEuler(E);
+          E.set(0, rot + (routing ? Math.PI : 0) + turn + (hash(i, hid + 9) - 0.5) * 0.3, 0); Q.setFromEuler(E);
           M.compose(V.set(X, Yb, Z), Q, S);
           if (cav) { horse.setMatrixAt(nc, M); rider.setMatrixAt(nc, M); rider.setColorAt(nc, C); nc++; }
           else { infBody.setMatrixAt(ni, M); infBody.setColorAt(ni, C); infHead.setMatrixAt(ni, M); infGear.setMatrixAt(ni, M); infGear.setColorAt(ni, C.setHex(SHIELD[u.side])); C.setHex(PALETTE[u.contingent] || 0xffffff); ni++; }
