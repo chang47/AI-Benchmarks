@@ -151,9 +151,11 @@
           } else if (cav && (fighting || ot === "pursue")) { // melee / pursuit: the rows break up, riders circle, surge and mix
             const rad = ot === "pursue" ? 14 + rnd * 30 : 6 + rnd * 10;
             x += Math.cos(clock * 1.7 + ph) * rad + f[0] * rnd * 25; y += Math.sin(clock * 2.1 + ph) * rad + f[1] * rnd * 25; turn = Math.sin(clock * 1.3 + ph) * 1.1;
-          } else if (cav && (ot === "charge" || ot === "path")) { // at the gallop: open order, riders surge ahead and fall back
-            x += f[0] * Math.sin(clock * 0.9 + ph) * 8 + r[0] * (rnd - 0.5) * sp; y += f[1] * Math.sin(clock * 0.9 + ph) * 8 + r[1] * (rnd - 0.5) * sp;
-            turn = (rnd - 0.5) * 0.35;
+          } else if (cav && (ot === "charge" || ot === "path")) { // on the move: a loose, strung-out mass, riders surging and drifting
+            const rnd2 = hash(hid + 13, i);
+            x += f[0] * ((rnd2 - 0.5) * sp * 2.2 + Math.sin(clock * 0.9 + ph) * 12) + r[0] * (rnd - 0.5) * sp * 1.8;
+            y += f[1] * ((rnd2 - 0.5) * sp * 2.2 + Math.sin(clock * 0.9 + ph) * 12) + r[1] * (rnd - 0.5) * sp * 1.8;
+            turn = (rnd - 0.5) * 0.5;
           }
           const bob = routing ? Math.abs(Math.sin(clock * 11 + ph)) * 1.4 : moving ? Math.abs(Math.sin(clock * 8 + ph)) * 0.9 : fighting ? Math.abs(Math.sin(clock * 13 + ph)) * 0.7 : 0.05 * Math.sin(clock + ph);
           const lunge = fighting ? Math.sin(clock * 6.5 + ph) * 1.2 : 0;
