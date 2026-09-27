@@ -1085,7 +1085,7 @@ Every planted bug is:
 - **(d) The 120-minute budget.** It isn't proven until the calibration run.
 - **(e) Validation and grade cost.** The matrix is now about 8–12 h of machine time. The harness work (workspace-prepare, exclusions, text judge, the non-test-mode setup driver, the contamination scan) is real engineering. Adding non-test-mode runs puts the 10-minute grade at real risk, which is why its fallback order is fixed in advance (TST-09).
 - **(f) 22b scoring.** It stays uncalibrated by design.
-- **(g) Remaining SRD citations.** Panel page numbers stand until G0 confirms them.
+- **(g) SRD citations.** G0 is done (58/66 confirmed, 8 corrected); the class slot tables were read from PDF word positions, so a misread is unlikely but not impossible.
 - **(h) Asset tickets.** Tickets are the orchestrator's answer to the panel's asset-auth finding. The panelist proposed a cookie session or socket delivery instead. How tickets behave through a real Funnel proxy and browser image caching is unverified until G2.
 - **(i) Contamination.** Web access is detected and disclosed, not prevented. The scan sees commands, not intent, so an indirect or obfuscated fetch can evade it.
 
