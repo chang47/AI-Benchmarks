@@ -29,6 +29,7 @@
     pressure: [0.7, 1.4],    // CAVALRY kill multiplier = sqrt(attacker men-per-metre-of-front ÷ defender's), clamped: weight of horse tells
     sideShare: 0.25,         // a side counts as engaged (for flank/encircled/compressed status) when >= 25% of its length is in contact
     harassPeriod: 40,
+    reformRate: 8,           // m/s: how fast a unit changes its frontage when it re-forms (line <-> column)
     columnWidth: 60,         // m: cavalry riding a route (not charging) moves as a column this wide
     endsPressIn: 80,         // m: once the trap closes, the crescent's ends may advance this far to keep contact
     pursueSeconds: 40,       // s: Hasdrubal's horse rides into the broken allied cavalry before re-forming
@@ -147,7 +148,7 @@
   const ev = (s, type, id, extra) => s.events.push({ t: s.t, type, id, ...extra });
   const idsOf = (s, sel) => (Array.isArray(sel) ? sel : s.units.filter((u) => u.id.startsWith(sel)).map((u) => u.id));
 
-  function setOrder(s, u, order) { u.order = { ...order, since: s.t }; ev(s, "order", u.id, { order: order.type }); }
+  function setOrder(s, u, order) { u.order = { ...order, since: s.t, prev: u.order?.type }; ev(s, "order", u.id, { order: order.type }); }
 
   /** Do two unit rectangles overlap by more than `tol` metres? (separating-axis test on the 4 edge normals) */
   function rectsOverlap(a, b, tol = 1) {
@@ -263,6 +264,8 @@
           setOrder(s, u, u.contingent === "numidian" ? { type: "chaseOff" } : { type: "hold" }); continue;
         }
         moveToward(s, u, tg.x, tg.y, S.numidian, { stopAtContact: false });
+      } else if (o.type === "face") { // halted: wheel to face the given heading
+        turnTo(u, o.h);
       } else if (o.type === "chaseOff") { // ride north after the fugitives until off the map
         turnTo(u, 0); u.y += S.numidian * RULES.dt;
         if (u.y > 1300) { u.status = "left"; ev(s, "left", u.id, { men: Math.round(u.men) }); }
@@ -349,19 +352,19 @@
     const pursuitOver = s.flags.pursue != null && (s.t - s.flags.pursue >= RULES.pursueSeconds || !alive(ac));
     if (!s.flags.wait && s.flags.ride && alive(hc) && hc.status !== "routing" && (pursuitOver || (!alive(ac) && s.flags.pursue == null))) {
       s.flags.wait = true;
-      setOrder(s, hc, { type: "path", speed: "cavTrot", points: [[0, rearOf(romanInf) + 400]], then: { type: "hold" } });
+      setOrder(s, hc, { type: "path", speed: "cavTrot", points: [[0, rearOf(romanInf) + 400]], then: { type: "face", h: Math.PI } }); // halt facing the Roman rear
       ev(s, "hasdrubal-waits", hc.id);
     }
     const libyansIn = s.units.some((u) => u.id.startsWith("C-lib") && u.order.type === "faceAndAdvance" && u.engagedSides.includes("front"));
     if (libyansIn && !s.flags.trapClosing) { s.flags.trapClosing = true; ev(s, "trap-closing", "C-lib"); }
-    if (!s.flags.rear && s.flags.wait && libyansIn && alive(hc) && hc.order.type === "hold") {
+    if (!s.flags.rear && s.flags.wait && libyansIn && alive(hc) && (hc.order.type === "hold" || hc.order.type === "face")) {
       s.flags.rear = true;
       // Split into one squadron per surviving Roman block; each re-forms to its block's width and charges its rear.
       const blocks = romanInf.slice().sort((a, b) => a.x - b.x), men = hc.men / blocks.length;
       blocks.forEach((r, i) => {
         const q = { id: `C-cav-${i + 1}`, side: "C", kind: "cav", contingent: "hasdrubal", name: `Hasdrubal's squadron ${i + 1}`, men, men0: men, status: "formed", morale: hc.morale,
           engagedSides: [], engagedWith: [], engagedBy: [], history: [], x: hc.x, y: hc.y, h: hc.h, w: r.w, d: 0, parent: hc.id, order: { type: "hold" } };
-        reform(q, r.w); q.x0 = q.x; q.y0 = q.y;
+        reform(q, r.w, true); q.x0 = q.x; q.y0 = q.y;
         s.units.push(q); s.byId[q.id] = q;
         setOrder(s, q, { type: "path", speed: "cavTrot", points: [[r.x, r.y + r.d / 2 + q.d / 2 + 60]], then: { type: "advanceRear", target: r.id } });
       });
@@ -390,7 +393,15 @@
   /** Cavalry marches in a narrow column and deploys into a wide line when it halts. */
   function march(u) { if (u.kind === "cav" && !u.column) { u.lineW = u.w; u.column = true; reform(u, RULES.columnWidth); } }
   function deploy(u) { if (u.column) { u.column = false; reform(u, u.lineW || u.w); } }
-  function reform(u, w) { u.w = w; u.d = Math.max(RULES.minDepth[u.kind], u.men / (u.w * dens(u))); }
+  /** Change frontage: gradually (RULES.reformRate m/s) unless instant — units re-form, they do not teleport into shape. */
+  function reform(u, w, instant = false) { if (instant) { u.w = w; u.wTarget = null; u.d = Math.max(RULES.minDepth[u.kind], u.men / (u.w * dens(u))); } else u.wTarget = w; }
+  function reformStep(u) {
+    if (u.wTarget == null) return;
+    const dw = u.wTarget - u.w, m = RULES.reformRate * RULES.dt;
+    u.w = Math.abs(dw) <= m ? u.wTarget : u.w + Math.sign(dw) * m;
+    if (u.w === u.wTarget) u.wTarget = null;
+    u.d = Math.max(RULES.minDepth[u.kind], u.men / (u.w * dens(u)));
+  }
 
   function combat(s) {
     const loss = new Map();
@@ -458,6 +469,7 @@
   }
 
   function step(s) {
+    for (const u of s.units) if (u.wTarget != null && alive(u)) reformStep(u);
     applyOrders(s);
     combat(s);
     s.step++; s.t = Number((s.step * RULES.dt).toFixed(3));
