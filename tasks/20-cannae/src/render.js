@@ -130,7 +130,8 @@
         const cav = u.kind === "cav", sp = Math.sqrt((MEN_PER_FIGURE / (u.kind === "light" ? 0.8 : cav ? 0.35 : u.contingent === "roman" || u.contingent === "alliedInf" ? 0.4 : u.contingent === "libyan" ? 1 : 1.2)));
         const cols = Math.max(1, Math.round(u.w / sp)), rows = Math.max(1, Math.ceil(n / cols));
         const f = [Math.sin(u.h), Math.cos(u.h)], r = [Math.cos(u.h), -Math.sin(u.h)], rot = Math.PI - u.h, hid = idHash(u.id);
-        const routing = u.status === "routing", fighting = u.status === "engaged", moving = !fighting && u.order !== "hold" && u.order !== "ambush" && u.order !== "holdLine";
+        const ot = u.order?.type ?? u.order; // live sim state holds order objects; snapshots hold the type string
+        const routing = u.status === "routing", fighting = u.status === "engaged", moving = !fighting && !["hold", "ambush", "holdLine", "giveGround"].includes(ot);
         C.setHex(PALETTE[u.contingent] || 0xffffff);
         for (let i = 0; i < n; i++) {
           const row = Math.floor(i / cols), colI = i % cols;
@@ -144,12 +145,15 @@
             x += Math.cos(ph) * spread; y += Math.sin(ph) * spread * 0.6; turn = (rnd - 0.5) * 0.9;
           } else if (u.kind === "light") { // open order: a loose, wandering screen
             x += (rnd - 0.5) * sp * 1.6 + Math.sin(clock * 0.6 + ph) * 3; y += (hash(i, hid + 11) - 0.5) * sp * 1.6 + Math.cos(clock * 0.5 + ph) * 3;
-          } else if (u.order === "harass") { // Numidians: riders dart in and out individually
+          } else if (ot === "harass") { // Numidians: riders dart in and out individually
             const dart = Math.sin(clock * 1.1 + ph) * 28;
             x += f[0] * dart + r[0] * Math.sin(clock * 0.7 + ph * 2) * 10; y += f[1] * dart + r[1] * Math.sin(clock * 0.7 + ph * 2) * 10; turn = Math.cos(clock * 1.1 + ph) > 0 ? 0 : Math.PI;
-          } else if (cav && fighting) { // cavalry melee: the rows break up, riders circle and mix
-            const rad = 6 + rnd * 10;
-            x += Math.cos(clock * 1.7 + ph) * rad; y += Math.sin(clock * 2.1 + ph) * rad; turn = Math.sin(clock * 1.3 + ph) * 1.1;
+          } else if (cav && (fighting || ot === "pursue")) { // melee / pursuit: the rows break up, riders circle, surge and mix
+            const rad = ot === "pursue" ? 14 + rnd * 30 : 6 + rnd * 10;
+            x += Math.cos(clock * 1.7 + ph) * rad + f[0] * rnd * 25; y += Math.sin(clock * 2.1 + ph) * rad + f[1] * rnd * 25; turn = Math.sin(clock * 1.3 + ph) * 1.1;
+          } else if (cav && (ot === "charge" || ot === "path")) { // at the gallop: open order, riders surge ahead and fall back
+            x += f[0] * Math.sin(clock * 0.9 + ph) * 8 + r[0] * (rnd - 0.5) * sp; y += f[1] * Math.sin(clock * 0.9 + ph) * 8 + r[1] * (rnd - 0.5) * sp;
+            turn = (rnd - 0.5) * 0.35;
           }
           const bob = routing ? Math.abs(Math.sin(clock * 11 + ph)) * 1.4 : moving ? Math.abs(Math.sin(clock * 8 + ph)) * 0.9 : fighting ? Math.abs(Math.sin(clock * 13 + ph)) * 0.7 : 0.05 * Math.sin(clock + ph);
           const lunge = fighting ? Math.sin(clock * 6.5 + ph) * 1.2 : 0;

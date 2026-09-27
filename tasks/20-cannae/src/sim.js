@@ -29,6 +29,8 @@
     pressure: [0.7, 1.4],    // CAVALRY kill multiplier = sqrt(attacker men-per-metre-of-front ÷ defender's), clamped: weight of horse tells
     sideShare: 0.25,         // a side counts as engaged (for flank/encircled/compressed status) when >= 25% of its length is in contact
     harassPeriod: 40,
+    endsPressIn: 80,         // m: once the trap closes, the crescent's ends may advance this far to keep contact
+    pursueSeconds: 40,       // s: Hasdrubal's horse rides into the broken allied cavalry before re-forming
     squadronMinWidth: 40,    // m: a squadron never narrows below this, even on a crushed block        // s: Numidians ride in and out on this cycle
     flankAngleDeg: 45,
     cohesion: 40,            // m: a Roman block never gets further than this ahead of an adjacent Roman block
@@ -146,6 +148,25 @@
 
   function setOrder(s, u, order) { u.order = { ...order, since: s.t }; ev(s, "order", u.id, { order: order.type }); }
 
+  /** Do two unit rectangles overlap by more than `tol` metres? (separating-axis test on the 4 edge normals) */
+  function rectsOverlap(a, b, tol = 1) {
+    const axesList = [fwd(a.h), right(a.h), fwd(b.h), right(b.h)];
+    for (const [ax, ay] of axesList) {
+      const proj = (u) => { const f = fwd(u.h), r = right(u.h), c = u.x * ax + u.y * ay, e = Math.abs(f[0] * ax + f[1] * ay) * u.d / 2 + Math.abs(r[0] * ax + r[1] * ay) * u.w / 2; return [c - e, c + e]; };
+      const [a0, a1] = proj(a), [b0, b1] = proj(b);
+      if (Math.min(a1, b1) - Math.max(a0, b0) <= tol) return false;
+    }
+    return true;
+  }
+  /** Would moving u by (dx, dy) push it into a friendly unit it is not already overlapping? (no marching through friends) */
+  function blockedByFriend(s, u, dx, dy) {
+    const g = { x: u.x + dx, y: u.y + dy, w: u.w, d: u.d, h: u.h };
+    for (const e of s.units) {
+      if (e === u || e.side !== u.side || !alive(e) || e.kind === "light" || e.status === "routing" || u.kind === "light") continue;
+      if (rectsOverlap(g, e) && !rectsOverlap(u, e)) return e;
+    }
+    return null;
+  }
   /** Would moving u by (dx, dy) bring its front edge within RULES.stopGap of a fighting enemy? (units stop at contact) */
   function blocked(s, u, dx, dy) {
     if (u.kind === "light") return false;
@@ -256,12 +277,12 @@
         if (u.moving) { u.x -= f[0] * S.giveGround * RULES.dt; u.y -= f[1] * S.giveGround * RULES.dt; }
         else if (!u.engagedSides.includes("front") && s.flags.trapClosing && fwd(u.h)[1] * (u.y0 - u.y) > 0) { // the ring contracts: step back into contact, never past the start line
           const mx = f[0] * S.giveGround * RULES.dt, my = f[1] * S.giveGround * RULES.dt;
-          if (!blocked(s, u, mx, my)) { u.x += mx; u.y += my; }
+          if (!blocked(s, u, mx, my) && !blockedByFriend(s, u, mx, my)) { u.x += mx; u.y += my; }
         }
-      } else if (o.type === "holdLine") { // ends of the crescent: stand; once the trap closes, press in to keep contact (not past the start line)
-        if (!u.engagedSides.includes("front") && s.flags.trapClosing && fwd(u.h)[1] * (u.y0 - u.y) > 0) {
+      } else if (o.type === "holdLine") { // ends of the crescent: stand; once the trap closes, press forward (≤ RULES.endsPressIn) into contact
+        if (!u.engagedSides.includes("front") && s.flags.trapClosing && fwd(u.h)[1] * (u.y - u.y0) < RULES.endsPressIn) {
           const f = fwd(u.h), mx = f[0] * S.giveGround * RULES.dt, my = f[1] * S.giveGround * RULES.dt;
-          if (!blocked(s, u, mx, my)) { u.x += mx; u.y += my; }
+          if (!blocked(s, u, mx, my) && !blockedByFriend(s, u, mx, my)) { u.x += mx; u.y += my; }
         }
       } else if (o.type === "ambush") { // Libyans: wait, then face inward and charge the Roman flank
         if (crescentCurve(s) <= -RULES.libyanTriggerConcave) { setOrder(s, u, { type: "faceAndAdvance", h: u.x < 0 ? Math.PI / 2 : -Math.PI / 2 }); ev(s, "libyans-turn", u.id); }
@@ -273,7 +294,13 @@
         const dx = gx - u.x, dy = gy - u.y, dist = hyp(dx, dy);
         if (dist < 0.5) continue;
         const st = Math.min(dist, S.libyan * RULES.dt), mx = (dx / dist) * st, my = (dy / dist) * st;
-        if (!blocked(s, u, mx, my)) { u.x += mx; u.y += my; }
+        const friend = blockedByFriend(s, u, mx, my);
+        if (!friend && !blocked(s, u, mx, my)) { u.x += mx; u.y += my; }
+        else if (friend) { // detour: step clear of the friendly unit (away from it along the other axis), then carry on
+          const sx = Math.abs(dx) >= Math.abs(dy), st2 = S.libyan * RULES.dt;
+          const ddx = sx ? 0 : Math.sign(u.x - friend.x) * st2, ddy = sx ? Math.sign(u.y - friend.y || 1) * st2 : 0;
+          if (!blockedByFriend(s, u, ddx, ddy) && !blocked(s, u, ddx, ddy)) { u.x += ddx; u.y += ddy; }
+        }
       }
     }
 
@@ -281,7 +308,9 @@
     const line = romanInf.slice().sort((a, b) => a.x - b.x), mid = line.reduce((a, r) => a + r.x, 0) / (line.length || 1);
     for (let i = 0; i < line.length; i++) {
       const u = line[i], inner = u.x < mid ? line[i + 1] : line[i - 1];
-      if (!inner || u.engagedSides.includes(u.x < mid ? "left" : "right") && false) continue;
+      // A block pinned on its outer flank (the Libyans) stays put; everyone else closes toward the centre.
+      const outerSide = u.x < mid ? "right" : "left"; // Romans face south: their right is west
+      if (!inner || flankAttacked(s, u) && u.engagedSides.includes(outerSide)) continue;
       const gap = Math.abs(inner.x - u.x) - (inner.w + u.w) / 2;
       if (gap > 1) { const dx = Math.sign(inner.x - u.x) * Math.min(gap - 1, RULES.closeRanks * RULES.dt); u.x += dx; }
     }
@@ -295,8 +324,15 @@
       setOrder(s, hc, { type: "path", speed: "cavTrot", points: [[-780, y], [ac.x, y]], then: { type: "charge", target: "R-acav", at: "rear", speed: "cavCharge" } });
       ev(s, "hasdrubal-ride", hc.id);
     }
-    // After the allied cavalry breaks, Hasdrubal waits 400 m behind the Roman army until the Libyans are on its flanks.
-    if (!s.flags.wait && s.flags.ride && alive(hc) && hc.status !== "routing" && (ac.status === "routing" || !alive(ac))) {
+    // When the allied cavalry breaks, Hasdrubal's horse first rides into the fleeing mass for RULES.pursueSeconds…
+    if (!s.flags.pursue && s.flags.ride && alive(hc) && hc.status !== "routing" && ac.status === "routing") {
+      s.flags.pursue = s.t;
+      setOrder(s, hc, { type: "pursue", target: "R-acav" });
+      ev(s, "hasdrubal-pursues", hc.id);
+    }
+    // …then leaves the chase to the Numidians and waits 400 m behind the Roman army until the Libyans are on its flanks.
+    const pursuitOver = s.flags.pursue != null && (s.t - s.flags.pursue >= RULES.pursueSeconds || !alive(ac));
+    if (!s.flags.wait && s.flags.ride && alive(hc) && hc.status !== "routing" && (pursuitOver || (!alive(ac) && s.flags.pursue == null))) {
       s.flags.wait = true;
       setOrder(s, hc, { type: "path", speed: "cavTrot", points: [[0, rearOf(romanInf) + 400]], then: { type: "hold" } });
       ev(s, "hasdrubal-waits", hc.id);
@@ -376,7 +412,9 @@
       const l = Math.min(u.men, loss.get(u.id) || 0);
       u.men -= l;
       // No morale loss while every enemy in contact is itself compressed (trapped men are no threat to the ring).
-      const threatened = u.engagedWith.some((id) => !s.byId[id].compressed);
+      // …nor while it is striking every enemy it touches in the flank or rear (the hammer does not break).
+      const hitsFlankOrRear = (e) => (e.engagedBy || []).some(([id, side]) => id === u.id && side !== "front");
+      const threatened = u.engagedWith.some((id) => !s.byId[id].compressed && !hitsFlankOrRear(s.byId[id]));
       if (threatened || !u.engagedWith.length) u.morale = Math.max(0, u.morale - RULES.moraleLossPerCasualtyFrac * (l / u.men0));
       if (u.men < 1) { u.men = 0; u.status = "destroyed"; ev(s, "destroyed", u.id); continue; }
       // Depth follows strength (frontage kept), so a shrinking block visibly thins; a trapped block also narrows.
