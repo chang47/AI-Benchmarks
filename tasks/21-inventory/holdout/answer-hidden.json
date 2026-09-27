@@ -1,0 +1,141 @@
+{
+ "pl": {
+  "2025-07": {
+   "revenue": 40569.5,
+   "refunds": 219.0,
+   "cogs": 19140.8,
+   "writeoffs": 450.7,
+   "opex": 12849.51,
+   "gross_profit": 20759.0,
+   "net_profit": 7909.49
+  },
+  "2025-08": {
+   "revenue": 25353.2,
+   "refunds": 59.0,
+   "cogs": 12044.0,
+   "writeoffs": 0.0,
+   "opex": 13119.22,
+   "gross_profit": 13250.2,
+   "net_profit": 130.98
+  },
+  "2025-09": {
+   "revenue": 22298.4,
+   "refunds": 625.0,
+   "cogs": 10755.56,
+   "writeoffs": 72.0,
+   "opex": 12956.81,
+   "gross_profit": 10845.84,
+   "net_profit": -2110.97
+  }
+ },
+ "inventory": {
+  "TENT-2P": {
+   "on_hand": 176,
+   "backordered": 0,
+   "stock_value": 15845.6,
+   "reorder": false,
+   "reorder_qty": 0
+  },
+  "TENT-4P": {
+   "on_hand": 0,
+   "backordered": 5,
+   "stock_value": 0,
+   "reorder": true,
+   "reorder_qty": 20
+  },
+  "BAG-SUM": {
+   "on_hand": 19,
+   "backordered": 0,
+   "stock_value": 641.25,
+   "reorder": true,
+   "reorder_qty": 60
+  },
+  "BAG-WIN": {
+   "on_hand": 110,
+   "backordered": 0,
+   "stock_value": 8435.36,
+   "reorder": false,
+   "reorder_qty": 0
+  },
+  "PAD-FOAM": {
+   "on_hand": 103,
+   "backordered": 0,
+   "stock_value": 1030.74,
+   "reorder": false,
+   "reorder_qty": 0
+  },
+  "STOVE-GAS": {
+   "on_hand": 68,
+   "backordered": 0,
+   "stock_value": 1890.4,
+   "reorder": false,
+   "reorder_qty": 0
+  },
+  "LAMP-LED": {
+   "on_hand": 42,
+   "backordered": 0,
+   "stock_value": 506.52,
+   "reorder": false,
+   "reorder_qty": 0
+  },
+  "PACK-35": {
+   "on_hand": 152,
+   "backordered": 0,
+   "stock_value": 5846.4,
+   "reorder": false,
+   "reorder_qty": 0
+  },
+  "PACK-65": {
+   "on_hand": 87,
+   "backordered": 0,
+   "stock_value": 8931.9,
+   "reorder": false,
+   "reorder_qty": 0
+  },
+  "BOTTLE-1L": {
+   "on_hand": 0,
+   "backordered": 2,
+   "stock_value": 0,
+   "reorder": true,
+   "reorder_qty": 150
+  },
+  "CHAIR-FLD": {
+   "on_hand": 46,
+   "backordered": 0,
+   "stock_value": 1084.1,
+   "reorder": false,
+   "reorder_qty": 0
+  },
+  "FILTER-H2O": {
+   "on_hand": 0,
+   "backordered": 17,
+   "stock_value": 0,
+   "reorder": true,
+   "reorder_qty": 24
+  }
+ },
+ "exceptions": [
+  [
+   "T0999",
+   "return of a product never sold \u2014 ignored"
+  ],
+  [
+   "T1204",
+   "duplicate transaction id \u2014 ignored"
+  ],
+  [
+   "T1351",
+   "duplicate transaction id \u2014 ignored"
+  ]
+ ],
+ "late_units": 91,
+ "totals": {
+  "revenue": 88221.1,
+  "refunds": 903.0,
+  "cogs": 41940.36,
+  "writeoffs": 522.7,
+  "gross_profit": 44855.04,
+  "opex": 38925.54,
+  "net_profit": 5929.5
+ }
+}
