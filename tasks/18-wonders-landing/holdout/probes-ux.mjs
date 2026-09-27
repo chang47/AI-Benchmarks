@@ -9,11 +9,18 @@ const require = createRequire(import.meta.url);
 
 const cursorState = (page) => page.evaluate(() => {
   const c = document.querySelector("[data-cursor]"); if (!c) return null;
-  const s = getComputedStyle(c), r = c.getBoundingClientRect();
-  const kids = [...c.querySelectorAll("*")].map((e) => `${e.className}|${getComputedStyle(e).opacity}|${e.textContent.trim()}`).join(";");
+  const s = getComputedStyle(c);
+  // The cursor is often a 0×0 positioned wrapper whose children (dot, ring) are what you see — so the visible
+  // cursor is the largest rendered box among the element and its descendants (fixed 2026-09-26: the root-only
+  // check marked real cursors "hidden").
+  const seen = (e) => { const r = e.getBoundingClientRect(); return r.width >= 2 && r.height >= 2 && e.checkVisibility({ opacityProperty: true, visibilityProperty: true }) && (() => { let o = 1; for (let a = e; a && a !== document.documentElement; a = a.parentElement) o *= Number(getComputedStyle(a).opacity); return o > 0.05; })(); };
+  const boxes = [c, ...c.querySelectorAll("*")].filter(seen).map((e) => e.getBoundingClientRect()).sort((a, b) => b.width * b.height - a.width * a.height);
+  const r = boxes[0] || c.getBoundingClientRect();
+  // Children's state for "changes on hover": scale only (translation is just the cursor moving), not position.
+  const sc = (t) => { const m = (t || "").match(/-?[\d.e]+/g); return t && t !== "none" && m ? Math.hypot(Number(m[0]), Number(m[1])).toFixed(2) : "1.00"; };
+  const kids = [...c.querySelectorAll("*")].map((e) => { const k = getComputedStyle(e); return `${e.className}|${Number(k.opacity).toFixed(1)}|${sc(k.transform)}|${k.backgroundColor}|${k.borderColor}|${e.textContent.trim()}`; }).join(";");
   return { cls: c.className, w: Math.round(r.width), h: Math.round(r.height), cx: r.left + r.width / 2, cy: r.top + r.height / 2,
-    t: s.transform, bg: s.backgroundColor, bd: s.borderColor, sh: s.boxShadow, o: s.opacity, kids,
-    shown: s.display !== "none" && s.visibility !== "hidden" && Number(s.opacity) > 0.05 && r.width > 0 };
+    t: s.transform, bg: s.backgroundColor, bd: s.borderColor, sh: s.boxShadow, o: s.opacity, kids, shown: boxes.length > 0 };
 });
 // Scale out of a transform matrix, so "grows on hover" via transform counts.
 const scaleOf = (t) => { const m = (t || "").match(/-?[\d.e]+/g); return t && t !== "none" && m ? Math.hypot(Number(m[0]), Number(m[1])) : 1; };
@@ -176,8 +183,10 @@ export async function probeQuality(page, browser, url, ctx) {
   // axe-core serious + critical, after scrolling through the page so revealed content is in its final state.
   for (let f = 0; f <= 1.001; f += 0.1) { await page.evaluate((f) => scrollTo({ top: (document.scrollingElement.scrollHeight - innerHeight) * f, behavior: "instant" }), f); await wait(page, 250); }
   await scrollToY(page, 0, 800);
+  // preload:false — axe otherwise XHRs every external stylesheet, which is CORS-blocked under file:// and logged a
+  // console error the PAGE was then charged for (L1). Fixed 2026-09-26.
   await page.addScriptTag({ content: readFileSync(require.resolve("axe-core/axe.min.js"), "utf8") });
-  const axe = await page.evaluate(async () => { const r = await window.axe.run(document, { resultTypes: ["violations"] }); return r.violations.filter((v) => ["serious", "critical"].includes(v.impact)).map((v) => `${v.id}(${v.nodes.length})`); });
+  const axe = await page.evaluate(async () => { const r = await window.axe.run(document, { resultTypes: ["violations"], preload: false }); return r.violations.filter((v) => ["serious", "critical"].includes(v.impact)).map((v) => `${v.id}(${v.nodes.length})`); });
   out.push({ id: "Q-axe", group: "Quality & performance", name: "axe-core: serious + critical violations", points: 3, earned: band(-axe.length, [[0, 3], [-2, 2], [-5, 1]]), detail: `${axe.length} rule(s): ${axe.join(", ") || "none"}` });
 
   // CLS over the first 3 s of a fresh load, no input.

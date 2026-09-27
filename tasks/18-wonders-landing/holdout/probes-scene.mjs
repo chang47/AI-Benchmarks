@@ -77,9 +77,9 @@ export async function probeScenes(page, ctx) {
   for (const [scene, sec] of Object.entries(SCENES)) {
     await showSection(page, sec, 1200);
     const a = await activity(page, 1000);
-    const pass = a.changed >= 0.005 && a.sd > 4;
+    const pass = a.changed >= 0.0015 && a.sd > 4; // 0.15%: a sparse meteor sky moves few pixels (Opus 5.5: 0.49%, clearly animating); frozen ≈ 0
     out.push({ id: `S-${scene}`, group: "Scenes animate", name: `${scene} scene animates while visible`, points: 2, earned: pass ? 2 : 0,
-      detail: `${(a.changed * 100).toFixed(2)}% of pixels changed in 1 s (need >= 0.5%), mean Δ ${a.mean.toFixed(2)}, image spread ${a.sd.toFixed(1)}` });
+      detail: `${(a.changed * 100).toFixed(2)}% of pixels changed in 1 s (need >= 0.15%), mean Δ ${a.mean.toFixed(2)}, image spread ${a.sd.toFixed(1)}` });
   }
 
   // Galaxy reacts to the mouse: pixel change while the mouse sweeps vs. while it is parked.

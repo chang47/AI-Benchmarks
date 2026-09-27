@@ -1,4 +1,26 @@
-# HANDOFF — ai-benchmark ("Vetted Bench") — 2026-09-26
+# HANDOFF — ai-benchmark ("Vetted Bench")
+
+## UPDATE 2026-09-27 — task 18 pilot graded (read this first; older notes below)
+- **Grader built + frozen:** `tasks/18-wonders-landing/holdout/grade-wonders.mjs` (82 pts = 74 scripted + 8 yes/no judge).
+  Reference = 74/74 scripted. Tamper-checked by `holdout/FREEZE_MANIFEST.json`; each result records `graderManifestSha256`.
+  Grader fixes found by grading real runs (all 7 regraded on the fixed grader): axe `preload:false` (its CSS XHR was a
+  false console error), cursor = largest visible box among `[data-cursor]` + descendants (0×0 wrappers), meteors bar 0.15%.
+- **Results (committed, scores only):** `reports/results/18-wonders-landing.md` — regenerate with `node bench/export-results.mjs 18`.
+  Sonnet 5 78 · Opus 5.5 75 · pi/GLM 73 · Opus 4.8 72 · claude-glm 72 · Codex 72 · Haiku 35 (claimed done).
+  pi/gpt-6-astra + pi/Sonnet 5 re-running (their first attempts were killed by the low-memory reaper → `runs/_aborted/`).
+- **Josh's read (2026-09-27):** Opus 5.5's page is visibly better art than Sonnet's, yet scores lower. The checklist measures
+  "does it work" and saturates at 72–78 for capable models. Decision: keep the checklist as the functional bar; show craft by
+  demo (side-by-side scroll recordings) + optional blind A/B pick by Josh — no craft score.
+- **Mutation suite** (`bench/checks/mutations-18.mjs`): frozen-volcano PASS; broken-pin/never-pause/no-cursor hit their targets
+  but S-mouse flaked (since recalibrated); remaining 5 mutations never ran (memory kill). Re-run it.
+- **Queued (agreed, not started) — one grader bump, then regrade all together:**
+  1. legibility decode fix (patched copy in the session scratchpad; decode each screenshot once in Node → ~3 min → ~1 min),
+  2. carousel I-next race (read the slide index right before the click),
+  3. judge meteors from 3 moments, 4. show scripted vs judge points separately,
+  5. unscored code-read "why it failed" notes on run pages, 6. scroll-recording MP4s + blind A/B page for the video.
+- **Memory:** run ONE thing at a time (3 parallel agents + grading Chrome got both jobs reaped). Grading 18 does not grab the mouse.
+
+## 2026-09-26 notes
 
 ## Task & Scope
 - Josh is building a benchmark platform for his YouTube channel ("a software engineer who builds real things with AI, honestly"; thesis: *the harness outlives the model*). The repo has frozen tasks and a harness (`bench/`) that runs task × harness × model on his **subscriptions only** (Claude Max, Codex $20, GLM, pi), grades against frozen answer keys, and renders a static HTML report.

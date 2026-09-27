@@ -81,6 +81,8 @@ export async function gradeRun(runDir, { judge = true, log = console.log } = {})
 
   const tc = tamperCheck(join(taskDir(slug), cfg.grader.cwd || "holdout"));
   result.tamperCheck = tc.ok ? "ok" : `TAMPER: ${tc.detail}`;
+  // Which frozen answer key graded this (scores are only comparable within one manifest).
+  result.graderManifestSha256 = tc.ok ? sha256File(join(taskDir(slug), cfg.grader.cwd || "holdout", "FREEZE_MANIFEST.json")) : null;
   if (!tc.ok) {
     result.status = "tamper";
     writeJson(join(runDir, "result.json"), result);
