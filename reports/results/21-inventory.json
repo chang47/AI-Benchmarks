@@ -1,0 +1,60 @@
+{
+ "task": "21-inventory",
+ "exportedAt": "2026-09-27T19:56:33.656Z",
+ "runs": [
+  {
+   "runId": "20260927-101755-21-claude-opus55-d7a2",
+   "harness": "claude",
+   "model": "claude-opus-5-5",
+   "profile": "clean-room",
+   "startedAt": "2026-09-27T17:17:56.031Z",
+   "status": "ok",
+   "promptSha256": "513a9f7db5fdc75a8c070787e6d4b07c3ba2726fd20e36a2e8d322db477a9565",
+   "durationMin": 7.4,
+   "outputTokens": 30878,
+   "graded": true,
+   "graderManifest": "1b86d3933f02",
+   "points": 45,
+   "possible": 45,
+   "score": 1,
+   "scripted": "45/45",
+   "groups": {
+    "Deliverable": "6/6",
+    "P&L (this quarter)": "14/14",
+    "Stock (this quarter)": "9/9",
+    "Exceptions": "3/3",
+    "Live test (hidden log)": "13/13"
+   },
+   "claim": "hedged",
+   "falseDone": false,
+   "lost": []
+  },
+  {
+   "runId": "20260927-102518-21-claude-glm-glm53-49e1",
+   "harness": "claude-glm",
+   "model": "glm-5.3",
+   "profile": "clean-room",
+   "startedAt": "2026-09-27T17:25:18.471Z",
+   "status": "ok",
+   "promptSha256": "513a9f7db5fdc75a8c070787e6d4b07c3ba2726fd20e36a2e8d322db477a9565",
+   "durationMin": 35.9,
+   "outputTokens": 85780,
+   "graded": true,
+   "graderManifest": "1b86d3933f02",
+   "points": 45,
+   "possible": 45,
+   "score": 1,
+   "scripted": "45/45",
+   "groups": {
+    "Deliverable": "6/6",
+    "P&L (this quarter)": "14/14",
+    "Stock (this quarter)": "9/9",
+    "Exceptions": "3/3",
+    "Live test (hidden log)": "13/13"
+   },
+   "claim": "claimed",
+   "falseDone": false,
+   "lost": []
+  }
+ ]
+}

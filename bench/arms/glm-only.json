@@ -1,0 +1,6 @@
+{
+  "description": "Re-run of task 20 at the 120-min limit (2026-09-27): only claude-glm timed out at 60 min; pi/GLM finished in 51 min, so it is not re-run.",
+  "arms": [
+    { "harness": "claude-glm", "model": "glm-5.3" }
+  ]
+}

@@ -1,5 +1,17 @@
 # HANDOFF — ai-benchmark ("Vetted Bench")
 
+## ▶ CHECKPOINT 2026-09-27 (afternoon) — read this first
+**Focus changed (Josh):** only **Opus 5.5 vs GLM-5.3** from now on — no Haiku / Sonnet. Arms: `bench/arms/glm-vs-opus.json`.
+**Results (committed, `reports/results/20-cannae.md` / `21-inventory.md`):**
+- 21 spreadsheet: Opus 5.5 45/45 (7 min) · claude-glm 45/45 (36 min) — saturates; separates only on speed.
+- 20 Cannae: Opus 5.5 60/65 (34 min) · claude-glm 60/65 given 120 min (81 min) · claude-glm 56/65 when cut at 60 min.
+  pi/GLM finished Cannae in 51 min (same model, claude-glm timed out) — ungraded (Josh: ignore pi). Opus 4.8 ungraded.
+- `timeoutMin` raised 60→120 for tasks 20/21 (GLM is slow, not stuck). Laptop sleep killed a run overnight — keep awake.
+**Next:** task 22 "Broken Tabletop" — a 5E-compatible virtual tabletop repo with planted bugs (Variant A: vague complaints
++ bonus for unreported bugs; Variant B: brainstorm + build features). Goal brief `design/2026-09-27-vtt-goal-brief.md`;
+Josh is running his multi-model spec council on it. Research: `research/vtt-2026-09/` (the features/dice file is kept OUT of
+the council's inputs on purpose — use it to cross-check their spec). Task 19 (clone page) is DROPPED.
+
 ## ▶ CHECKPOINT 2026-09-27 (evening) — read this first
 **Running in the background (check before anything else):**
 - Task 20 Cannae pilot, 9 arms serially: `.bench-cache/logs/pilot20.log` (runs first, grades all at the end).
