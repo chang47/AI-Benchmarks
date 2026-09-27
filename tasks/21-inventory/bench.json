@@ -2,7 +2,7 @@
   "artifacts": ["src/pips-q3-report.xlsx"],
   "artifactDirs": ["src"],
   "extractFromFinal": false,
-  "timeoutMin": 60,
+  "timeoutMin": 120,
   "grader": { "kind": "node-script", "cwd": "holdout", "script": "grade-inventory.mjs", "parse": "points", "timeoutMin": 15 },
   "judgeItems": []
 }

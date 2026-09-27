@@ -136,7 +136,10 @@ export function redact(text) {
   for (const h of homeVariants) t = t.split(h).join("~");
   // Windows path fragments that sneak through with other casings/escapings
   // Any escaping depth: a path inside a command inside JSON inside JSON can carry 8+ backslashes.
-  t = t.replace(new RegExp(`([A-Za-z]:)?(\\\\+|/)Users(\\\\+|/)${esc(USER)}`, "gi"), "~");
+  // Separators may also be URL-encoded (%5C / %2F): GLM's upload URLs embed the local screenshot path.
+  const sep = "(?:\\\\+|/|%5C|%2F)+";
+  t = t.replace(new RegExp(`([A-Za-z]:|[A-Za-z]%3A)?${sep}Users${sep}${esc(USER)}`, "gi"), "~");
+  t = t.replace(new RegExp(`(%5C|%2F)${esc(USER)}(?=%5C|%2F|\\b)`, "gi"), "$1user");
   // Bare username anywhere else (e.g. a whoami, a git author, a path fragment the agent printed).
   t = t.replace(new RegExp(`\\b${esc(USER)}\\b`, "gi"), "user");
   for (const term of extraTerms) t = t.replace(new RegExp(esc(term), "gi"), "[redacted]");

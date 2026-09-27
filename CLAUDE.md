@@ -67,3 +67,11 @@ tool-call counts page==steps==raw, browser render clean at 1440/390, no path lea
   `npx wrangler deploy --config deploy/wonders/wrangler.jsonc` (Workers static assets; `wrangler pages`
   now delegates to Workers and fails for a plain static folder). Only the reference page (`src/`) is
   public. Never deploy run data: `runs/` holds absolute local paths.
+
+## Gotchas (learned 2026-09-27)
+- GLM-5.3 is ~2x slower wall-clock than Opus 5.5 (endpoint latency); tasks 20/21 use `timeoutMin: 120`. A run killed by
+  the time limit gets no "false done" verdict (its last message is mid-work).
+- GLM's endpoint uploads screenshots and returns URLs with the local path URL-encoded (`C:%5CUsers%5C<user>`); the
+  redactor handles `%5C` / `%2F` separators — C5 catches regressions.
+- The laptop sleeps overnight and a sleeping run is logged as a timeout — hold ES_SYSTEM_REQUIRED while `bench/cli.mjs` runs.
+

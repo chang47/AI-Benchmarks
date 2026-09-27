@@ -1,0 +1,8 @@
+{
+  "description": "Head-to-head (2026-09-27): Opus 5.5 vs GLM-5.3, GLM in both its home harness (claude-glm) and pi. Subscriptions only.",
+  "arms": [
+    { "harness": "claude", "model": "claude-opus-5-5" },
+    { "harness": "claude-glm", "model": "glm-5.3" },
+    { "harness": "pi", "model": "zai/glm-5.3" }
+  ]
+}
