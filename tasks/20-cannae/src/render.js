@@ -117,8 +117,15 @@
 
     const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), V = new THREE.Vector3(), S = new THREE.Vector3(1, 1, 1), E = new THREE.Euler(), C = new THREE.Color();
     const counts = {};
+    // Per-figure smoothing of the figure's offset from its unit's centre: formation changes (line <-> column, swirl ->
+    // ranks, a grid gaining a column) ease over ~0.4 s instead of teleporting riders. Unit positions stay exact.
+    const ease = new Map();
+    let lastT = null, lastClock = null;
 
     function update(state, clock) {
+      const scrub = lastT == null || Math.abs(state.t - lastT) > 25 || state.t < lastT; // a scrub or a jump: snap
+      const k = scrub ? 1 : Math.min(1, (clock - lastClock) * 5);
+      lastT = state.t; lastClock = clock;
       let ni = 0, nc = 0, nf = 0;
       for (const k in counts) delete counts[k];
       const routT = {};
@@ -131,6 +138,7 @@
         const cols = Math.max(1, Math.round(u.w / sp)), rows = Math.max(1, Math.ceil(n / cols));
         const f = [Math.sin(u.h), Math.cos(u.h)], r = [Math.cos(u.h), -Math.sin(u.h)], rot = Math.PI - u.h, hid = idHash(u.id);
         const ot = u.order?.type ?? u.order; // live sim state holds order objects; snapshots hold the type string
+        const rally = u.order?.prev === "pursue" ? Math.max(0, 1 - (state.t - u.order.since) / 25) : 0; // 1 → 0 over 25 s of battle
         const routing = u.status === "routing", fighting = u.status === "engaged", moving = !fighting && !["hold", "ambush", "holdLine", "giveGround"].includes(ot);
         C.setHex(PALETTE[u.contingent] || 0xffffff);
         for (let i = 0; i < n; i++) {
@@ -148,10 +156,10 @@
           } else if (ot === "harass") { // Numidians: riders dart in and out individually
             const dart = Math.sin(clock * 1.1 + ph) * 28;
             x += f[0] * dart + r[0] * Math.sin(clock * 0.7 + ph * 2) * 10; y += f[1] * dart + r[1] * Math.sin(clock * 0.7 + ph * 2) * 10; turn = Math.cos(clock * 1.1 + ph) > 0 ? 0 : Math.PI;
-          } else if (cav && (fighting || ot === "pursue")) { // melee / pursuit: the rows break up, riders circle, surge and mix
-            const rad = ot === "pursue" ? 14 + rnd * 30 : 6 + rnd * 10;
+          } else if (cav && (fighting || ot === "pursue" || rally > 0)) { // melee / pursuit: the rows break up, riders circle, surge and mix
+            const rad = (ot === "pursue" || rally > 0 ? 14 + rnd * 30 : 6 + rnd * 10) * (rally > 0 && ot !== "pursue" ? rally : 1); // after a pursuit the swirl fades as they rally
             x += Math.cos(clock * 1.7 + ph) * rad + f[0] * rnd * 25; y += Math.sin(clock * 2.1 + ph) * rad + f[1] * rnd * 25; turn = Math.sin(clock * 1.3 + ph) * 1.1;
-          } else if (cav && (ot === "charge" || ot === "path")) { // on the move: a loose, strung-out mass, riders surging and drifting
+          } else if (cav && (ot === "charge" || ot === "path" || ot === "chaseOff")) { // on the move: a loose, strung-out mass, riders surging and drifting
             const rnd2 = hash(hid + 13, i);
             x += f[0] * ((rnd2 - 0.5) * sp * 2.2 + Math.sin(clock * 0.9 + ph) * 12) + r[0] * (rnd - 0.5) * sp * 1.8;
             y += f[1] * ((rnd2 - 0.5) * sp * 2.2 + Math.sin(clock * 0.9 + ph) * 12) + r[1] * (rnd - 0.5) * sp * 1.8;
@@ -160,6 +168,9 @@
           const bob = routing ? Math.abs(Math.sin(clock * 11 + ph)) * 1.4 : moving ? Math.abs(Math.sin(clock * 8 + ph)) * 0.9 : fighting ? Math.abs(Math.sin(clock * 13 + ph)) * 0.7 : 0.05 * Math.sin(clock + ph);
           const lunge = fighting ? Math.sin(clock * 6.5 + ph) * 1.2 : 0;
           x += f[0] * lunge; y += f[1] * lunge;
+          const key = `${u.id}:${i}`, ox = x - u.x, oy = y - u.y, prev = ease.get(key);
+          const ex = prev && !scrub ? prev[0] + (ox - prev[0]) * k : ox, ey = prev && !scrub ? prev[1] + (oy - prev[1]) * k : oy;
+          ease.set(key, [ex, ey]); x = u.x + ex; y = u.y + ey;
           const X = x, Z = -y, Yb = terrainHeight(X, Z) + bob;
           E.set(0, rot + (routing ? Math.PI : 0) + turn + (hash(i, hid + 9) - 0.5) * 0.3, 0); Q.setFromEuler(E);
           M.compose(V.set(X, Yb, Z), Q, S);
