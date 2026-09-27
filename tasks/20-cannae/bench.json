@@ -1,0 +1,9 @@
+{
+  "artifacts": ["src/index.html"],
+  "artifactDirs": ["src"],
+  "extractFromFinal": false,
+  "timeoutMin": 60,
+  "grader": { "kind": "node-script", "cwd": "holdout", "script": "grade-cannae.mjs", "parse": "points", "timeoutMin": 10 },
+  "judgeItems": "checklist",
+  "judgeQuestions": "holdout/judge-questions.json"
+}

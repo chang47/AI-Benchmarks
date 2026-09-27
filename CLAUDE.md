@@ -46,6 +46,14 @@ tool-call counts page==steps==raw, browser render clean at 1440/390, no path lea
 - `node bench/checks/mutations-18.mjs [names]` = probe validation (~1 h). Mutation anchors must survive CRLF sources.
 - Memory: 3 parallel agent runs + a grading Chrome got both jobs killed by Claude Code's low-memory reaper. Run 18 serially.
 
+## Task 20 Cannae (added 2026-09-27)
+- Reference `tasks/20-cannae/src/` (deterministic sim `sim.js` + Three.js `render.js`); a WOW showcase — Josh accepted
+  its remaining visual rough spots. Headless: `node tasks/20-cannae/research/run-sim.mjs`.
+- Grader `holdout/grade-cannae.mjs` samples `__cannae.seek/state` every 10 s and scores rules + history on the states;
+  judge frames are zoomed with the mouse wheel (the prompt requires wheel zoom). Reference 64/65.
+- Determinism is tested across two FRESH page loads at an off-grid time (t=1473): a page that caches checkpoints
+  returns identical states for repeated seeks even when its sim is random.
+
 ## Public showcase
 - Task 18 reference page → https://wonders-of-the-universe.iamjoshchang.workers.dev. Redeploy with
   `npx wrangler deploy --config deploy/wonders/wrangler.jsonc` (Workers static assets; `wrangler pages`

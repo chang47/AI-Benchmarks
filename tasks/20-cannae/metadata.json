@@ -1,0 +1,11 @@
+{
+  "slug": "20-cannae",
+  "type": "visual",
+  "difficulty": "hard",
+  "status": "candidate",
+  "created": "2026-09-27",
+  "theme": "Cannae, 216 BC — a rule-based Three.js battle simulation where the historical encirclement must EMERGE from unit rules and a fixed order script (the 'game equivalent' task)",
+  "authorities": ["Polybius 3.107-118", "Livy 22.44-52", "Goldsworthy, Cannae (research/RESEARCH.md)"],
+  "contamination": "low — original deployment table, rules and test contract written for this bench on 2026-09-27",
+  "grading": "points checklist (65 pts: 60 scripted from state() samples every 10 s — contract, order of battle, determinism, rule compliance, 10 historical beats, rendering — plus 5 yes/no judge questions). holdout/grade-cannae.mjs (frozen). Reference 64/65; 8/8 mutations caught (bench/checks/mutations-20.mjs)."
+}

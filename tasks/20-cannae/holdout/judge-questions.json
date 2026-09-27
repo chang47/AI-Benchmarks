@@ -1,0 +1,10 @@
+{
+  "instructions": "You are looking at still frames of a web page that re-enacts the Battle of Cannae (216 BC) as a cartoon 3D battlefield. Answer each question with yes or no, judging ONLY what the named frames show. Answer yes only when the frames clearly show it. Do not rate overall quality.",
+  "questions": [
+    { "id": "J1", "q": "Do these frames show a 3D battlefield with many small cartoon soldier figures standing in formations (not just flat coloured rectangles or dots)?", "frames": ["c-mid.png"] },
+    { "id": "J2", "q": "Can the two armies be told apart by colour, with the Romans shown in red?", "frames": ["f-start.png"] },
+    { "id": "J3", "q": "In this late-battle frame, is the red (Roman) force visibly surrounded or hemmed in by the other army on several sides?", "frames": ["f-end.png"] },
+    { "id": "J4", "q": "Is there a recognizable landscape: ground terrain and a river running along one side of the field?", "frames": ["f-start.png", "f-mid.png"] },
+    { "id": "J5", "q": "At phone width, are the controls and text readable, fitting the screen without overlapping each other?", "frames": ["m-mid.png"] }
+  ]
+}

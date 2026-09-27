@@ -1,0 +1,18 @@
+{
+  "frozen_at": "2026-09-27T05:22:56.841Z",
+  "algorithm": "sha256",
+  "excludes": [
+    "node_modules",
+    "package-lock.json",
+    "frames",
+    "FREEZE_MANIFEST.json (self)"
+  ],
+  "files": {
+    "grade-cannae.mjs": "a25a59687240150cb0d82456ba4a296068d6344bc0578a59ddc02ba2c0783a13",
+    "probes-history.mjs": "9d61d8cd89215dd6f26293c50fd8a274e36ee33365adefaeb0af41d35f3eca57",
+    "lib/geo.mjs": "3415618738ee64abda55ab3dccbe7909ec9e2bedcd185177ca0a40db987ff0c3",
+    "lib/pix.mjs": "6aea646282438903853b2bf86107f2f27768caeec8b102a397e2e948f912cfa8",
+    "judge-questions.json": "ade038e89f2aa8618971d843659509805b06a12ad215a4fef3e54abe900b7de7",
+    "package.json": "e79d549ef3637fcc31fcb74b4278cfc747b919b8d6865dfee9a0036a034baba6"
+  }
+}
