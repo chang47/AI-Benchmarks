@@ -29,6 +29,7 @@
     pressure: [0.7, 1.4],    // CAVALRY kill multiplier = sqrt(attacker men-per-metre-of-front ÷ defender's), clamped: weight of horse tells
     sideShare: 0.25,         // a side counts as engaged (for flank/encircled/compressed status) when >= 25% of its length is in contact
     harassPeriod: 40,
+    columnWidth: 60,         // m: cavalry riding a route (not charging) moves as a column this wide
     endsPressIn: 80,         // m: once the trap closes, the crescent's ends may advance this far to keep contact
     pursueSeconds: 40,       // s: Hasdrubal's horse rides into the broken allied cavalry before re-forming
     squadronMinWidth: 40,    // m: a squadron never narrows below this, even on a crushed block        // s: Numidians ride in and out on this cycle
@@ -241,11 +242,12 @@
         if (!tg || !alive(tg) || tg.status === "routing") { setOrder(s, u, { type: "hold" }); continue; }
         const [cx, cy] = o.at === "rear" ? [tg.x - fwd(tg.h)[0] * (tg.d / 2 + u.d / 2), tg.y - fwd(tg.h)[1] * (tg.d / 2 + u.d / 2)] : [tg.x, tg.y];
         moveToward(s, u, cx, cy, S[o.speed || "cavCharge"]);
-      } else if (o.type === "path") { // follow waypoints, then take the next order
+      } else if (o.type === "path") { // follow waypoints, then take the next order (cavalry rides it in column)
+        if (u.id === "C-cav") march(u);
         const wp = o.points[o.i || 0];
         if (moveToward(s, u, wp[0], wp[1], S[o.speed || "cavTrot"], { stopAtContact: false })) {
           o.i = (o.i || 0) + 1;
-          if (o.i >= o.points.length) setOrder(s, u, o.then);
+          if (o.i >= o.points.length) { deploy(u); setOrder(s, u, o.then); }
         }
       } else if (o.type === "harass") { // Numidians: hover 40 m off the target's front, pinning it
         const tg = s.byId[o.target];
@@ -257,8 +259,13 @@
         moveToward(s, u, gx, gy, S.numidian, { turn: false }); turnTo(u, Math.atan2(tg.x - u.x, tg.y - u.y));
       } else if (o.type === "pursue") {
         const tg = s.byId[o.target];
-        if (!tg || !alive(tg)) { setOrder(s, u, { type: "hold" }); continue; }
+        if (!tg || !alive(tg)) { // target gone: light horse chase the fugitives off the field; others stand
+          setOrder(s, u, u.contingent === "numidian" ? { type: "chaseOff" } : { type: "hold" }); continue;
+        }
         moveToward(s, u, tg.x, tg.y, S.numidian, { stopAtContact: false });
+      } else if (o.type === "chaseOff") { // ride north after the fugitives until off the map
+        turnTo(u, 0); u.y += S.numidian * RULES.dt;
+        if (u.y > 1300) { u.status = "left"; ev(s, "left", u.id, { men: Math.round(u.men) }); }
       } else if (o.type === "advance") { // Roman infantry: push south; stop while flanked; drift toward a yielding enemy
         if (flankAttacked(s, u) || u.compressed || s.flags.trapClosing) continue; // flanked or trapped men do not march; once the ring closes they fight where they stand
         const f = fwd(u.h);
@@ -280,7 +287,8 @@
           if (!blocked(s, u, mx, my) && !blockedByFriend(s, u, mx, my)) { u.x += mx; u.y += my; }
         }
       } else if (o.type === "holdLine") { // ends of the crescent: stand; once the trap closes, press forward (≤ RULES.endsPressIn) into contact
-        if (s.flags.trapClosing && fwd(u.h)[1] * (u.y - u.y0) < RULES.endsPressIn) {
+        const f0 = fwd(u.h), foeAhead = s.units.some((e) => e.side !== u.side && alive(e) && e.kind === "inf" && distToRect(u.x + f0[0] * (u.d / 2 + 30), u.y + f0[1] * (u.d / 2 + 30), e) < 40);
+        if (s.flags.trapClosing && foeAhead && fwd(u.h)[1] * (u.y - u.y0) < RULES.endsPressIn) { // only press toward an enemy actually in front
           const f = fwd(u.h), mx = f[0] * S.giveGround * RULES.dt, my = f[1] * S.giveGround * RULES.dt;
           if (!blocked(s, u, mx, my) && !blockedByFriend(s, u, mx, my)) { u.x += mx; u.y += my; }
         }
@@ -298,11 +306,12 @@
         const st = Math.min(dist, sp * RULES.dt), mx = (dx / dist) * st, my = (dy / dist) * st;
         const friend = blockedByFriend(s, u, mx, my);
         if (!friend && !blocked(s, u, mx, my)) { u.x += mx; u.y += my; o.detour = null; }
-        else if (friend) { // detour: step clear of the friendly unit (away from it along the other axis), then carry on
+        else if (friend && !o.contacted) { // before first contact: detour round the friendly unit; afterwards hold — they are part of the ring
           const sx = Math.abs(dx) >= Math.abs(dy), st2 = sp * RULES.dt;
           o.detour = o.detour || (sx ? [0, Math.sign(u.y - friend.y) || 1] : [Math.sign(u.x - friend.x) || 1, 0]); // pick a side once
           const ddx = o.detour[0] * st2, ddy = o.detour[1] * st2;
           if (!blockedByFriend(s, u, ddx, ddy) && !blocked(s, u, ddx, ddy)) { u.x += ddx; u.y += ddy; }
+          else o.detour = [-o.detour[0], -o.detour[1]]; // that side is blocked too: go round the other way
         }
       }
     }
@@ -315,7 +324,10 @@
       const outerSide = u.x < mid ? "right" : "left"; // Romans face south: their right is west
       if (!inner || flankAttacked(s, u) && u.engagedSides.includes(outerSide)) continue;
       const gap = Math.abs(inner.x - u.x) - (inner.w + u.w) / 2;
-      if (gap > 1) { const dx = Math.sign(inner.x - u.x) * Math.min(gap - 1, RULES.closeRanks * RULES.dt); u.x += dx; }
+      if (gap > 1) {
+        const dx = Math.sign(inner.x - u.x) * Math.min(gap - 1, RULES.closeRanks * RULES.dt), g = { x: u.x + dx, y: u.y, w: u.w, d: u.d, h: u.h };
+        if (!s.units.some((e) => e.side !== u.side && alive(e) && e.kind !== "light" && rectsOverlap(g, e, 0.5))) u.x += dx; // never slide onto an enemy
+      }
     }
 
     // Event-driven orders (the "commanders"): Hasdrubal's ride around the Roman army, the wait, then the rear attack.
@@ -375,6 +387,9 @@
     return Math.min(RULES.pressure[1], Math.max(RULES.pressure[0], r));
   }
   function dens(u) { return RULES.density[u.kind === "inf" ? u.contingent : u.kind]; }
+  /** Cavalry marches in a narrow column and deploys into a wide line when it halts. */
+  function march(u) { if (u.kind === "cav" && !u.column) { u.lineW = u.w; u.column = true; reform(u, RULES.columnWidth); } }
+  function deploy(u) { if (u.column) { u.column = false; reform(u, u.lineW || u.w); } }
   function reform(u, w) { u.w = w; u.d = Math.max(RULES.minDepth[u.kind], u.men / (u.w * dens(u))); }
 
   function combat(s) {
