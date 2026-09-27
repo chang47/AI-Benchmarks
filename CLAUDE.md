@@ -74,4 +74,9 @@ tool-call counts page==steps==raw, browser render clean at 1440/390, no path lea
 - GLM's endpoint uploads screenshots and returns URLs with the local path URL-encoded (`C:%5CUsers%5C<user>`); the
   redactor handles `%5C` / `%2F` separators — C5 catches regressions.
 - The laptop sleeps overnight and a sleeping run is logged as a timeout — hold ES_SYSTEM_REQUIRED while `bench/cli.mjs` runs.
+- **Task 22's answer key is private** (spec v3 §1 A8): `design/2026-09-27-task22-*` and `tasks/22*/` are gitignored.
+  Backup copies live in `~/Projects/ai-benchmark-private/task22/`. Never commit them until the round-1 runs are done.
+- **`git rm --cached` + `.gitignore` + switching branches DELETES the file from disk.** Checking out a branch that still
+  tracks the file overwrites it (git treats ignored files as expendable), and merging the untracking commit then removes
+  it. Copy the file somewhere outside the repo first. (Lost the uncommitted spec v3 edits this way once; re-applied.)
 

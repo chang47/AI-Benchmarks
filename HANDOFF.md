@@ -9,7 +9,9 @@
 - `timeoutMin` raised 60→120 for tasks 20/21 (GLM is slow, not stuck). Laptop sleep killed a run overnight — keep awake.
 **Next:** task 22 "Broken Tabletop" — a 5E-compatible virtual tabletop repo with planted bugs (Variant A: vague complaints
 + bonus for unreported bugs; Variant B: brainstorm + build features). Goal brief `design/2026-09-27-vtt-goal-brief.md`;
-Josh is running his multi-model spec council on it. Research: `research/vtt-2026-09/` (the features/dice file is kept OUT of
+Council spec done → reviewed → **spec v3** applied (Funnel/tickets/export cut, decoys, visual bar, GLM calibration).
+Spec + holdout are PRIVATE (gitignored; backup `~/Projects/ai-benchmark-private/task22/`). OPEN: v2 is in public git
+history (OQ-7 — Josh to decide: repo private / rename product / change bugs / accept). Research: `research/vtt-2026-09/` (the features/dice file is kept OUT of
 the council's inputs on purpose — use it to cross-check their spec). Task 19 (clone page) is DROPPED.
 
 ## ▶ CHECKPOINT 2026-09-27 (evening) — read this first
