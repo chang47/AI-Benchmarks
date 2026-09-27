@@ -1,5 +1,17 @@
 # HANDOFF — ai-benchmark ("Vetted Bench")
 
+## UPDATE 2026-09-27 (later) — task 20 "Cannae" built as a showcase
+- `tasks/20-cannae/src/` = reference page: deterministic rule-based battle sim (`sim.js`, units = rectangles, 1 s step,
+  fixed order script + event-driven "commanders") + Three.js cartoon renderer (`render.js`, 1 figure = 20 men) + HUD
+  (`app.js`) + checkpointed scrub runner (`battle.js`). Test hook `window.__cannae` (seek/state/play/figures/view/_cam).
+  Research brief: `research/RESEARCH.md`; headless dev runner: `node tasks/20-cannae/research/run-sim.mjs`.
+- History emerges: river cavalry routs -> Hasdrubal rides round -> allied horse breaks -> crescent bends concave ->
+  Libyans turn -> squadrons hit the rear -> pocket contracts. ~51k Roman / ~5.8k Carthaginian dead (sources 45-70k / 5.7-8k).
+- Josh (2026-09-27): "some regressions but good enough — this is more of a wow showcase". Not frozen, no grader, no
+  frozen prompt yet. Verify visually with a 30x playback frame-strip (watch.mjs/strip.py pattern in .bench-cache/cannae).
+- Lesson: every emergent-behaviour bug was geometry (corner contacts, shrinking breaking contact, sliding onto
+  enemies, no friendly collision, snap re-forms), found only by WATCHING playback, not by the numbers.
+
 ## UPDATE 2026-09-27 — task 18 pilot graded (read this first; older notes below)
 - **Grader built + frozen:** `tasks/18-wonders-landing/holdout/grade-wonders.mjs` (82 pts = 74 scripted + 8 yes/no judge).
   Reference = 74/74 scripted. Tamper-checked by `holdout/FREEZE_MANIFEST.json`; each result records `graderManifestSha256`.
