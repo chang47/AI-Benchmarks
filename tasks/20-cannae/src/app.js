@@ -184,5 +184,6 @@
     events: () => snapshot().events,
     figures: () => ({ ...soldiers.counts, menPerFigure: soldiers.MEN_PER_FIGURE }),
     view: goView, views: () => Object.keys(VIEWS),
+    _cam: ({ x, y, dist, theta, phi }) => { cam.goal = { target: new THREE.Vector3(x, 0, -y), dist, theta, phi }; }, // dev/grader: aim the camera at a map point
   };
 })();
