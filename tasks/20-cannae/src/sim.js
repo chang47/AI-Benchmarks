@@ -21,7 +21,7 @@
     rangedRange: 70,
     density: { roman: 0.4, alliedInf: 0.4, gaul: 1.2, spaniard: 1.2, libyan: 1.0, cav: 0.35, light: 0.8 }, // men per m^2 — depth = men / (frontage × density); the Roman maniples stood ~50-70 ranks deep
     minDepth: { inf: 6, cav: 6, light: 4 },
-    speed: { advance: 1.0, giveGround: 0.45, libyan: 1.1, cavTrot: 4, cavCharge: 5, numidian: 6, light: 1.5, rout: 4, turnDegPerSec: 4.5 },
+    speed: { press: 0.5, advance: 1.0, giveGround: 0.45, libyan: 1.1, cavTrot: 4, cavCharge: 5, numidian: 6, light: 1.5, rout: 4, turnDegPerSec: 4.5 },
     cavRoutMorale: 0.35,     // cavalry routs when morale falls below this, or instantly when charged in the rear
     moraleLossPerCasualtyFrac: 1.6, // morale -= this × (fraction of the unit's starting men lost)
     libyanTriggerConcave: 30, // Libyans turn inward once the crescent's centre has fallen 30 m behind its ends (Hannibal's signal)
@@ -260,7 +260,7 @@
         if (!tg || !alive(tg)) { setOrder(s, u, { type: "hold" }); continue; }
         moveToward(s, u, tg.x, tg.y, S.numidian, { stopAtContact: false });
       } else if (o.type === "advance") { // Roman infantry: push south; stop while flanked; drift toward a yielding enemy
-        if (flankAttacked(s, u)) continue;
+        if (flankAttacked(s, u) || u.compressed || s.flags.trapClosing) continue; // flanked or trapped men do not march; once the ring closes they fight where they stand
         const f = fwd(u.h);
         // Cohesion: a block never gets more than RULES.cohesion ahead of an adjacent block's front.
         // Cohesion: never more than RULES.cohesion ahead of an adjacent surviving block (the line bends, it does not break).
@@ -275,12 +275,12 @@
         u.moving = pressed && back < RULES.maxGiveGround;
         const f = fwd(u.h);
         if (u.moving) { u.x -= f[0] * S.giveGround * RULES.dt; u.y -= f[1] * S.giveGround * RULES.dt; }
-        else if (!u.engagedSides.includes("front") && s.flags.trapClosing && fwd(u.h)[1] * (u.y0 - u.y) > 0) { // the ring contracts: step back into contact, never past the start line
+        else if (s.flags.trapClosing && fwd(u.h)[1] * (u.y0 - u.y) > 0) { // the ring contracts: press right up to the enemy, never past the start line
           const mx = f[0] * S.giveGround * RULES.dt, my = f[1] * S.giveGround * RULES.dt;
           if (!blocked(s, u, mx, my) && !blockedByFriend(s, u, mx, my)) { u.x += mx; u.y += my; }
         }
       } else if (o.type === "holdLine") { // ends of the crescent: stand; once the trap closes, press forward (≤ RULES.endsPressIn) into contact
-        if (!u.engagedSides.includes("front") && s.flags.trapClosing && fwd(u.h)[1] * (u.y - u.y0) < RULES.endsPressIn) {
+        if (s.flags.trapClosing && fwd(u.h)[1] * (u.y - u.y0) < RULES.endsPressIn) {
           const f = fwd(u.h), mx = f[0] * S.giveGround * RULES.dt, my = f[1] * S.giveGround * RULES.dt;
           if (!blocked(s, u, mx, my) && !blockedByFriend(s, u, mx, my)) { u.x += mx; u.y += my; }
         }
@@ -288,17 +288,20 @@
         if (crescentCurve(s) <= -RULES.libyanTriggerConcave) { setOrder(s, u, { type: "faceAndAdvance", h: u.x < 0 ? Math.PI / 2 : -Math.PI / 2 }); ev(s, "libyans-turn", u.id); }
       } else if (o.type === "faceAndAdvance") { // turn to face inward, then march onto the flank of the outermost Roman block
         if (!turnTo(u, o.h)) continue;
-        if (u.engagedSides.includes("front") || !romanInf.length) continue;
+        if (!romanInf.length) continue;
         const west = u.x < 0, tgt = romanInf.reduce((a, b) => ((west ? b.x < a.x : b.x > a.x) ? b : a));
         const gx = tgt.x + (west ? -1 : 1) * (tgt.w / 2 + u.d / 2), gy = tgt.y;
         const dx = gx - u.x, dy = gy - u.y, dist = hyp(dx, dy);
         if (dist < 0.5) continue;
-        const st = Math.min(dist, S.libyan * RULES.dt), mx = (dx / dist) * st, my = (dy / dist) * st;
+        if (u.engagedSides.length) o.contacted = true;
+        const sp = o.contacted || s.flags.trapClosing ? S.press : S.libyan; // charge in once; afterwards only press to keep contact
+        const st = Math.min(dist, sp * RULES.dt), mx = (dx / dist) * st, my = (dy / dist) * st;
         const friend = blockedByFriend(s, u, mx, my);
-        if (!friend && !blocked(s, u, mx, my)) { u.x += mx; u.y += my; }
+        if (!friend && !blocked(s, u, mx, my)) { u.x += mx; u.y += my; o.detour = null; }
         else if (friend) { // detour: step clear of the friendly unit (away from it along the other axis), then carry on
-          const sx = Math.abs(dx) >= Math.abs(dy), st2 = S.libyan * RULES.dt;
-          const ddx = sx ? 0 : Math.sign(u.x - friend.x) * st2, ddy = sx ? Math.sign(u.y - friend.y || 1) * st2 : 0;
+          const sx = Math.abs(dx) >= Math.abs(dy), st2 = sp * RULES.dt;
+          o.detour = o.detour || (sx ? [0, Math.sign(u.y - friend.y) || 1] : [Math.sign(u.x - friend.x) || 1, 0]); // pick a side once
+          const ddx = o.detour[0] * st2, ddy = o.detour[1] * st2;
           if (!blockedByFriend(s, u, ddx, ddy) && !blocked(s, u, ddx, ddy)) { u.x += ddx; u.y += ddy; }
         }
       }
@@ -358,11 +361,13 @@
       if (!tg || !alive(tg)) { tg = romanInf.length ? romanInf.reduce((a, b) => (Math.abs(b.x - u.x) < Math.abs(a.x - u.x) ? b : a)) : null; if (tg) u.order.target = tg.id; }
       turnTo(u, Math.PI);
       if (!tg) continue;
-      const slide = Math.max(-RULES.speed.cavTrot * RULES.dt, Math.min(RULES.speed.cavTrot * RULES.dt, tg.x - u.x));
+      if (u.engagedSides.length) u.order.contacted = true;
+      const v = (u.order.contacted ? RULES.speed.press : RULES.speed.cavTrot) * RULES.dt; // after the first shock, horsemen press, they don't gallop
+      const slide = Math.max(-v, Math.min(v, tg.x - u.x));
       u.x += slide; const w = Math.max(RULES.squadronMinWidth, tg.w); if (Math.abs(u.w - w) > 0.5) reform(u, w);
       // Close onto the block's rear edge — never ride past it.
       const room = frontY(u) - (tg.y + tg.d / 2) - RULES.stopGap;
-      if (!u.engagedSides.includes("front") && room > 0) { const my = -Math.min(room, RULES.speed.cavTrot * RULES.dt); if (!blocked(s, u, 0, my)) u.y += my; }
+      if (room > 0) { const my = -Math.min(room, v); if (!blocked(s, u, 0, my)) u.y += my; } // press right up (to stopGap), not just into contact range
     }
   }
   function pressure(a, d) {
@@ -459,5 +464,5 @@
     };
   }
 
-  root.CannaeSim = { RULES, QUALITY, SCRIPT, create, step, snapshot, corners, fwd, _dev: { blocked, touches, flankAttacked } };
+  root.CannaeSim = { RULES, QUALITY, SCRIPT, create, step, snapshot, corners, fwd, _dev: { blocked, touches, flankAttacked, blockedByFriend } };
 })(typeof window !== "undefined" ? window : globalThis);

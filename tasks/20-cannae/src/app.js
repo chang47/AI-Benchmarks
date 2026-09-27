@@ -89,10 +89,10 @@
     [(e) => e.type === "split", "Squadron after squadron, Hasdrubal strikes the Roman rear. The ring is closed."],
     [(e) => e.type === "encircled", "“The circle becoming more and more contracted.” — Polybius"],
   ];
-  function caption(events) {
-    let text = CAPTIONS[0][1];
-    for (const e of events) for (const [test, c] of CAPTIONS) if (test(e)) text = c;
-    return text;
+  function caption(events) { // the story only moves forward: show the latest beat (in story order) that has happened
+    let best = 0;
+    for (const e of events) CAPTIONS.forEach(([test], i) => { if (i > best && test(e)) best = i; });
+    return CAPTIONS[best][1];
   }
   const clock = (bt) => { const m = 9 * 60 + 30 + (bt / R.duration) * 7 * 60; return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(Math.floor(m % 60)).padStart(2, "0")} · battle time ${Math.floor(bt / 60)}:${String(Math.floor(bt % 60)).padStart(2, "0")}`; };
 
@@ -135,7 +135,7 @@
     const fy = (u) => u.y + Math.cos(u.h) * u.d / 2, n = c.length;
     const bent = s.flags && s.events.some((e) => e.type === "libyans-turn");
     if (bent || (n >= 4 && (fy(c[n / 2 - 1]) + fy(c[n / 2])) / 2 - (fy(c[0]) + fy(c[n - 1])) / 2 < -20)) out.push({ t: s.t, type: "concave" });
-    if (s.units.some((u) => u.id.startsWith("R-inf") && u.encircled)) out.push({ t: s.t, type: "encircled" });
+    if (s.units.some((u) => u.id.startsWith("R-inf") && u.compressed) && s.events.some((e) => e.type === "split") && s.t > (s.events.find((e) => e.type === "split")?.t ?? 1e9) + 240) out.push({ t: s.t, type: "encircled" });
     return out.sort((a, b) => a.t - b.t);
   }
 
