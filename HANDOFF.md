@@ -1,5 +1,23 @@
 # HANDOFF — ai-benchmark ("Vetted Bench")
 
+## ▶ CHECKPOINT 2026-09-27 (evening) — read this first
+**Running in the background (check before anything else):**
+- Task 20 Cannae pilot, 9 arms serially: `.bench-cache/logs/pilot20.log` (runs first, grades all at the end).
+- Task 21 pilot is QUEUED behind it (PowerShell waits on the pilot-20 node PID, then runs):
+  `.bench-cache/logs/pilot21.log`. When both finish: `node bench/export-results.mjs 20` and `... 21`, then commit
+  `reports/results/`. If the low-memory reaper killed them: move partial runs to `runs/_aborted/` and re-run only missing
+  arms (`--fill`), one at a time.
+**State of each benchmark:**
+- 18 Wonders: graded, results in `reports/results/18-wonders-landing.md` (Sonnet 78, Opus5.5 75 … Haiku 35).
+  Josh: checklist = "does it work"; craft judged by watching, not scored. Queued grader bump (not done): legibility
+  decode-once speedup (patched copy in session scratchpad), carousel race, meteors 3 frames, show scripted vs judge.
+- 20 Cannae: reference = wow showcase (Josh accepted known rough spots). Prompt + 65-pt grader frozen; reference 64/65;
+  8/8 mutations (`bench/checks/mutations-20.mjs`).
+- 21 Pip's inventory: live FIFO spreadsheet; 45-pt grader (LibreOffice recalc + hidden-log swap); key agreed 81/81 by 3
+  independent methods; controls hard-coded 31 / no-dedup 28 / order-date 31.
+**Next (Josh to decide after /clear):** the context-flooding experiment (last backlog item, `design/benchmark-backlog.md`
+§4), or review the 20/21 pilot results and watch the Cannae pages side by side.
+
 ## UPDATE 2026-09-27 (later) — task 20 "Cannae" built as a showcase
 - `tasks/20-cannae/src/` = reference page: deterministic rule-based battle sim (`sim.js`, units = rectangles, 1 s step,
   fixed order script + event-driven "commanders") + Three.js cartoon renderer (`render.js`, 1 figure = 20 men) + HUD
