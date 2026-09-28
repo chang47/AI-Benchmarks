@@ -47,6 +47,7 @@ node bench/cli.mjs run --task 07 --harness claude --model claude-sonnet-5 --grad
 node bench/cli.mjs run --task 07,15,17 --arms bench/arms/pilot.json --n 3 --parallel 3 --grade
 node bench/cli.mjs report                     # → reports/site/index.html (open from disk)
 node bench/cli.mjs view <any .jsonl>          # render ANY Claude Code / Codex / pi transcript
+node bench/cli.mjs contamination [runId…]     # read-only raw.jsonl scan: web tools / network / benchmark refs
 npm run check                                 # the regression gate (see below)
 ```
 
@@ -61,11 +62,31 @@ npm run check                                 # the regression gate (see below)
 
 **Profiles** (`bench/profiles/*.json`) are per-experiment options, not rules: `clean-room` (default: empty temp dir outside the repo, bare harness, all tools), `josh` (your full setup), `no-web` (web tools denied). A profile can also point at a `skill` file under test or a `worktree:<repo>@<ref>` isolation.
 
+**Denying web tools** (`tools.deny: ["WebSearch", "WebFetch"]`, the `no-web` profile, or `"denyWebTools": true` in a task's `bench.json`, which forces it whatever the profile):
+
+| harness | how the deny is applied | notes |
+|---|---|---|
+| `claude`, `claude-glm` | `--disallowed-tools WebSearch WebFetch` | the init event lists the tools actually offered → `meta.contamination.webToolsInInit` proves it per run |
+| `codex` | `-c web_search="disabled"` | Codex has no per-tool deny list; its only web tool is the native `web_search`, set by the top-level config key `web_search` = `disabled`/`cached`/`indexed`/`live` (0.155.1 validates the value). The default when unset can't be seen without an agent run — assume earlier Codex runs could search (none did: 0 web_search calls in the local runs) |
+| `pi` | `--exclude-tools WebSearch,WebFetch` | pi's built-ins (read, bash, powershell, edit, write, grep, find, ls) have no web tool; the deny only matters for extensions loaded by the `josh` setup |
+
+No harness blocks the network from the **shell** (`curl`, `npm install`) — every harness runs with approvals/sandbox bypassed. That is what the contamination scan is for. `meta.webToolsAvailable` records what the harness + effective profile offered (`true` / `false` / `"partial"` / `null` = unknown).
+
 **A run** writes `runs/<id>/`: `raw.jsonl` (the harness's stdout, untouched — source of truth), `steps.json` (normalized, re-derivable with `bench reparse`), `meta.json` (model, profile, command, metrics), `output/` (the artifact), then `result.json` after grading. Raw + steps are gitignored; meta/result/output are small and committed.
 
 **Grading** re-hashes the answer key against its `FREEZE_MANIFEST.json` (refuses on mismatch), runs the task's frozen grader **unmodified** in a sandbox that mirrors the task layout, and normalizes the checks. Items a script can't decide go to a local **AI judge** (`claude -p`, clean, blind to the model, prompt hash recorded, tagged "AI judge" in the report). The judge also classifies the agent's final message (claimed / hedged / blocked) → **fake convergence** = claimed done but failed the key.
 
 **Task inputs.** If `tasks/<slug>/inputs/` exists it is copied into the agent's workspace as `inputs/` (task 18: the vendored Three.js); the input hashes are recorded in `meta.json`. `bench.json` can set `artifactDirs` (collect a whole folder, e.g. `src/`, not just the entry file) and `timeoutMin` (overrides the profile's 30 min).
+
+**Whole-repo tasks** (added 2026-09-28, generic — for tasks where the agent works inside a big prepared repo). `bench.json` options:
+
+- `"workspace": { "from": "<dir>", "shortRoot": true }` — copy a prepared directory (a whole repo **including `node_modules` and `.git`**) into the agent's workspace instead of starting empty. `from` is absolute or task-relative; `$VAR` / `${VAR}` expand from the environment (keep big or private prepared dirs outside the repo). `shortRoot` puts the workspace at `C:\b\<task>-<4hex>` (override the base with `VBENCH_SHORT_ROOT`) to stay under Windows MAX_PATH. Copies are real (robocopy `/MT` on Windows, Node elsewhere). Links in the source (npm-workspaces junctions) are re-created pointing at the same place **inside the workspace**; links that point outside the source are copied as content; a final walk refuses any link that leaves the workspace. `meta.workspacePrep` records files, bytes, `copyMs`, link counts and the prepared repo's `gitHead`. Removed after the run unless `--keep`. Needs isolation `tmp`.
+- `"artifactDirs": ["."]` collects the whole workspace; `"artifactExclude": ["node_modules", "dist", ".git/objects", "var"]` drops matches — a pattern without `/` matches any path segment (glob `*` `?`), one with `/` matches consecutive segments anywhere. Links are never collected. `meta.artifactSize` = files + bytes collected (recorded for every run). Tasks without `artifactExclude` keep the old copy path. `"referenceDir"` (task-relative) is where `grade --reference` takes the reference solution from for such tasks.
+- `"judgeText": { "file": "FINDINGS.md", "questions": "holdout/findings-questions.json" }` — a **text-input judge**. The runner snapshots `file` when the run ends (`runs/<id>/judge-text/`, sha256 in `meta.judgeTextSnapshot`; missing = empty text). Each question (`{instructions?, questions: [{id, q, points?, group?, name?}]}`) is its own `claude -p` prompt holding **only** that text — no repo, no tools — 3 votes (claude-sonnet-5, clean, prompt sha256 recorded), majority yes; a failed/unparseable vote is retried (2 extra attempts); fewer than 3 valid votes → `"judge failed"` (status unclear, 0 points, never guessed); an empty file → every answer "no" by rule. Checks the grader emits with `method: "judge-text"`, `status: "skip"` are filled (their points come from the grader); if it emits none, one check per question is added. Summary in `result.judgeText`. A task grader can call it itself: `const { judgeText } = await import(process.env.VBENCH_JUDGE_TEXT_MODULE)` (the snapshot path is `VBENCH_JUDGE_TEXT_FILE`), or `node bench/cli.mjs judge-text --text F.md --questions q.json`.
+- node-script graders also get `VBENCH_RUN_DIR` and `VBENCH_OUTPUT_DIR` (the collected artifacts) — existing graders ignore them.
+- `"contamination": { "extraTerms": [...] }` — extra strings for the contamination scan.
+
+**Contamination scan** (every run, unscored). A read-only pass over `raw.jsonl` → `meta.contamination`: web-tool calls, shell commands that reach the network (curl / wget / Invoke-WebRequest / iwr / irm / git clone|fetch|pull / gh / npm view|install / pip download|install / `fetch(` or `http.get(` with a remote URL …; requests whose every target is localhost are counted, not flagged), and strings naming this benchmark (`github.com/chang47`, `AI-Benchmarks`, `ai-benchmark`, `vetted-bench`). Shown as a "contamination" flag next to the score and a panel on the run page — never folded into the score. `node bench/cli.mjs contamination [runId…]` re-scans existing runs (so does `reparse`). First scan of the 72 local runs (2026-09-28): no web-tool calls at all; 3 runs ran `npm install` of a test dependency (jsdom / puppeteer-core).
 
 **Points checklists** (task 18 on). The grader emits checks with `points` / `earned`; `result.json` gets `pointsEarned`, `pointsPossible`, `score` and per-group totals, and the scoreboard shows "% of points". Measured values become points through bands frozen in the grader. Subjective items are **yes/no judge questions** (`judgeItems: "checklist"`): answered blind from fixed frames the grader saves, 3 votes, strict majority, a tie scores 0, never an overall rating. A points run counts as a false "done" when the agent claimed done and scored under 90%.
 
@@ -73,7 +94,7 @@ npm run check                                 # the regression gate (see below)
 
 **Task 18 probe validation:** `node bench/checks/mutations-18.mjs` grades the reference, then broken copies of it (frozen volcano, broken pin, never-pausing scenes, no cursor, no validation, no reduced motion, a console error, no scrims, galaxy ignores the mouse) and checks each loses exactly its own checks. Slow (~1 h, one Chrome at a time); not part of `npm run check`.
 
-**`npm run check`** — parser fixtures per harness; every wired task's reference passes its key; a broken bowling scorer fails with named checks; a 1-byte holdout edit is caught; task 17's July realistic build still grades 7/8 (V6); every report number equals its JSON; tool-call counts agree across page / steps / raw; browser render has zero console errors and no horizontal scroll at 1440px and 390px; no home paths leak into the site. `--quick` skips the slow browser tasks.
+**`npm run check`** — parser fixtures per harness; every wired task's reference passes its key; a broken bowling scorer fails with named checks; a 1-byte holdout edit is caught; task 17's July realistic build still grades 7/8 (V6); every report number equals its JSON; tool-call counts agree across page / steps / raw; browser render has zero console errors and no horizontal scroll at 1440px and 390px; no home paths leak into the site; D1–D6 self-test the whole-repo options without a model or a real task (prepared-dir workspace at a short root with junctions + a read-only `.git` object + a >260-char path, `artifactExclude`, the text judge with a faked judge incl. retries and "judge failed", the contamination scan on crafted raws for all 3 formats + the 4 real fixtures, the web-tool deny args per harness, and an end-to-end run → grade of a generated fixture task driven by a scripted fake agent). `--quick` skips the slow browser tasks.
 
 ---
 
