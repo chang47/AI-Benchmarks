@@ -51,7 +51,7 @@ function prepareSandbox(slug, cfg, outputDir) {
   return { box, hold, sandboxTamper: tamperCheck(hold), cleanup: () => rmSync(box, { recursive: true, force: true }) };
 }
 
-async function runGrader(slug, cfg, hold, gradeDir, runDir) {
+async function runGrader(slug, cfg, hold, gradeDir, runDir, judge = true) {
   const g = cfg.grader;
   const timeoutMs = (g.timeoutMin || 10) * 60_000;
   if (g.kind === "vitest") {
@@ -65,7 +65,7 @@ async function runGrader(slug, cfg, hold, gradeDir, runDir) {
     const p = await runProcess(process.execPath, [g.script], {
       // points graders save their judge frames to VBENCH_FRAMES_DIR. Whole-repo tasks read the collected output
       // (VBENCH_OUTPUT_DIR) and may call the text judge themselves (VBENCH_JUDGE_TEXT_MODULE / _FILE).
-      cwd: hold, env: { ...process.env, ...graderEnv(cfg, gradeDir, runDir) }, stdoutPath: join(gradeDir, "grader-stdout.txt"), stderrPath: join(gradeDir, "grader-stderr.txt"), timeoutMs,
+      cwd: hold, env: { ...process.env, ...graderEnv(slug, cfg, gradeDir, runDir, judge) }, stdoutPath: join(gradeDir, "grader-stdout.txt"), stderrPath: join(gradeDir, "grader-stderr.txt"), timeoutMs,
     });
     let raw = null;
     try { raw = JSON.parse(readFileSync(join(gradeDir, "grader-stdout.txt"), "utf8")); } catch { /* grader crashed */ }
@@ -74,9 +74,13 @@ async function runGrader(slug, cfg, hold, gradeDir, runDir) {
   throw new Error(`unknown grader kind ${g.kind}`);
 }
 
-/** Extra env for node-script graders (ignored by graders that don't read it). */
-function graderEnv(cfg, gradeDir, runDir) {
-  const env = { VBENCH_FRAMES_DIR: join(gradeDir, "frames") };
+/**
+ * Extra env for node-script graders (ignored by graders that don't read it). VBENCH_JUDGE is "0" under --no-judge
+ * (a grader that calls the text judge itself honours it); VBENCH_TASK_DIR is the ORIGINAL, tamper-checked task dir,
+ * for heavy holdout content the sandbox copy leaves out (it skips every nested node_modules).
+ */
+function graderEnv(slug, cfg, gradeDir, runDir, judge = true) {
+  const env = { VBENCH_FRAMES_DIR: join(gradeDir, "frames"), VBENCH_JUDGE: judge ? "1" : "0", VBENCH_TASK_DIR: taskDir(slug) };
   if (!runDir) return env;
   env.VBENCH_RUN_DIR = runDir;
   env.VBENCH_OUTPUT_DIR = join(runDir, "output");
@@ -144,13 +148,13 @@ export async function gradeRun(runDir, { judge = true, log = console.log } = {})
   try {
     if (!sandboxTamper.ok) throw new Error(`sandbox copy failed its own tamper check: ${sandboxTamper.detail}`);
     log(`[grade] ${meta.runId} · ${cfg.grader.kind}${cfg.grader.script ? " " + cfg.grader.script : ""}`);
-    const { proc, parsed } = await runGrader(slug, cfg, hold, gradeDir, runDir);
+    const { proc, parsed } = await runGrader(slug, cfg, hold, gradeDir, runDir, judge);
     result.checks = parsed.checks;
     // Some frozen browser checks are timing-sensitive (measured 2026-09-26: task 15 R10 passed 2 of 3 grades of
     // the same build). With grader.repeat N, re-run the frozen grader and mark any check whose verdict
     // disagrees across runs as "unclear (flaky)" instead of letting one run's luck decide it.
     for (let k = 2; k <= (cfg.grader.repeat || 1); k++) {
-      const again = await runGrader(slug, cfg, hold, gradeDir, runDir);
+      const again = await runGrader(slug, cfg, hold, gradeDir, runDir, judge);
       for (const c of result.checks) {
         const o = again.parsed.checks.find((x) => x.id === c.id);
         if (o && o.status !== c.status) {
