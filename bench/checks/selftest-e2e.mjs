@@ -32,7 +32,8 @@ import { join } from "node:path";
 const out = process.env.VBENCH_OUTPUT_DIR || "";
 const calc = existsSync(join(out, "src", "calc.js")) ? readFileSync(join(out, "src", "calc.js"), "utf8") : "";
 const leaked = ["node_modules", "dist", "var", ".git/objects"].filter((d) => existsSync(join(out, d)));
-const env = !!process.env.VBENCH_JUDGE_TEXT_MODULE && /FINDINGS\\.md$/.test(process.env.VBENCH_JUDGE_TEXT_FILE || "");
+const env = !!process.env.VBENCH_JUDGE_TEXT_MODULE && /FINDINGS\\.md$/.test(process.env.VBENCH_JUDGE_TEXT_FILE || "")
+  && process.env.VBENCH_JUDGE === "1" && /99-selftest$/.test(process.env.VBENCH_TASK_DIR || "") && existsSync(join(process.env.VBENCH_TASK_DIR || "", "holdout", "grade.mjs"));
 const c = (id, name, points, ok, detail = "") => ({ id, group: "Bugs", name, points, earned: ok ? points : 0, status: ok ? "pass" : "fail", detail });
 console.log(JSON.stringify({ pointsPossible: 9, checks: [
   c("B1", "add() fixed", 3, calc.includes("a + b")),

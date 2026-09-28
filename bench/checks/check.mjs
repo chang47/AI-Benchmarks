@@ -17,7 +17,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { gradeReference, tamperCheck } from "../grade/grade.mjs";
 import { buildReport } from "../render/report.mjs";
-import { REDACT_PROBES, ROOT, RUNS_DIR, readJson, taskDir } from "../lib/util.mjs";
+import { REDACT_PROBES, ROOT, RUNS_DIR, loadBenchConfig, readJson, taskDir } from "../lib/util.mjs";
 import { parseFile, readJsonl } from "../trajectory/index.mjs";
 import { harnessSelfTests } from "./harness-selftests.mjs";
 
@@ -50,6 +50,9 @@ const wired = readdirSync(join(ROOT, "tasks")).filter((d) => existsSync(join(tas
 for (const slug of wired) {
   const slow = /^(15|15b|17|18)-/.test(slug); // browser graders (15/15b grab the real mouse); `15-` alone missed 15b
   if (quick && slow) continue;
+  // bench.json "checkReference": false = a task this gate cannot grade from a reference (e.g. a private, unfrozen
+  // whole-repo task, or one whose grade takes minutes + judge calls); such a task has its own controls runner.
+  if (loadBenchConfig(slug).checkReference === false) { console.log(`SKIP  B1   ${slug}: bench.json checkReference: false`); continue; }
   const r = await gradeReference(slug, { log: quiet });
   if (r.pointsPossible) { // points checklists (task 18): the reference must earn >= 95% of the scripted points (spec)
     const scripted = r.checks.filter((c) => c.method !== "judge-checklist");
