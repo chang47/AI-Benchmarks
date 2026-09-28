@@ -154,7 +154,7 @@
         <p class="sub">${cz.flagged ? `<span class="flag contam">${cz.flags.length} flag${cz.flags.length === 1 ? "" : "s"}</span> ${Object.entries(cz.counts).map(([k, v]) => `${v} ${esc(kinds[k] || k)}`).join(", ")}` : "No web tools, network commands or references to this benchmark in the transcript."}
         ${cz.loopbackRequests ? ` ${cz.loopbackRequests} request(s) to localhost not counted.` : ""}
         Web tools offered: ${meta.webToolsAvailable === true ? "yes" : meta.webToolsAvailable === false ? "no" : esc(meta.webToolsAvailable ?? "unknown")}${Array.isArray(cz.webToolsInInit) ? ` (harness listed: ${esc(cz.webToolsInInit.join(", ") || "none")})` : ""}.</p>
-        ${cz.flagged ? `<ul class="checks">${cz.flags.slice(0, 40).map((f) => `<li class="unclear"><span class="mark">${esc(kinds[f.kind] || f.kind)}</span>${esc(f.category)} · step ${f.step}${f.tool ? ` · ${esc(f.tool)}` : ""}<details><summary>${esc(f.match)}</summary><pre>${esc(f.excerpt)}</pre></details></li>`).join("")}</ul>` : ""}</section>`;
+        ${cz.flagged ? `<ul class="checks">${cz.flags.slice(0, 40).map((f) => `<li class="unclear"><span class="mark">flag</span>${esc(kinds[f.kind] || f.kind)}: ${esc(f.category)} · step ${f.step}${f.tool ? ` · ${esc(f.tool)}` : ""}<details><summary>${esc(f.match)}</summary><pre>${esc(f.excerpt)}</pre></details></li>`).join("")}</ul>` : ""}</section>`;
     }
     if (outputs?.length) {
       h += `<section class="panel"><h3>What it produced</h3>${outputs.map((o, i) => `<div class="outfile"><div class="row"><code>${esc(o.rel)}</code><span class="sub">${(o.size / 1024).toFixed(1)} KB</span></div>
