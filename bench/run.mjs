@@ -4,25 +4,48 @@
 import { spawnSync } from "node:child_process";
 import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { basename, dirname, join } from "node:path";
+import { basename, dirname, isAbsolute, join } from "node:path";
 import { getHarness, modelAlias } from "./harnesses/index.mjs";
+import { scanRaw, webToolsAvailable } from "./lib/contamination.mjs";
 import {
   ROOT, RUNS_DIR, ensureDir, listFiles, loadBenchConfig, nowIso, rand4, readJson, resolveTask,
   runProcess, sha256, sha256File, stamp, taskDir, writeJson,
 } from "./lib/util.mjs";
+import { copyTreeExcluding, dirSize, makeShortWorkspace, prepareFromDir, removeWorkspace } from "./lib/workspace.mjs";
 import { parseFile } from "./trajectory/index.mjs";
+
+export const WEB_TOOLS = ["WebFetch", "WebSearch"];
 
 export function loadProfile(name = "clean-room", overrides = {}) {
   const p = join(ROOT, "bench", "profiles", `${name}.json`);
   return { ...readJson(p), ...overrides };
 }
 
-function makeWorkspace(runId, profile) {
+/** bench.json `denyWebTools: true` adds WebFetch/WebSearch to the profile's deny list for this task (whatever the profile). */
+export function applyTaskToolPolicy(profile, cfg) {
+  if (!cfg.denyWebTools) return profile;
+  const deny = [...new Set([...(profile.tools?.deny || []), ...WEB_TOOLS])];
+  return { ...profile, tools: { ...(profile.tools || {}), deny }, taskDeniedTools: WEB_TOOLS };
+}
+
+/** `workspace.from`: absolute, or relative to the task dir; `$VAR` / `${VAR}` expand from the environment. */
+export function resolveWorkspaceFrom(slug, from) {
+  const expanded = String(from).replace(/\$\{?([A-Z0-9_]+)\}?/gi, (_, v) => {
+    if (process.env[v] == null) throw new Error(`workspace.from uses $${v}, which is not set`);
+    return process.env[v];
+  });
+  return isAbsolute(expanded) ? expanded : join(taskDir(slug), expanded);
+}
+
+function makeWorkspace(runId, profile, cfg = {}, slug = "") {
   const iso = profile.isolation || "tmp";
+  const wcfg = cfg.workspace || {};
+  if (wcfg.from && iso !== "tmp") throw new Error(`bench.json workspace.from needs isolation "tmp" (profile ${profile.name} uses "${iso}")`);
   if (iso === "tmp") {
-    const ws = join(tmpdir(), "vbench", runId);
+    // Short root (C:\b\<task>-<4hex>) keeps deep node_modules paths under Windows MAX_PATH.
+    const ws = wcfg.shortRoot ? makeShortWorkspace(slug.split("-")[0] || "run") : join(tmpdir(), "vbench", runId);
     mkdirSync(ws, { recursive: true });
-    return { ws, cleanup: () => rmSync(ws, { recursive: true, force: true }) };
+    return { ws, cleanup: () => (wcfg.from ? removeWorkspace(ws) : rmSync(ws, { recursive: true, force: true })) };
   }
   const m = /^worktree:(.+?)(?:@(.+))?$/.exec(iso);
   if (m) {
@@ -83,13 +106,30 @@ function collectArtifacts(cfg, ws, outDir, finalText) {
   }
   // Multi-file deliverables (task 18: index.html + its own .js + vendor/): copy the whole folder. If the agent
   // put the entry file somewhere else, take the folder it actually lives in.
+  // `"."` collects the whole workspace (whole-repo tasks); `artifactExclude` drops node_modules, dist, .git/objects, …
   for (const dir of cfg.artifactDirs || []) {
+    const whole = dir === "." || dir === "./";
     const entry = found.find((f) => f.path.startsWith(`${dir}/`));
-    const from = existsSync(join(ws, dir)) ? join(ws, dir)
+    const from = whole ? ws : existsSync(join(ws, dir)) ? join(ws, dir)
       : entry?.source?.startsWith("file:") ? join(ws, dirname(entry.source.slice(5))) : null;
-    if (from && from !== ws) cpSync(from, join(outDir, dir), { recursive: true, force: false, errorOnExist: false });
+    if (!from || (from === ws && !whole)) continue;
+    const to = whole ? outDir : join(outDir, dir);
+    if (cfg.artifactExclude?.length || whole) copyTreeExcluding(from, to, cfg.artifactExclude || []);
+    else cpSync(from, to, { recursive: true, force: false, errorOnExist: false }); // unchanged path for tasks 18/20/21
   }
   return found;
+}
+
+/** Snapshot the text file the text judge will read (bench.json judgeText.file), exactly as the run left it. */
+function snapshotJudgeText(cfg, ws, runDir) {
+  if (!cfg.judgeText?.file) return null;
+  const rel = cfg.judgeText.file;
+  const src = join(ws, rel);
+  if (!existsSync(src)) return { file: rel, present: false, bytes: 0, sha256: null, path: null };
+  const buf = readFileSync(src);
+  const dst = join(ensureDir(join(runDir, "judge-text")), basename(rel));
+  writeFileSync(dst, buf);
+  return { file: rel, present: true, bytes: buf.length, sha256: sha256(buf), path: `judge-text/${basename(rel)}` };
 }
 
 /** Copy tasks/<slug>/inputs/** into the workspace (vendored libs, screenshots) and record their hashes. */
@@ -106,13 +146,21 @@ export async function runOne({ task, harness: harnessId, model, profile: profile
   const harness = getHarness(harnessId);
   model = model || harness.defaultModel;
   if (!model) throw new Error(`--model is required for harness ${harnessId}`);
-  const profile = loadProfile(profileName, profileOverrides);
+  const profile = applyTaskToolPolicy(loadProfile(profileName, profileOverrides), cfg);
   const runId = `${stamp()}-${slug.split("-")[0]}-${harnessId}-${modelAlias(model)}-${rand4()}`;
   const runDir = ensureDir(join(RUNS_DIR, runId));
   const prompt = readFileSync(join(taskDir(slug), cfg.prompt || "frozen-prompt.md"), "utf8");
   writeFileSync(join(runDir, "prompt.md"), prompt);
 
-  const { ws, cleanup } = makeWorkspace(runId, profile);
+  const { ws, cleanup } = makeWorkspace(runId, profile, cfg, slug);
+  let workspacePrep = null;
+  if (cfg.workspace?.from) {
+    const from = resolveWorkspaceFrom(slug, cfg.workspace.from);
+    log(`[run] ${runId} · preparing workspace from ${from} → ${ws}`);
+    try { workspacePrep = { from: cfg.workspace.from, root: ws, shortRoot: !!cfg.workspace.shortRoot, ...prepareFromDir(from, ws) }; }
+    catch (e) { cleanup(); throw e; }
+    log(`[run] ${runId} · workspace ready: ${workspacePrep.files} files, ${(workspacePrep.bytes / 1e6).toFixed(1)} MB in ${(workspacePrep.copyMs / 1000).toFixed(1)}s (${workspacePrep.method})`);
+  }
   for (const d of new Set(cfg.artifacts.map((a) => dirname(a)).filter((d) => d !== "."))) mkdirSync(join(ws, d), { recursive: true });
   const inputs = copyInputs(slug, ws);
   if (profile.skill && harnessId === "codex") copyFileSync(profile.skill, join(ws, "AGENTS.md"));
@@ -135,8 +183,13 @@ export async function runOne({ task, harness: harnessId, model, profile: profile
 
   const wsFiles = listFiles(ws);
   writeFileSync(join(runDir, "workspace-files.txt"), wsFiles.join("\n") + "\n");
+  const judgeTextSnapshot = snapshotJudgeText(cfg, ws, runDir);
   const artifacts = collectArtifacts(cfg, ws, ensureDir(join(runDir, "output")), parsed.info.finalText);
   const artifactProduced = artifacts.every((a) => a.source);
+  const artifactSize = dirSize(join(runDir, "output"));
+  let contamination;
+  try { contamination = scanRaw(join(runDir, "raw.jsonl"), harness.rawFormat, { extraTerms: cfg.contamination?.extraTerms }); }
+  catch (e) { contamination = { scanner: null, error: String(e.message || e) }; }
 
   let status = "ok";
   if (proc.timedOut) status = "timeout";
@@ -154,6 +207,11 @@ export async function runOne({ task, harness: harnessId, model, profile: profile
     parserVersion: parsed.parserVersion, command: [cmd.cmd === process.execPath ? "node" : cmd.cmd, ...safeArgs],
     init: parsed.info.init || null, sessionId: parsed.info.sessionId || null,
     artifacts, finalText: clipEnds(parsed.info.finalText),
+    artifactSize: { ...artifactSize, exclude: cfg.artifactExclude || null },
+    ...(workspacePrep ? { workspacePrep } : {}),
+    ...(judgeTextSnapshot ? { judgeTextSnapshot } : {}),
+    webToolsAvailable: webToolsAvailable(harnessId, profile),
+    contamination,
     rawBadLines: parsed.badLines?.length || 0,
     metrics: { durationMs: proc.ms, ...parsed.metrics, artifactProduced },
   };
@@ -198,8 +256,18 @@ export function reparseRun(runDir) {
   meta.parserVersion = parsed.parserVersion;
   meta.modelReported = parsed.info.modelReported || meta.modelReported || null;
   meta.finalText = clipEnds(parsed.info.finalText);
+  rescanContamination(runDir, meta);
   writeJson(join(runDir, "meta.json"), meta);
   return `${parsed.steps.length} steps (${parsed.parserVersion})`;
+}
+
+/** Re-derive meta.contamination (+ webToolsAvailable) from raw.jsonl — read-only over raw. Mutates and returns meta. */
+export function rescanContamination(runDir, meta) {
+  let extraTerms = [];
+  try { extraTerms = loadBenchConfig(resolveTask(meta.task)).contamination?.extraTerms || []; } catch { /* task no longer wired */ }
+  meta.contamination = scanRaw(join(runDir, "raw.jsonl"), getHarness(meta.harness).rawFormat, { extraTerms });
+  if (meta.webToolsAvailable === undefined) meta.webToolsAvailable = webToolsAvailable(meta.harness, meta.profile || {});
+  return meta;
 }
 
 export const promptHash = (slug) => sha256(readFileSync(join(taskDir(slug), "frozen-prompt.md"), "utf8"));

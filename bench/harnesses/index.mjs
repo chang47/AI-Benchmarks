@@ -62,6 +62,10 @@ export const HARNESSES = {
       // Clean: skip ~/.codex/config.toml + execpolicy rules. Auth still comes from CODEX_HOME.
       if (profile.harnessSetup === "clean") a.push("--ignore-user-config", "--ignore-rules");
       a.push("-c", `model_reasoning_effort=${profile.effort || "high"}`);
+      // Codex has one web tool, its native `web_search` (search + open page). tools.deny naming WebSearch/web_search
+      // turns it off via the top-level config key (0.155.1 accepts disabled|cached|indexed|live; verified 2026-09-28).
+      // Codex has no per-tool deny list otherwise; shell network access (curl) is untouched by this.
+      if ((profile.tools?.deny || []).some((t) => /^(websearch|web_search)$/i.test(t))) a.push("-c", 'web_search="disabled"');
       // Skill-under-test for codex = an AGENTS.md dropped into the workspace (see run.mjs).
       a.push("-"); // prompt on stdin
       return { cmd: "codex", args: a, env: { ...process.env }, cwdFlag: "-C" };
@@ -84,6 +88,8 @@ export const HARNESSES = {
         if (provider === "claude-bridge") a.push("-e", PI_CLAUDE_BRIDGE);
       }
       if (profile.effort) a.push("--thinking", profile.effort);
+      // pi's built-ins (read, bash, powershell, edit, write, grep, find, ls) include no web tool, so denying
+      // WebFetch/WebSearch is a no-op in clean mode; it matters only for extensions loaded in josh mode.
       if (profile.tools?.deny?.length) a.push("--exclude-tools", profile.tools.deny.join(","));
       if (profile.skill) a.push("--skill", profile.skill);
       a.push(prompt); // pi takes the prompt as an argument

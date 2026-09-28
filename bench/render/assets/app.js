@@ -78,7 +78,7 @@
       document.getElementById("runs-body").innerHTML = list.map((r) => {
         const tools = Object.values(r.toolCalls || {}).reduce((a, b) => a + b, 0);
         return `<tr><td><a href="runs/${esc(r.id)}.html">${day(r.startedAt)}</a></td><td>${esc(r.task)}</td><td>${esc(HARNESS[r.harness] || r.harness)}</td><td>${esc(r.model)}</td>
-          <td>${resultPill(r)}</td><td>${esc(r.claim || "—")}${r.fakeConvergence ? ` <span class="flag fake">false</span>` : ""}</td>
+          <td>${resultPill(r)}${r.contamination ? ` <span class="flag contam" title="unscored: web / network use or a benchmark reference in the transcript">contamination</span>` : ""}</td><td>${esc(r.claim || "—")}${r.fakeConvergence ? ` <span class="flag fake">false</span>` : ""}</td>
           <td class="num">${dur(r.durationMs)}</td><td class="num">${num(r.outputTokens)}</td><td class="num">${num(r.peakContextTokens)}</td><td class="num">${tools || "—"}</td></tr>`;
       }).join("") || `<tr><td colspan="10" class="empty">No runs match these filters.</td></tr>`;
     };
@@ -142,9 +142,19 @@
       const sorted = result.checks.slice().sort((a, b) => rank(a.status) - rank(b.status));
       h += `<section class="panel"><h3>Answer-key checks</h3>
         ${result.notes?.length ? result.notes.map((n) => `<p class="sub">${esc(n)}</p>`).join("") : ""}
-        <ul class="checks">${sorted.map((c) => `<li class="${esc(c.status)}"><span class="mark">${c.status === "pass" ? "pass" : c.status === "fail" ? "fail" : "?"}</span>${typeof c.points === "number" ? `<b>${c.earned ?? 0}/${c.points}</b> ` : ""}${esc(c.name)}${c.flaky ? `<span class="by">flaky: ${esc(c.flaky.join("/"))}</span>` : ""}${c.method === "judged" || c.method === "judge-checklist" ? `<span class="by">AI judge</span>` : c.method === "resolver" || c.method === "bench-probe" ? `<span class="by">bench probe${c.frozenStatus ? `, frozen said ${esc(c.frozenStatus)}` : ""}</span>` : c.method === "bench-check" ? `<span class="by">added check</span>` : ""}
+        <ul class="checks">${sorted.map((c) => `<li class="${esc(c.status)}"><span class="mark">${c.status === "pass" ? "pass" : c.status === "fail" ? "fail" : "?"}</span>${typeof c.points === "number" ? `<b>${c.earned ?? 0}/${c.points}</b> ` : ""}${esc(c.name)}${c.flaky ? `<span class="by">flaky: ${esc(c.flaky.join("/"))}</span>` : ""}${c.method === "judged" || c.method === "judge-checklist" ? `<span class="by">AI judge</span>` : c.method === "judge-text" ? `<span class="by">AI judge (text)</span>` : c.method === "resolver" || c.method === "bench-probe" ? `<span class="by">bench probe${c.frozenStatus ? `, frozen said ${esc(c.frozenStatus)}` : ""}</span>` : c.method === "bench-check" ? `<span class="by">added check</span>` : ""}
           ${c.detail ? `<details><summary>detail</summary><pre>${esc(c.detail)}</pre></details>` : ""}</li>`).join("")}</ul>
-        ${result.judge ? `<p class="sub">Judge: ${esc(result.judge.model)}, blind to which model built this.</p>` : ""}</section>`;
+        ${result.judge ? `<p class="sub">Judge: ${esc(result.judge.model)}, blind to which model built this.</p>` : ""}
+        ${result.judgeText ? `<p class="sub">Text judge: ${esc(result.judgeText.model)} read only ${esc(result.judgeText.file)} as the run left it (${result.judgeText.snapshot === "present" ? `${num(result.judgeText.textChars)} characters` : "file missing: every answer is no"}), ${result.judgeText.votes} votes per question.</p>` : ""}</section>`;
+    }
+    const cz = meta.contamination;
+    if (cz && cz.scanner) {
+      const kinds = { "web-tool": "web tool", "network-command": "network command", "benchmark-reference": "benchmark reference" };
+      h += `<section class="panel"><h3>Contamination check <span class="sub">(not scored)</span></h3>
+        <p class="sub">${cz.flagged ? `<span class="flag contam">${cz.flags.length} flag${cz.flags.length === 1 ? "" : "s"}</span> ${Object.entries(cz.counts).map(([k, v]) => `${v} ${esc(kinds[k] || k)}`).join(", ")}` : "No web tools, network commands or references to this benchmark in the transcript."}
+        ${cz.loopbackRequests ? ` ${cz.loopbackRequests} request(s) to localhost not counted.` : ""}
+        Web tools offered: ${meta.webToolsAvailable === true ? "yes" : meta.webToolsAvailable === false ? "no" : esc(meta.webToolsAvailable ?? "unknown")}${Array.isArray(cz.webToolsInInit) ? ` (harness listed: ${esc(cz.webToolsInInit.join(", ") || "none")})` : ""}.</p>
+        ${cz.flagged ? `<ul class="checks">${cz.flags.slice(0, 40).map((f) => `<li class="unclear"><span class="mark">${esc(kinds[f.kind] || f.kind)}</span>${esc(f.category)} · step ${f.step}${f.tool ? ` · ${esc(f.tool)}` : ""}<details><summary>${esc(f.match)}</summary><pre>${esc(f.excerpt)}</pre></details></li>`).join("")}</ul>` : ""}</section>`;
     }
     if (outputs?.length) {
       h += `<section class="panel"><h3>What it produced</h3>${outputs.map((o, i) => `<div class="outfile"><div class="row"><code>${esc(o.rel)}</code><span class="sub">${(o.size / 1024).toFixed(1)} KB</span></div>
@@ -157,6 +167,8 @@
       ${kv("run", meta.runId)}${kv("status", meta.status)}${kv("harness", meta.harnessVersion)}${kv("parser", meta.parserVersion)}
       ${meta.init ? kv("setup", `${meta.init.tools ?? "?"} tools, ${meta.init.skills ?? 0} skills, ${meta.init.mcp ?? 0} MCP servers, plugins: ${(meta.init.plugins || []).join(", ") || "none"}`) : ""}
       ${kv("input tokens", num(x.inputTokens))}${kv("cache read", num(x.cacheReadTokens))}${kv("cache write", num(x.cacheCreationTokens))}${kv("reasoning", num(x.reasoningTokens))}
+      ${meta.workspacePrep ? kv("workspace", `prepared copy: ${num(meta.workspacePrep.files)} files, ${(meta.workspacePrep.bytes / 1e6).toFixed(1)} MB in ${dur(meta.workspacePrep.copyMs)}`) : ""}
+      ${meta.artifactSize ? kv("collected", `${num(meta.artifactSize.files)} files, ${(meta.artifactSize.bytes / 1024).toFixed(1)} KB${meta.artifactSize.exclude ? ` (excluding ${meta.artifactSize.exclude.join(", ")})` : ""}`) : ""}
       ${meta.command ? kv("command", meta.command.join(" ")) : ""}${meta.promptSha256 ? kv("prompt sha256", meta.promptSha256.slice(0, 16) + "…") : ""}
       </dl>${prompt ? `<details style="margin-top:8px"><summary>Prompt given to the agent</summary><pre>${esc(prompt)}</pre></details>` : ""}</section>`;
     h += `</aside></div></div>`;

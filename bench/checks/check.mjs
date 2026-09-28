@@ -9,6 +9,8 @@
 //   C2 tool calls: rendered steps == steps.json == independent count from raw.jsonl
 //   C4 browser render: zero console errors, no horizontal scroll (desktop + phone)
 //   C5 the built site leaks no home paths / username / leak-guard terms
+//   D1-D6 harness capabilities (bench/checks/harness-selftests.mjs): prepared-dir workspace at a short root,
+//      artifactExclude, text judge (faked), contamination scan, web-tool deny per harness, end-to-end fixture task
 // Flags: --quick (skip B1 for slow browser tasks, skip C4), --no-browser (skip C4)
 import { copyFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -17,6 +19,7 @@ import { gradeReference, tamperCheck } from "../grade/grade.mjs";
 import { buildReport } from "../render/report.mjs";
 import { REDACT_PROBES, ROOT, RUNS_DIR, readJson, taskDir } from "../lib/util.mjs";
 import { parseFile, readJsonl } from "../trajectory/index.mjs";
+import { harnessSelfTests } from "./harness-selftests.mjs";
 
 const quick = process.argv.includes("--quick");
 const noBrowser = quick || process.argv.includes("--no-browser");
@@ -91,6 +94,10 @@ if (!quick) {
   const disk = readJson(join(taskDir("17-budget-dashboard"), "raw-lane", "attempt-1-realistic", "verify-result.json"));
   record("B4", r.passed === disk.passed && r.total === disk.total && failed.join() === "V6", `now ${r.passed}/${r.total} failing ${failed.join(",")}; July verify-result.json says ${disk.passed}/${disk.total}`);
 }
+
+// ---------------------------------------------------------------- D: harness capability self-tests
+// (prepared-dir workspaces, artifactExclude, text judge, contamination scan, web-tool deny, e2e fixture task)
+await harnessSelfTests(record);
 
 // ---------------------------------------------------------------- C: report
 const site = join(ROOT, "reports", "site");

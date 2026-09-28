@@ -8,6 +8,7 @@ import { parseFile } from "../trajectory/index.mjs";
 
 const ASSETS = join(ROOT, "bench", "render", "assets");
 const BODY_CAP = 24_000; // per-step body cap in HTML; the full body stays in steps.json
+const TEXT_BUDGET = 2_000_000; // total output text embedded in one run page
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const median = (xs) => {
@@ -85,9 +86,10 @@ function summarizeRun(r) {
     peakContextTokens: x.peakContextTokens, costUsdEstimate: x.costUsdEstimate, toolCalls: x.toolCalls, toolErrors: x.toolErrors,
     numTurns: x.numTurns,
     graded: !!g && g.status === "graded", passed: g?.passed ?? null, total: g?.total ?? null, allPass: g?.allPass ?? null,
-    unresolved: g?.unresolved ?? 0, judged: !!g?.checks?.some((c) => c.method === "judged" || (c.method === "judge-checklist" && c.status !== "skip")),
+    unresolved: g?.unresolved ?? 0, judged: !!g?.checks?.some((c) => c.method === "judged" || ((c.method === "judge-checklist" || c.method === "judge-text") && c.status !== "skip")),
     pointsEarned: g?.pointsEarned ?? null, pointsPossible: g?.pointsPossible ?? null, score: g?.score ?? null,
     claim: g?.claim?.label ?? null, fakeConvergence: g?.fakeConvergence ?? null,
+    contamination: m.contamination?.flagged ? m.contamination.flags?.length ?? 0 : 0, // unscored flag, never in the score
   };
 }
 
@@ -130,11 +132,15 @@ function copyAssets(outDir) {
 }
 
 function runPageData(run, steps) {
+  // Whole-repo artifacts can be thousands of files: embed text for the first ~2 MB only (small outputs are unaffected).
+  let budget = TEXT_BUDGET;
   const outputs = listFiles(join(run.dir, "output")).map((rel) => {
     const p = join(run.dir, "output", rel);
     const size = statSync(p).size;
     const isText = /\.(m?js|html?|css|json|md|txt|svg|ts|py)$/i.test(rel);
-    return { rel, size, isHtml: /\.html?$/i.test(rel), text: isText && size < 400_000 ? readFileSync(p, "utf8") : null };
+    const embed = isText && size < 400_000 && size <= budget;
+    if (embed) budget -= size;
+    return { rel, size, isHtml: /\.html?$/i.test(rel), text: embed ? readFileSync(p, "utf8") : null };
   });
   const shots = existsSync(join(run.dir, "grade")) ? readdirSync(join(run.dir, "grade")).filter((f) => f.endsWith(".png")) : [];
   const frames = existsSync(join(run.dir, "grade", "frames")) ? readdirSync(join(run.dir, "grade", "frames")).filter((f) => f.endsWith(".png")).map((f) => `frames/${f}`) : [];
