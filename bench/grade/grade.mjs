@@ -3,11 +3,14 @@
 // grader UNMODIFIED, normalize to result.json, then add AI-judged items and the claim check.
 import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import {
   CACHE_DIR, ROOT, RUNS_DIR, ensureDir, listFiles, loadBenchConfig, nowIso, rand4, readJson, resolveTask,
   runProcess, sha256File, taskDir, writeJson,
 } from "../lib/util.mjs";
 import { classifyClaim, judgeChecklist, judgeVisualItems, JUDGE_MODEL } from "./judge.mjs";
+import { judgeText, loadQuestions, snapshotText } from "./judge-text.mjs";
+import { copyTreeExcluding } from "../lib/workspace.mjs";
 import { NORMALIZERS } from "./normalize.mjs";
 
 /** Verify every file in a holdout dir against FREEZE_MANIFEST.json. */
@@ -48,7 +51,7 @@ function prepareSandbox(slug, cfg, outputDir) {
   return { box, hold, sandboxTamper: tamperCheck(hold), cleanup: () => rmSync(box, { recursive: true, force: true }) };
 }
 
-async function runGrader(slug, cfg, hold, gradeDir) {
+async function runGrader(slug, cfg, hold, gradeDir, runDir) {
   const g = cfg.grader;
   const timeoutMs = (g.timeoutMin || 10) * 60_000;
   if (g.kind === "vitest") {
@@ -60,14 +63,57 @@ async function runGrader(slug, cfg, hold, gradeDir) {
   }
   if (g.kind === "node-script") {
     const p = await runProcess(process.execPath, [g.script], {
-      // points graders save their judge frames to VBENCH_FRAMES_DIR
-      cwd: hold, env: { ...process.env, VBENCH_FRAMES_DIR: join(gradeDir, "frames") }, stdoutPath: join(gradeDir, "grader-stdout.txt"), stderrPath: join(gradeDir, "grader-stderr.txt"), timeoutMs,
+      // points graders save their judge frames to VBENCH_FRAMES_DIR. Whole-repo tasks read the collected output
+      // (VBENCH_OUTPUT_DIR) and may call the text judge themselves (VBENCH_JUDGE_TEXT_MODULE / _FILE).
+      cwd: hold, env: { ...process.env, ...graderEnv(cfg, gradeDir, runDir) }, stdoutPath: join(gradeDir, "grader-stdout.txt"), stderrPath: join(gradeDir, "grader-stderr.txt"), timeoutMs,
     });
     let raw = null;
     try { raw = JSON.parse(readFileSync(join(gradeDir, "grader-stdout.txt"), "utf8")); } catch { /* grader crashed */ }
     return { proc: p, parsed: NORMALIZERS[g.parse](raw, p) };
   }
   throw new Error(`unknown grader kind ${g.kind}`);
+}
+
+/** Extra env for node-script graders (ignored by graders that don't read it). */
+function graderEnv(cfg, gradeDir, runDir) {
+  const env = { VBENCH_FRAMES_DIR: join(gradeDir, "frames") };
+  if (!runDir) return env;
+  env.VBENCH_RUN_DIR = runDir;
+  env.VBENCH_OUTPUT_DIR = join(runDir, "output");
+  env.VBENCH_JUDGE_TEXT_MODULE = pathToFileURL(join(ROOT, "bench", "grade", "judge-text.mjs")).href;
+  if (cfg.judgeText?.file) env.VBENCH_JUDGE_TEXT_FILE = snapshotText(runDir, cfg.judgeText.file).path || "";
+  return env;
+}
+
+/**
+ * Fill judge-text checks. Checks the grader emitted with method "judge-text" and status "skip" are placeholders
+ * (their points come from the grader); if the grader emitted none at all, one check per question is added.
+ * A check the grader already decided is left alone (the grader may call the text judge itself).
+ */
+async function applyTextJudge({ slug, cfg, runDir, gradeDir, result, judge, log }) {
+  const jt = cfg.judgeText;
+  const spec = loadQuestions(join(taskDir(slug), jt.questions));
+  const snap = snapshotText(runDir, jt.file);
+  if (!result.checks.some((c) => c.method === "judge-text")) {
+    for (const q of spec.questions) result.checks.push({ id: q.id, name: q.name || q.q, group: q.group || jt.group || "Findings (judge)",
+      ...(typeof q.points === "number" ? { points: q.points, earned: 0 } : {}), status: "skip", method: "judge-text", detail: "" });
+  }
+  const todo = result.checks.filter((c) => c.method === "judge-text" && c.status === "skip");
+  if (!todo.length) return;
+  if (!judge) {
+    for (const c of todo) { c.status = "fail"; if (typeof c.points === "number") c.earned = 0; c.detail = "judge disabled (--no-judge): scored 0"; }
+    return;
+  }
+  const questions = todo.map((c) => spec.questions.find((q) => q.id === c.id) || { id: c.id, q: c.name });
+  const j = await judgeText({ text: snap.text, file: jt.file, questions, instructions: spec.instructions, outDir: join(gradeDir, "judge-text"), log });
+  for (const c of todo) {
+    const v = j.verdicts[c.id];
+    c.status = v.verdict === "yes" ? "pass" : v.verdict === "no" ? "fail" : "unclear"; // "judge failed" → unclear, 0 points
+    if (typeof c.points === "number") c.earned = v.verdict === "yes" ? c.points : 0;
+    c.judgeVerdict = v.verdict;
+    c.detail = `TEXT JUDGE (${jt.file}): ${v.verdict} — ${v.reasoning}`;
+  }
+  result.judgeText = { ...j.meta, snapshot: snap.path ? "present" : "missing", verdicts: j.verdicts };
 }
 
 /** Grade one run folder (a real run, or a reference/control pseudo-run). */
@@ -98,13 +144,13 @@ export async function gradeRun(runDir, { judge = true, log = console.log } = {})
   try {
     if (!sandboxTamper.ok) throw new Error(`sandbox copy failed its own tamper check: ${sandboxTamper.detail}`);
     log(`[grade] ${meta.runId} · ${cfg.grader.kind}${cfg.grader.script ? " " + cfg.grader.script : ""}`);
-    const { proc, parsed } = await runGrader(slug, cfg, hold, gradeDir);
+    const { proc, parsed } = await runGrader(slug, cfg, hold, gradeDir, runDir);
     result.checks = parsed.checks;
     // Some frozen browser checks are timing-sensitive (measured 2026-09-26: task 15 R10 passed 2 of 3 grades of
     // the same build). With grader.repeat N, re-run the frozen grader and mark any check whose verdict
     // disagrees across runs as "unclear (flaky)" instead of letting one run's luck decide it.
     for (let k = 2; k <= (cfg.grader.repeat || 1); k++) {
-      const again = await runGrader(slug, cfg, hold, gradeDir);
+      const again = await runGrader(slug, cfg, hold, gradeDir, runDir);
       for (const c of result.checks) {
         const o = again.parsed.checks.find((x) => x.id === c.id);
         if (o && o.status !== c.status) {
@@ -176,6 +222,9 @@ export async function gradeRun(runDir, { judge = true, log = console.log } = {})
       } else for (const c of questions) { c.earned = 0; c.status = "fail"; c.detail = missing.length ? "no artifact to judge" : "judge disabled (--no-judge): scored 0"; }
     }
 
+    // Text judge (judgeText): yes/no questions answered from ONE agent-written file, snapshotted when the run ended.
+    if (cfg.judgeText) await applyTextJudge({ slug, cfg, runDir, gradeDir, result, judge, log });
+
     // AI judge for items still undecided.
     const skipped = result.checks.filter((c) => c.status === "skip");
     if (judge && skipped.length && cfg.judgeItems === "skipped-autochecks" && !missing.length) {
@@ -229,7 +278,14 @@ export async function gradeReference(task, { candidate, label = "reference", jud
   const artifacts = [];
   // Folder deliverables (task 18): the control is a whole src/ folder (reference, or a mutated copy of it).
   if (cfg.artifactDirs?.length && (!candidate || statSync(candidate).isDirectory())) {
-    for (const dir of cfg.artifactDirs) cpSync(candidate || join(taskDir(slug), dir), join(runDir, "output", dir), { recursive: true });
+    // `referenceDir` (task-relative) = where the reference solution lives when it is not the task dir itself
+    // (whole-repo tasks collect artifactDirs ["."]); artifactExclude applies like it does to a real run.
+    const refRoot = cfg.referenceDir ? join(taskDir(slug), cfg.referenceDir) : taskDir(slug);
+    for (const dir of cfg.artifactDirs) {
+      const from = candidate || join(refRoot, dir), to = join(runDir, "output", dir);
+      if (cfg.artifactExclude?.length) copyTreeExcluding(from, to, cfg.artifactExclude);
+      else cpSync(from, to, { recursive: true });
+    }
     artifacts.push(...cfg.artifacts.map((rel) => ({ path: rel, source: candidate ? `control:${label}` : "reference" })));
   } else for (const rel of cfg.artifacts) {
     const from = candidate || join(taskDir(slug), rel);

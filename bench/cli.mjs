@@ -5,9 +5,11 @@
 //   bench grade  <runId…> | --ungraded | --reference <task> | --control <task> <file> <label>
 //   bench report [--out reports/site]
 //   bench view   <any .jsonl> [--out file.html]
-//   bench reparse [runId…]   (re-derive steps.json + metrics from raw.jsonl)
+//   bench reparse [runId…]   (re-derive steps.json + metrics + contamination scan from raw.jsonl)
+//   bench contamination [runId…]   (read-only raw.jsonl scan: web tools, network commands, benchmark refs)
+//   bench judge-text --text FINDINGS.md --questions q.json [--out dir]
 //   bench ls
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { gradeReference, gradeRun } from "./grade/grade.mjs";
 import { ROOT, RUNS_DIR, readJson, resolveTask } from "./lib/util.mjs";
@@ -96,6 +98,32 @@ async function main() {
     return;
   }
 
+  if (cmd === "contamination") {
+    // Read-only scan of raw.jsonl for web tools / network commands / benchmark references → meta.contamination.
+    const { rescanContamination } = await import("./run.mjs");
+    const { writeJson } = await import("./lib/util.mjs");
+    const done = new Set(allRunDirs());
+    for (const id of (a._.length ? a._ : [...done]).map((x) => x.replace(/[\/]$/, ""))) {
+      if (!done.has(id)) { console.log(`[contamination] ${id} skipped (no meta.json)`); continue; }
+      const dir = join(RUNS_DIR, id);
+      const m = rescanContamination(dir, readJson(join(dir, "meta.json")));
+      writeJson(join(dir, "meta.json"), m);
+      const c = m.contamination;
+      console.log(`[contamination] ${id} → ${c.flagged ? `FLAGGED ${JSON.stringify(c.counts)}` : "clean"}${c.loopbackRequests ? ` · ${c.loopbackRequests} loopback request(s)` : ""} · web tools ${m.webToolsAvailable}`);
+    }
+    return;
+  }
+
+  if (cmd === "judge-text") {
+    // Ad-hoc text judge: bench judge-text --text FINDINGS.md --questions q.json [--out dir]
+    const { judgeText, loadQuestions } = await import("./grade/judge-text.mjs");
+    if (!a.questions) throw new Error("usage: bench judge-text --text <file> --questions <json> [--out dir]");
+    const text = a.text && existsSync(resolve(a.text)) ? readFileSync(resolve(a.text), "utf8") : "";
+    const out = await judgeText({ text, file: a.text ? String(a.text).split(/[\\/]/).pop() : "document", ...loadQuestions(resolve(a.questions)), outDir: a.out && a.out !== true ? resolve(a.out) : null });
+    console.log(JSON.stringify(out, null, 2));
+    return;
+  }
+
   if (cmd === "ls") {
     for (const d of allRunDirs()) {
       const m = readJson(join(RUNS_DIR, d, "meta.json"));
@@ -105,7 +133,7 @@ async function main() {
     return;
   }
 
-  console.log("usage: bench run|grade|report|view|ls  (see header of bench/cli.mjs)");
+  console.log("usage: bench run|grade|report|view|reparse|contamination|judge-text|ls  (see header of bench/cli.mjs)");
   process.exitCode = cmd ? 1 : 0;
 }
 

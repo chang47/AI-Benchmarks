@@ -62,6 +62,22 @@ tool-call counts page==steps==raw, browser render clean at 1440/390, no path lea
   reference (`research/build_reference.py` → `src/`) and a blind solver from the brief alone (81/81 identical). If you
   change a rule, change all three and re-run that three-way check before freezing.
 
+## Whole-repo harness options (added 2026-09-28)
+- `bench.json` `workspace.from` + `shortRoot`, `artifactDirs: ["."]` + `artifactExclude`, `judgeText`, `denyWebTools`,
+  `referenceDir`, `contamination.extraTerms` — semantics in README "Whole-repo tasks". Self-tests D1–D6 in `npm run check`.
+- Prepared dirs carry npm-workspaces **junctions**. The copier re-creates in-source links pointing INTO the workspace and
+  dereferences out-of-source ones; it refuses a workspace with any link leaving it. Never "optimise" the copy into a
+  junction/symlink to the prepared dir — the agent (or `rm -rf`) would then write into the pristine source.
+- `listFiles` no longer recurses through links (junction cycles); `fs.rmSync` unlinks junctions without following them.
+- Short roots live under `C:\b` (override `VBENCH_SHORT_ROOT`); a `--keep` run leaves its `C:\b\<task>-<4hex>` behind.
+- Codex has no per-tool deny: web search is the top-level config `web_search` (`-c web_search="disabled"`). pi has no
+  built-in web tool. No harness blocks shell network (`curl`, `npm install`) — read `meta.contamination` instead.
+- The contamination scan is calibrated against the local runs (loopback `http.get`/`fetch(` and `grep "fetch("` were false
+  positives, now ignored). It is unscored; don't fold it into a score.
+- `VBENCH_TASKS_DIR` (new) exists for the D6 fixture task only; like `VBENCH_RUNS_DIR` it must be set before
+  `bench/lib/util.mjs` is imported (hence D6 runs in a child process).
+- Judge seam for tests: `judgeHooks.ask` in `bench/grade/judge.mjs` (null in production).
+
 ## Public showcase
 - Task 18 reference page → https://wonders-of-the-universe.iamjoshchang.workers.dev. Redeploy with
   `npx wrangler deploy --config deploy/wonders/wrangler.jsonc` (Workers static assets; `wrangler pages`

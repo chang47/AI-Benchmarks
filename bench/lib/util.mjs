@@ -9,7 +9,7 @@ import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
-export const TASKS_DIR = join(ROOT, "tasks");
+export const TASKS_DIR = process.env.VBENCH_TASKS_DIR || join(ROOT, "tasks"); // override = self-test fixture tasks only
 export const RUNS_DIR = process.env.VBENCH_RUNS_DIR || join(ROOT, "runs");
 export const CACHE_DIR = join(ROOT, ".bench-cache");
 export const HOME = homedir();
@@ -49,13 +49,18 @@ export function loadBenchConfig(slug) {
   return readJson(p);
 }
 
-/** List files under dir (relative paths), skipping node_modules. */
+/** List files under dir (relative paths), skipping node_modules and .git. Never recurses through a link (junction cycles). */
 export function listFiles(dir, base = dir, out = []) {
   if (!existsSync(dir)) return out;
-  for (const name of readdirSync(dir)) {
+  for (const d of readdirSync(dir, { withFileTypes: true })) {
+    const name = d.name;
     if (name === "node_modules" || name === ".git") continue;
     const p = join(dir, name);
-    if (statSync(p).isDirectory()) listFiles(p, base, out);
+    if (d.isSymbolicLink()) {
+      let isDir = false;
+      try { isDir = statSync(p).isDirectory(); } catch { continue; } // broken link
+      if (!isDir) out.push(relative(base, p).split("\\").join("/"));
+    } else if (d.isDirectory()) listFiles(p, base, out);
     else out.push(relative(base, p).split("\\").join("/"));
   }
   return out;

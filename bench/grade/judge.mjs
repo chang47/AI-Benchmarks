@@ -10,7 +10,11 @@ import { ROOT, runProcess, sha256, taskDir } from "../lib/util.mjs";
 export const JUDGE_MODEL = process.env.VBENCH_JUDGE_MODEL || "claude-sonnet-5";
 export const VOTES = Number(process.env.VBENCH_JUDGE_VOTES || 3);
 
-async function askClaude({ prompt, cwd, outPath, allowRead = false, timeoutMs = 5 * 60_000 }) {
+// Test seam: the self-tests (bench/checks) swap in a fake judge so grading logic is checked without model calls.
+export const judgeHooks = { ask: null };
+
+export async function askClaude({ prompt, cwd, outPath, allowRead = false, timeoutMs = 5 * 60_000 }) {
+  if (judgeHooks.ask) return judgeHooks.ask({ prompt, cwd, outPath, allowRead });
   const args = ["-p", "--model", JUDGE_MODEL, "--output-format", "json", "--no-session-persistence",
     "--setting-sources", "", "--strict-mcp-config", "--disable-slash-commands", "--no-chrome",
     "--dangerously-skip-permissions"];
