@@ -47,6 +47,7 @@ function stopTime() {
 const pastStop = () => { const s = stopTime(); return !!s && new Date() >= s; };
 const startedAt = new Date();
 
+const netRetries = new Map();
 const cellKey = (task, arm) => `${task}|${arm.harness}|${arm.model}|${arm.profile}`;
 function cellRuns(task, arm) {
   return readdirSync(RUNS_DIR).filter((d) => !d.startsWith("_") && existsSync(join(RUNS_DIR, d, "meta.json")))
@@ -69,7 +70,11 @@ function limitHit(id) {
   }
   const m = readJson(join(RUNS_DIR, id, "meta.json"));
   if (m.status !== "ok" && /usage limit|limit reached|hit your limit/i.test(String(m.finalText || m.errorDetail || ""))) hit = true;
-  return { hit, resetsAt };
+  // A dropped connection (2026-10-01: DNS outage, two task-18 runs died in ~4 min as "0/82") is infrastructure,
+  // not a result: treat it like the limit, but with a short fixed wait.
+  const text = String(m.finalText || "") + " " + String(m.errorDetail || "");
+  const network = m.status !== "ok" && /can't reach the api server|ENOTFOUND|EAI_AGAIN|ECONNRESET|ETIMEDOUT|socket hang up|overloaded/i.test(text);
+  return { hit, resetsAt, network };
 }
 
 const node = (args) => spawnSync(process.execPath, [join(ROOT, "bench", "cli.mjs"), ...args], { cwd: ROOT, stdio: "inherit" });
@@ -100,7 +105,16 @@ outer: for (const stage of stages) for (let k = 1; k <= stage.n; k++) for (const
     const after = cellRuns(task, arm);
     const fresh = after.find((x) => !have.some((h) => h.id === x.id));
     if (!fresh) { log(`no new run dir for ${task} ${arm.model}; stopping to avoid a loop`); break outer; }
-    const { hit, resetsAt } = limitHit(fresh.id);
+    const { hit, resetsAt, network } = limitHit(fresh.id);
+    if (network && !hit) {
+      mkdirSync(join(RUNS_DIR, "_aborted"), { recursive: true });
+      renameSync(join(RUNS_DIR, fresh.id), join(RUNS_DIR, "_aborted", fresh.id));
+      netRetries.set(cellKey(task, arm), (netRetries.get(cellKey(task, arm)) || 0) + 1);
+      if (netRetries.get(cellKey(task, arm)) > 6) { log(`NETWORK: 6 retries failed for ${task} ${arm.model}; stopping`); break outer; }
+      log(`NETWORK ERROR on ${fresh.id} → moved to runs/_aborted; retrying in 5 min (try ${netRetries.get(cellKey(task, arm))}/6)`);
+      await sleep(5 * 60_000);
+      continue;
+    }
     if (hit) {
       mkdirSync(join(RUNS_DIR, "_aborted"), { recursive: true });
       renameSync(join(RUNS_DIR, fresh.id), join(RUNS_DIR, "_aborted", fresh.id));
