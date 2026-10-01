@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Vetted Bench harness CLI.
 //   bench run    --task 07[,15,17] (--harness claude --model claude-opus-5-5 | --arms bench/arms/pilot.json)
-//                [--profile clean-room] [--n 1] [--fill] [--parallel 1] [--keep] [--grade]
+//                [--profile clean-room] [--n 1] [--fill] [--parallel 1] [--keep] [--grade] [--timeout-min N]
 //   bench grade  <runId…> | --ungraded | --reference <task> | --control <task> <file> <label>
 //   bench report [--out reports/site]
 //   bench view   <any .jsonl> [--out file.html]
@@ -52,7 +52,7 @@ async function main() {
     for (let k = 1; k <= n; k++) for (const task of tasks) for (const arm of arms) {
       const profile = a.profile && a.profile !== true ? a.profile : arm.profile || "clean-room";
       if (a.fill && (have[`${task}|${arm.harness}|${arm.model}|${profile}`] || 0) >= k) continue;
-      jobs.push({ task, harness: arm.harness, model: arm.model, profile, attempt: k, of: n, keep: !!a.keep });
+      jobs.push({ task, harness: arm.harness, model: arm.model, profile, attempt: k, of: n, keep: !!a.keep, timeoutMinOverride: a["timeout-min"] ? Number(a["timeout-min"]) : null });
     }
     console.log(`[bench] ${jobs.length} run(s) · parallel ${a.parallel || 1}`);
     const metas = await runPool(jobs, Number(a.parallel || 1));

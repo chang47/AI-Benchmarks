@@ -140,7 +140,7 @@ function copyInputs(slug, ws) {
   return Object.fromEntries(listFiles(src).map((rel) => [rel, sha256File(join(src, rel))]));
 }
 
-export async function runOne({ task, harness: harnessId, model, profile: profileName = "clean-room", attempt = 1, of = 1, keep = false, profileOverrides = {}, log = console.log }) {
+export async function runOne({ task, harness: harnessId, model, profile: profileName = "clean-room", attempt = 1, of = 1, keep = false, profileOverrides = {}, timeoutMinOverride = null, log = console.log }) {
   const slug = resolveTask(task);
   const cfg = loadBenchConfig(slug);
   const harness = getHarness(harnessId);
@@ -169,11 +169,22 @@ export async function runOne({ task, harness: harnessId, model, profile: profile
   const args = cmd.cwdFlag ? [...cmd.args.slice(0, -1), cmd.cwdFlag, ws, cmd.args.at(-1)] : cmd.args;
   const startedAt = nowIso();
   log(`[run] ${runId} · ${slug} · ${harnessId}/${model} · ${profile.name} · attempt ${attempt}/${of}`);
+  const timeoutMin = timeoutMinOverride || cfg.timeoutMin || profile.timeoutMin || 30; // a task may need longer than the profile default
+  // Claude Code: interrupt at the cap (keeps the official result event). profile.capWarningMin (opt-in) also tells
+  // the agent how long it has left, which changes behaviour, so it is off by default and recorded in meta.capPolicy.
+  const warnMin = profile.capWarningMin || null;
+  const streamJson = cmd.streamInput ? {
+    message: { type: "user", message: { role: "user", content: prompt } },
+    graceMs: 90_000,
+    warnBeforeMs: warnMin ? warnMin * 60_000 : null,
+    warnText: warnMin ? `[benchmark harness] This run has a ${timeoutMin}-minute time limit and about ${warnMin} minutes remain. Finish what you can, make sure the deliverable is in place, and report.` : null,
+  } : null;
   const proc = await runProcess(cmd.cmd, args, {
-    cwd: ws, env: cmd.env, stdin: cmd.promptInArgs ? null : prompt,
+    cwd: ws, env: cmd.env, stdin: cmd.promptInArgs || streamJson ? null : prompt, streamJson,
     stdoutPath: join(runDir, "raw.jsonl"), stderrPath: join(runDir, "stderr.log"),
-    timeoutMs: (cfg.timeoutMin || profile.timeoutMin || 30) * 60_000, // a task may need longer than the profile default
+    timeoutMs: timeoutMin * 60_000,
   });
+  const capPolicy = { timeoutMin, mode: streamJson ? "interrupt-then-kill" : "kill", warnMin, ...(proc.cap || {}) };
   const endedAt = nowIso();
 
   let parsed;
@@ -201,7 +212,7 @@ export async function runOne({ task, harness: harnessId, model, profile: profile
     runId, task: slug, workspace: ws, harness: harnessId, harnessVersion: await harness.version(),
     model, modelReported: parsed.info.modelReported || null,
     modelMismatch: !!(parsed.info.modelReported && !parsed.info.modelReported.includes(model.split("/").pop().replace(/\[.*\]$/, ""))),
-    profile, attempt, of, startedAt, endedAt, status,
+    profile, attempt, of, startedAt, endedAt, status, capPolicy,
     exitCode: proc.code, timedOut: proc.timedOut, errorDetail: parsed.info.errorDetail || null,
     promptFile: cfg.prompt || "frozen-prompt.md", promptSha256: sha256(prompt), inputs,
     parserVersion: parsed.parserVersion, command: [cmd.cmd === process.execPath ? "node" : cmd.cmd, ...safeArgs],

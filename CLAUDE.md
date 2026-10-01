@@ -101,4 +101,10 @@ tool-call counts page==steps==raw, browser render clean at 1440/390, no path lea
 - Effort is pinned per arm via `clean-room-medium` / `clean-room-max` profiles. Runs before 2026-10-01 have `profile.effort: null`
   (Claude Code default, which Anthropic says is Medium; not provable from the logs), so pair them with an explicit-medium run.
 - Task 18 `timeoutMin` raised 60 → 120 (2026-10-01) so a max-effort arm isn't cut off; every arm in a batch gets the same limit.
+- Capped runs (2026-10-01): Claude Code runs are interrupted at `timeoutMin` via stream-json `control_request {subtype:"interrupt"}`
+  and keep their `result` event (verified live: Cannae capped at 30 s → interrupted at 30.0 s, cost + modelUsage recorded).
+  Runs from before this change that hit the cap (e.g. 20261001-053939-20-claude-sonnet55-b545) have no result event:
+  input/cache tokens are exact, output tokens + cost are null.
+- Max effort can fan out to sub-agents (Sonnet 5.5 max on 22a: 4 auditors, 724 model calls, $80.92 list). Token totals come
+  from `modelUsage`; the context chart interleaves main + sub-agent calls (a sawtooth), not a bug.
 
