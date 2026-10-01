@@ -10,7 +10,8 @@ import { HOME, capture } from "../lib/util.mjs";
 const CLAUDE_CLEAN = ["--setting-sources", "", "--strict-mcp-config", "--disable-slash-commands", "--no-chrome"];
 
 function claudeArgs({ model, profile }) {
-  const a = ["-p", "--model", model, "--output-format", "stream-json", "--verbose",
+  // stream-json input keeps stdin open so the runner can interrupt at the time cap and still get the result event.
+  const a = ["-p", "--model", model, "--input-format", "stream-json", "--output-format", "stream-json", "--verbose",
     "--dangerously-skip-permissions", "--no-session-persistence"];
   if (profile.harnessSetup === "clean") a.push(...CLAUDE_CLEAN);
   if (profile.tools?.deny?.length) a.push("--disallowed-tools", ...profile.tools.deny);
@@ -40,7 +41,7 @@ export const HARNESSES = {
   claude: {
     id: "claude",
     rawFormat: "claude",
-    command: ({ model, profile }) => ({ cmd: "claude", args: claudeArgs({ model, profile }), env: { ...process.env } }),
+    command: ({ model, profile }) => ({ cmd: "claude", args: claudeArgs({ model, profile }), env: { ...process.env }, streamInput: true }),
     version: () => capture("claude", ["--version"]),
   },
 
@@ -48,7 +49,7 @@ export const HARNESSES = {
     id: "claude-glm",
     rawFormat: "claude",
     defaultModel: "glm-5.3",
-    command: ({ model, profile }) => ({ cmd: "claude", args: claudeArgs({ model, profile }), env: glmEnv(profile) }),
+    command: ({ model, profile }) => ({ cmd: "claude", args: claudeArgs({ model, profile }), env: glmEnv(profile), streamInput: true }),
     version: async () => `${await capture("claude", ["--version"])} (CLAUDE_CONFIG_DIR=~/.claude-glm)`,
   },
 

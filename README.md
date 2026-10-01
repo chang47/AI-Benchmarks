@@ -99,6 +99,15 @@ No harness blocks the network from the **shell** (`curl`, `npm install`) — eve
 
 ---
 
+### Time cap without losing the cost record (added 2026-10-01)
+Claude Code runs (`claude`, `claude-glm`) now start with `--input-format stream-json`: the prompt goes in as one user
+message and stdin closes when the session emits its `result` event. At the task's `timeoutMin` the runner sends an
+`interrupt` control request instead of killing the process, so a capped run still ends with Claude Code's own `result`
+event (`total_cost_usd`, `modelUsage`); only if none arrives within 90 s is the process tree killed. `meta.capPolicy`
+records `{timeoutMin, mode, interruptedAtMs, resultEvent, warnMin}`. Opt-in `profile.capWarningMin: N` also sends the
+agent an "about N minutes remain" message before the cap. That changes behaviour, so it is off by default. `bench run
+--timeout-min N` overrides the cap for one invocation (testing).
+
 ### Unattended overnight batches (added 2026-10-01)
 `powershell -NoProfile -ExecutionPolicy Bypass -File bench/keepawake.ps1 node bench/overnight.mjs --arms bench/arms/<arms>.json --plan "22a,21,20,18:1;22a,21:3" --stop-at 09:00`
 runs one job at a time, grades each run as soon as it finishes, and is resumable (`--fill` semantics per task × model × profile).
@@ -168,6 +177,9 @@ Repo visibility barely matters for *this* suite, so it's public. The usual "keep
 - **Live look-up is a run-mode choice, not a visibility choice.** A model can only "look up" an answer mid-eval if you run it *with tools/web access*. A sealed one-shot (paste `frozen-prompt.md`, take the output) generates from weights and can't search — public repo or not.
 
 Privacy only earns its keep for tasks whose answer is **not** already on the web — future *personal-variant* or bespoke tasks. Keep **those** in a private holdout; for the community-canonical 16, privacy is theater. The lever that actually protects an eval is **how you run the model** (tools vs sealed one-shot), not repo visibility.
+
+**Update 2026-10-01:** bespoke tasks headed for the core set now keep their answer keys private, because agents run
+with shell network access. Tiers, admission and retirement rules: `design/2026-10-01-task-rotation-policy.md`.
 
 ## Integrity: the builder never sees the answer key
 

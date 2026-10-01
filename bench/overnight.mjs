@@ -33,15 +33,18 @@ const log = (m) => { const line = `${new Date().toISOString()} ${m}`; process.st
 const status = existsSync(STATUS) ? readJson(STATUS) : { runs: [] };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-function pastStop() {
-  if (!stopAt) return false;
+// --stop-at takes an ISO date-time ("2026-10-02T09:00") or a local HH:MM. For HH:MM, a time that already passed
+// less than 12 h before this process started means "this morning" (stop now), not tomorrow: on 2026-10-01 a later
+// stage started at 10:18 read "09:00" as the next day and began spending Josh's daytime quota.
+function stopTime() {
+  if (!stopAt) return null;
+  if (stopAt.includes("T")) return new Date(stopAt);
   const [h, m] = stopAt.split(":").map(Number);
-  const now = new Date();
-  const stop = new Date(now); stop.setHours(h, m, 0, 0);
-  // a stop time earlier than the start of the night means "tomorrow morning"
-  if (stop < startedAt) stop.setDate(stop.getDate() + 1);
-  return now >= stop;
+  const stop = new Date(startedAt); stop.setHours(h, m, 0, 0);
+  if (stop < startedAt && startedAt - stop >= 12 * 3600_000) stop.setDate(stop.getDate() + 1);
+  return stop;
 }
+const pastStop = () => { const s = stopTime(); return !!s && new Date() >= s; };
 const startedAt = new Date();
 
 const cellKey = (task, arm) => `${task}|${arm.harness}|${arm.model}|${arm.profile}`;

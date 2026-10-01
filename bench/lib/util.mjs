@@ -78,34 +78,55 @@ export function copyDir(src, dst, { skipNodeModules = false } = {}) {
  * Never uses a shell: args (including empty strings) pass through verbatim.
  * Resolves { code, signal, timedOut, ms }.
  */
-export function runProcess(cmd, args, { cwd, env, stdin, stdoutPath, stderrPath, timeoutMs, onLine } = {}) {
+// streamJson (Claude Code with --input-format stream-json): stdin stays open. The prompt goes in as one user message,
+// stdin closes when the session emits its `result` event, and at timeoutMs the harness sends an `interrupt` control
+// request instead of killing, so a capped run still ends with Claude Code's own result event (cost, modelUsage).
+// Only if no result arrives within graceMs is the process tree killed. warnBeforeMs (opt-in, changes behaviour) sends
+// warnText as a user message that long before the cap.
+export function runProcess(cmd, args, { cwd, env, stdin, stdoutPath, stderrPath, timeoutMs, onLine, streamJson } = {}) {
   return new Promise((resolvePromise) => {
     const t0 = Date.now();
     const child = spawn(cmd, args, { cwd, env, windowsHide: true });
     const out = stdoutPath ? createWriteStream(stdoutPath) : null;
     const err = stderrPath ? createWriteStream(stderrPath) : null;
-    let buf = "";
+    const send = (o) => { if (!child.stdin.writableEnded) child.stdin.write(JSON.stringify(o) + "\n"); };
+    let buf = "", resultSeen = false, interruptedAt = null, warnedAt = null;
     child.stdout.on("data", (d) => {
       out?.write(d);
-      if (onLine) {
-        buf += d.toString("utf8");
-        let i;
-        while ((i = buf.indexOf("\n")) >= 0) { onLine(buf.slice(0, i)); buf = buf.slice(i + 1); }
+      if (!onLine && !streamJson) return;
+      buf += d.toString("utf8");
+      let i;
+      while ((i = buf.indexOf("\n")) >= 0) {
+        const line = buf.slice(0, i); buf = buf.slice(i + 1);
+        onLine?.(line);
+        if (streamJson && !resultSeen && line.includes('"type":"result"')) { resultSeen = true; child.stdin.end(); }
       }
     });
     child.stderr.on("data", (d) => err?.write(d));
-    let timedOut = false;
-    const timer = timeoutMs ? setTimeout(() => { timedOut = true; killTree(child.pid); }, timeoutMs) : null;
+    let timedOut = false, graceTimer = null;
+    const timer = timeoutMs ? setTimeout(() => {
+      timedOut = true;
+      if (!streamJson || resultSeen) return killTree(child.pid);
+      interruptedAt = Date.now() - t0;
+      send({ type: "control_request", request_id: "bench-cap", request: { subtype: "interrupt" } });
+      graceTimer = setTimeout(() => killTree(child.pid), streamJson.graceMs ?? 90_000);
+    }, timeoutMs) : null;
+    const warnTimer = streamJson?.warnBeforeMs && timeoutMs > streamJson.warnBeforeMs ? setTimeout(() => {
+      warnedAt = Date.now() - t0;
+      send({ type: "user", message: { role: "user", content: streamJson.warnText } });
+    }, timeoutMs - streamJson.warnBeforeMs) : null;
     child.on("error", (e) => { err?.write(String(e)); });
     child.on("close", (code, signal) => {
-      if (timer) clearTimeout(timer);
-      const done = () => resolvePromise({ code, signal, timedOut, ms: Date.now() - t0 });
+      for (const t of [timer, graceTimer, warnTimer]) if (t) clearTimeout(t);
+      const done = () => resolvePromise({ code, signal, timedOut, ms: Date.now() - t0,
+        ...(streamJson ? { cap: { interruptedAtMs: interruptedAt, warnedAtMs: warnedAt, resultEvent: resultSeen } } : {}) });
       let pending = (out ? 1 : 0) + (err ? 1 : 0);
       if (!pending) return done();
       const fin = () => { if (--pending === 0) done(); };
       out?.end(fin); err?.end(fin);
     });
-    if (stdin != null) child.stdin.end(stdin); else child.stdin.end();
+    if (streamJson) send(streamJson.message);
+    else if (stdin != null) child.stdin.end(stdin); else child.stdin.end();
   });
 }
 
@@ -145,6 +166,8 @@ export function redact(text) {
   const sep = "(?:\\\\+|/|%5C|%2F)+";
   t = t.replace(new RegExp(`([A-Za-z]:|[A-Za-z]%3A)?${sep}Users${sep}${esc(USER)}`, "gi"), "~");
   t = t.replace(new RegExp(`(%5C|%2F)${esc(USER)}(?=%5C|%2F|\\b)`, "gi"), "$1user");
+  // A path whose separators a shell ate, e.g. "…\UsersjoeAppDataLocalTemp" (a sub-agent's Git Bash call, 2026-10-01).
+  t = t.replace(new RegExp(`Users${esc(USER)}`, "gi"), "Users~");
   // Bare username anywhere else (e.g. a whoami, a git author, a path fragment the agent printed).
   t = t.replace(new RegExp(`\\b${esc(USER)}\\b`, "gi"), "user");
   for (const term of extraTerms) t = t.replace(new RegExp(esc(term), "gi"), "[redacted]");

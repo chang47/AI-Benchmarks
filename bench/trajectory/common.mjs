@@ -65,7 +65,7 @@ export function emptyMetrics() {
     harnessDurationMs: null, numTurns: null,
     inputTokens: null, outputTokens: null, cacheReadTokens: null, cacheCreationTokens: null,
     reasoningTokens: null, peakContextTokens: null, toolCalls: {}, toolErrors: 0,
-    costUsdEstimate: null, costBasis: null,
+    costUsdEstimate: null, costBasis: null, usageScope: null, mainThreadOutputTokens: null,
   };
 }
 

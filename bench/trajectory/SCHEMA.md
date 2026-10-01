@@ -30,6 +30,12 @@ raw.jsonl  ──parse (versioned: claude@1, codex@1, pi@1)──▶  steps.json
 
 **Null means "the harness did not report it" — never a guess.**
 
+**Token totals include sub-agents** (2026-10-01). Claude Code's `result.usage` covers the main thread only; the parser
+sums `result.modelUsage` instead, so a run that fans out to sub-agents reports the tokens behind its full cost
+(`mainThreadOutputTokens` keeps the main-thread figure; `usageScope` says which). A headless run killed by the time
+limit has no result event: input/cache tokens are summed over every message, output tokens and cost stay `null`
+(stream-json logs a message's usage before it finishes streaming, so summed output counts are partial).
+
 | Harness | per-step context | cost | model reported |
 |---|---|---|---|
 | Claude Code | yes | list-price estimate (`costBasis: list`) | yes |
