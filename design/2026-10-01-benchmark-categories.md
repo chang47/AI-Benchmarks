@@ -65,6 +65,9 @@ Effort level, harness and context load are run *settings*, recorded per run, not
 
 ## Proposed next tasks (one per gap, in order)
 
+Superseded by the researched designs in `2026-10-01-category-task-ideas.md` (build order, C4–C7, Money series).
+
+
 1. **C5 — spec for a feature in Hearthtable** (22's app): the model writes the spec; a fixed cheap model implements it;
    hidden tests grade the result. Reuses 22's private repo and hidden-suite machinery.
 2. **C7 — broken CI / build** on a small real repo: the deliverable is a green pipeline without deleting tests.
