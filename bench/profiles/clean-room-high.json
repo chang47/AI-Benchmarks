@@ -1,0 +1,14 @@
+{
+  "name": "clean-room-high",
+  "description": "clean-room with effort pinned to high (round 2 of the Sonnet 5.5 vs Opus 5.5 batch, 2026-10-01).",
+  "isolation": "tmp",
+  "harnessSetup": "clean",
+  "tools": {
+    "allow": null,
+    "deny": []
+  },
+  "skill": null,
+  "effort": "high",
+  "contextPrefill": null,
+  "timeoutMin": 30
+}

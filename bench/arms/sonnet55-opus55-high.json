@@ -1,0 +1,15 @@
+{
+  "description": "Round 2 (2026-10-01): Sonnet 5.5 and Opus 5.5, both with effort pinned to high.",
+  "arms": [
+    {
+      "harness": "claude",
+      "model": "claude-sonnet-5-5",
+      "profile": "clean-room-high"
+    },
+    {
+      "harness": "claude",
+      "model": "claude-opus-5-5",
+      "profile": "clean-room-high"
+    }
+  ]
+}
