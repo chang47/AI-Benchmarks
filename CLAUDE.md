@@ -96,3 +96,9 @@ tool-call counts page==steps==raw, browser render clean at 1440/390, no path lea
   tracks the file overwrites it (git treats ignored files as expendable), and merging the untracking commit then removes
   it. Copy the file somewhere outside the repo first. (Lost the uncommitted spec v3 edits this way once; re-applied.)
 
+## Overnight batches (added 2026-10-01)
+- `bench/overnight.mjs` (wrap in `bench/keepawake.ps1`) = serial run → grade → next, usage-limit aware, `--stop-at`. README has the command.
+- Effort is pinned per arm via `clean-room-medium` / `clean-room-max` profiles. Runs before 2026-10-01 have `profile.effort: null`
+  (Claude Code default, which Anthropic says is Medium; not provable from the logs), so pair them with an explicit-medium run.
+- Task 18 `timeoutMin` raised 60 → 120 (2026-10-01) so a max-effort arm isn't cut off; every arm in a batch gets the same limit.
+

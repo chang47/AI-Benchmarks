@@ -99,6 +99,14 @@ No harness blocks the network from the **shell** (`curl`, `npm install`) — eve
 
 ---
 
+### Unattended overnight batches (added 2026-10-01)
+`powershell -NoProfile -ExecutionPolicy Bypass -File bench/keepawake.ps1 node bench/overnight.mjs --arms bench/arms/<arms>.json --plan "22a,21,20,18:1;22a,21:3" --stop-at 09:00`
+runs one job at a time, grades each run as soon as it finishes, and is resumable (`--fill` semantics per task × model × profile).
+A run that hits the subscription usage limit is moved to `runs/_aborted/` and retried after the window resets. `--stop-at` starts
+no new run after that local time. `keepawake.ps1` holds the laptop awake for the command's lifetime. Progress:
+`.bench-cache/logs/overnight.log` + `overnight-status.json`. Effort is pinned per arm through a profile
+(`bench/profiles/clean-room-{medium,max}.json`); arms can name a `profile`.
+
 ## The meta-experiment
 
 Each task rehearses the vetted-bench loop with one twist: **"what to build" and "what counts as correct" are outsourced** — external authorities and community consensus, never hand-invented. Per task:

@@ -1,0 +1,8 @@
+{
+  "description": "Sonnet 5.5 vs Opus 5.5 (2026-10-01). A vs B = same effort, different model. A vs C = same model, different effort. All clean-room, effort pinned per arm.",
+  "arms": [
+    { "harness": "claude", "model": "claude-sonnet-5-5", "profile": "clean-room-medium" },
+    { "harness": "claude", "model": "claude-opus-5-5", "profile": "clean-room-medium" },
+    { "harness": "claude", "model": "claude-sonnet-5-5", "profile": "clean-room-max" }
+  ]
+}
