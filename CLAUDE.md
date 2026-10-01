@@ -9,6 +9,7 @@ YouTube channel ("the harness outlives the model") and, later, a shareable eval 
 - `design/2026-09-25-harness-v1-spec.md` — the spec the harness implements (acceptance checks A/B/C).
 - `bench/trajectory/SCHEMA.md` — the normalized Step schema + which metrics each harness reports.
 - `design/2026-10-01-task-rotation-policy.md` — which tasks are core / spotlight / archive, and when a task moves.
+- `design/2026-10-01-benchmark-categories.md` — task categories (C1–C7), run modes, and the lenses measured on every run.
 
 ## Rules
 - **Never edit anything under `tasks/<slug>/holdout/`** (or other frozen files). Grading re-hashes them

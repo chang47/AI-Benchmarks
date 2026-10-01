@@ -51,7 +51,7 @@ All of these, on the record in the task's `metadata.json` or handoff:
 
 - **One new spotlight task per video.** A trustworthy task (prompt, grader, mutations, cross-checked key, re-verification)
   is days of work, so the backlog (`design/benchmark-backlog.md`) stays at least two tasks ahead of the videos.
-- **Rotate genres** across videos: cinematic web build (18) · simulation (20) · data / spreadsheet (21) · repo bug hunt
+- **Rotate categories** (see `2026-10-01-benchmark-categories.md`; gaps first: C5 planning, C6 data/performance, C7 ops). Genres so far: cinematic web build (18) · simulation (20) · data / spreadsheet (21) · repo bug hunt
   (22a) · next up: long-horizon feature on an existing repo (22b), migration / refactor, a game, an ops / incident fix,
   clone-from-screenshots (19, parked).
 - **Every new model:** core set at its default effort and at medium, n ≥ 2, before it appears in any video.
