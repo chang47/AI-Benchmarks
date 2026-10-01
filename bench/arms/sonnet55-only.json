@@ -1,0 +1,15 @@
+{
+  "description": "Stage 1 of 2026-10-01: Sonnet 5.5 at medium and max (Opus 5.5 reuses its 9/26-9/28 clean-room runs + a fresh explicit-medium run).",
+  "arms": [
+    {
+      "harness": "claude",
+      "model": "claude-sonnet-5-5",
+      "profile": "clean-room-medium"
+    },
+    {
+      "harness": "claude",
+      "model": "claude-sonnet-5-5",
+      "profile": "clean-room-max"
+    }
+  ]
+}

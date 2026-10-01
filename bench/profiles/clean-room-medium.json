@@ -1,0 +1,14 @@
+{
+  "name": "clean-room-medium",
+  "description": "clean-room with effort pinned to medium (Sonnet 5.5 vs Opus 5.5 batch, 2026-10-01).",
+  "isolation": "tmp",
+  "harnessSetup": "clean",
+  "tools": {
+    "allow": null,
+    "deny": []
+  },
+  "skill": null,
+  "effort": "medium",
+  "contextPrefill": null,
+  "timeoutMin": 30
+}
