@@ -4,6 +4,28 @@ Research: five parallel agents (2026-10-01), each reading the landscape memo and
 `~/.claude/jobs/f8205858/tmp/{c4,c5,c6,c7,money}/` (session scratch). Categories: `2026-10-01-benchmark-categories.md`.
 No numbers below are measured on our tasks; public-benchmark figures are cited from their sources.
 
+## Decisions and refinements (Josh, 2026-10-01 afternoon)
+
+- **C5 Blueprint: agreed**, build first.
+- **Money #1 becomes "Make-money plan" (C5), replacing Freelancer for a Day as the lead.** The model writes a
+  comprehensive step-by-step plan to make money from a fixed brief (budget, 90 days, skill set). Graded without taste
+  scores: a **data room with traps** (supplier quotes, fees, regulations, competitor prices, a planted wrong number, an
+  expired promotion) lets a script check that the unit economics reconcile, the plan stays inside budget and timeline,
+  uses the right fees, and catches the traps; a few yes/no judge items on top. **Sequel:** the plan must include an
+  operating policy that runs in the seeded shop simulator (plan → execution: "your plan said $X; here's the simulated year").
+- **C7 "The build is red" reuses Hearthtable** (private; real typecheck/lint/test/e2e scripts; its hidden suite catches
+  "fixing" the build by breaking behaviour). Use a fresh frozen copy and break types that don't overlap 22a/22b.
+- **C6 data source: real public data, our own questions, a time-sliced hidden twin.** The agent gets one month (e.g.
+  Seattle/King County open data, NYC taxi trips, Backblaze drive stats, Steam/GitHub activity), answers our private
+  questions with code; the grader re-runs that code on the next month, answered by us. Public data, private
+  questions/answers, hard-coding fails on the twin. Option: our own 80+ benchmark trajectories as the dataset. The
+  speed task can share the same data. Check each dataset's licence before freezing.
+- **C4 Monday Inbox: pilot before trusting "too easy".** Josh's concern: a step-by-step multi-app flow (calendar → email
+  → docs → research) is too easy for current models. Likely true for the plain flow; the public multi-app benchmarks
+  score low because of judgment, not orchestration (conflicting emails, a mid-run cancellation, "don't" rules, a timezone
+  trap, look-alike records, injection, information it must ask for). Plan: build the plain flow (~1 day), pilot on Sonnet
+  @ medium, then add traps until there's a spread. "Easy for AI, until the second email changed the plan" is the beat.
+
 ## Recommended build order (cheapest proof first)
 
 | # | Task | Category | Build effort | Why first |
