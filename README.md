@@ -178,6 +178,9 @@ Repo visibility barely matters for *this* suite, so it's public. The usual "keep
 
 Privacy only earns its keep for tasks whose answer is **not** already on the web — future *personal-variant* or bespoke tasks. Keep **those** in a private holdout; for the community-canonical 16, privacy is theater. The lever that actually protects an eval is **how you run the model** (tools vs sealed one-shot), not repo visibility.
 
+**Update 2026-10-01:** bespoke tasks headed for the core set now keep their answer keys private, because agents run
+with shell network access. Tiers, admission and retirement rules: `design/2026-10-01-task-rotation-policy.md`.
+
 ## Integrity: the builder never sees the answer key
 
 Each task's answer key (`holdout/`) is frozen and committed *before* the candidate is built, hash-pinned in `FREEZE_MANIFEST.json`, and the builder agent is instructed never to read `holdout/`, `research/`, or `verify/`. A post-run transcript audit of the wave-2 run confirmed **zero** builders opened any answer-key or research file. Note this is currently enforced by instruction + freeze-ordering + tamper-check, **not** physical isolation — before running a model you don't control, build in a checkout that omits `holdout/` and auto-void any run whose builder reads it.

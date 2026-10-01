@@ -8,6 +8,7 @@ YouTube channel ("the harness outlives the model") and, later, a shareable eval 
 - `README.md` → "The harness" section: commands, harnesses, profiles, what a run writes.
 - `design/2026-09-25-harness-v1-spec.md` — the spec the harness implements (acceptance checks A/B/C).
 - `bench/trajectory/SCHEMA.md` — the normalized Step schema + which metrics each harness reports.
+- `design/2026-10-01-task-rotation-policy.md` — which tasks are core / spotlight / archive, and when a task moves.
 
 ## Rules
 - **Never edit anything under `tasks/<slug>/holdout/`** (or other frozen files). Grading re-hashes them
