@@ -14,6 +14,7 @@ export function parseClaude(events) {
   const info = { modelReported: null, sessionId: null, finalText: null, isError: null, stopReason: null, errorDetail: null, init: null };
   const seenMsg = new Set();
   const lastUsage = new Map(); // message id → last usage seen (for sessions with no result event)
+  const allUsage = new Map(); // same, but including sub-agent messages (their tokens are real spend too)
   let firstT = null, lastT = null;
   const toolNames = new Map();
 
@@ -44,6 +45,7 @@ export function parseClaude(events) {
       const msg = e.message;
       if (msg.model && msg.model !== "<synthetic>") info.modelReported = info.modelReported || msg.model;
       if (msg.id && msg.usage && !e.parent_tool_use_id && !e.isSidechain) lastUsage.set(msg.id, msg.usage);
+      if (msg.id && msg.usage) allUsage.set(msg.id, msg.usage);
       let ctx;
       if (msg.id && !seenMsg.has(msg.id) && msg.usage) {
         seenMsg.add(msg.id);
@@ -100,6 +102,18 @@ export function parseClaude(events) {
       m.cacheCreationTokens = u.cache_creation_input_tokens ?? null;
       m.reasoningTokens = u.output_tokens_details?.thinking_tokens ?? null;
       const mu = Object.values(e.modelUsage || {});
+      // result.usage covers the main thread only; modelUsage sums every model call, sub-agents included
+      // (a run that fans out to sub-agents otherwise reports a fraction of its tokens next to its full cost).
+      if (mu.length) {
+        const sumMu = (k) => mu.reduce((a, x) => a + (x[k] || 0), 0);
+        m.mainThreadOutputTokens = m.outputTokens;
+        m.inputTokens = sumMu("inputTokens");
+        m.outputTokens = sumMu("outputTokens");
+        m.cacheReadTokens = sumMu("cacheReadInputTokens");
+        m.cacheCreationTokens = sumMu("cacheCreationInputTokens");
+        if (mu.some((x) => x.thinkingTokens != null)) m.reasoningTokens = sumMu("thinkingTokens");
+        m.usageScope = "all-agents";
+      } else m.usageScope = "main-thread";
       const basis = mu.map((x) => x.costBasis).find(Boolean) || null;
       m.costBasis = basis;
       // Only a list-price basis is a meaningful API-equivalent estimate (GLM via claude-glm reports "unknown").
@@ -109,13 +123,20 @@ export function parseClaude(events) {
   }
 
   // Interactive session files have no result event: derive what we can, and say so via costBasis.
+  // A headless run killed by the time limit has no result event either. Tokens are summed over every message,
+  // sub-agents included; cost stays null (never estimated from a price table).
   if (m.numTurns == null && lastUsage.size) {
-    const us = [...lastUsage.values()];
+    const us = [...allUsage.values()];
     const sum = (k) => us.reduce((a, u) => a + (u[k] || 0), 0);
-    m.numTurns = us.length;
+    m.numTurns = lastUsage.size;
     m.inputTokens = sum("input_tokens"); m.outputTokens = sum("output_tokens");
     m.cacheReadTokens = sum("cache_read_input_tokens"); m.cacheCreationTokens = sum("cache_creation_input_tokens");
+    m.mainThreadOutputTokens = [...lastUsage.values()].reduce((a, u) => a + (u.output_tokens || 0), 0);
+    m.usageScope = "all-agents-derived-from-messages";
     m.costBasis = "derived-from-session-messages";
+    // Headless stream-json logs a message's usage before it finishes streaming, so a killed run's output counts
+    // are partial (a 2-hour run summed to ~1.3k). Input/cache counts are known up front and stay; output → null.
+    if (info.init) { m.outputTokens = null; m.mainThreadOutputTokens = null; m.usageScope += "; output unknown (run killed)"; }
     if (firstT && lastT) m.harnessDurationMs = new Date(lastT) - new Date(firstT);
   }
   if (info.finalText == null) {

@@ -145,6 +145,8 @@ export function redact(text) {
   const sep = "(?:\\\\+|/|%5C|%2F)+";
   t = t.replace(new RegExp(`([A-Za-z]:|[A-Za-z]%3A)?${sep}Users${sep}${esc(USER)}`, "gi"), "~");
   t = t.replace(new RegExp(`(%5C|%2F)${esc(USER)}(?=%5C|%2F|\\b)`, "gi"), "$1user");
+  // A path whose separators a shell ate, e.g. "…\UsersjoeAppDataLocalTemp" (a sub-agent's Git Bash call, 2026-10-01).
+  t = t.replace(new RegExp(`Users${esc(USER)}`, "gi"), "Users~");
   // Bare username anywhere else (e.g. a whoami, a git author, a path fragment the agent printed).
   t = t.replace(new RegExp(`\\b${esc(USER)}\\b`, "gi"), "user");
   for (const term of extraTerms) t = t.replace(new RegExp(esc(term), "gi"), "[redacted]");
