@@ -101,6 +101,8 @@ tool-call counts page==steps==raw, browser render clean at 1440/390, no path lea
 
 ## Overnight batches (added 2026-10-01)
 - `bench/overnight.mjs` (wrap in `bench/keepawake.ps1`) = serial run → grade → next, usage-limit aware, `--stop-at`. README has the command.
+- A run killed by a dropped connection (ENOTFOUND, "Can't reach the API server") is moved to `runs/_aborted` and retried
+  after 5 min (max 6), like the usage limit (2026-10-01: a DNS outage turned two task-18 runs into "0/82" in ~4 min).
 - Effort is pinned per arm via `clean-room-medium` / `clean-room-max` profiles. Runs before 2026-10-01 have `profile.effort: null`
   (Claude Code default, which Anthropic says is Medium; not provable from the logs), so pair them with an explicit-medium run.
 - Task 18 `timeoutMin` raised 60 → 120 (2026-10-01) so a max-effort arm isn't cut off; every arm in a batch gets the same limit.
