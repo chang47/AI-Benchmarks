@@ -1,0 +1,7 @@
+{
+  "description": "Default arms for benchmarking a new model (2026-10-02): medium effort only, clean-room. Max/high runs are reserved for the dedicated effort video (max took 27-74 min vs 1-2 min at medium on task 24 for +2 pts). Add the new model as one more medium arm.",
+  "arms": [
+    { "harness": "claude", "model": "claude-sonnet-5-5", "profile": "clean-room-medium" },
+    { "harness": "claude", "model": "claude-opus-5-5", "profile": "clean-room-medium" }
+  ]
+}
