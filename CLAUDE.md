@@ -88,6 +88,10 @@ tool-call counts page==steps==raw, browser render clean at 1440/390, no path lea
 - Name injected env vars plainly (`DESK_URL`, `DESK_SESSION`): Codex's shell may filter names containing KEY/SECRET/TOKEN,
   and the hook refuses such names anyway. Ship a config file next to a service CLI as a fallback.
 - PowerShell may block `.ps1`: ship a `.cmd` + an extensionless sh script for any CLI put on `pathPrepend`.
+- The agent CAN reach the service data dir (`pathPrepend` puts `<dataDir>/bin` on its PATH): anything a grader trusts must
+  also live in runner memory (task 25 streams each log entry's seq + mac to the service module over stdout).
+- A `.cmd` shim on PATH lets cmd.exe re-parse PowerShell's arguments (newlines cut, `%VAR%` expanded): ship a native
+  launcher (task 25: `desk.exe` from csc.exe) for any CLI an agent calls with free text.
 - An agent that runs `taskkill /IM node.exe` kills the service (and probably the harness): the module reports
   `exitedEarly`; graders score from what the service logged before it died.
 

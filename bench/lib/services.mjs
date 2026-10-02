@@ -28,6 +28,11 @@ import { nowIso, sha256, taskDir } from "./util.mjs";
 export const SECRET_ENV_NAME = /secret|token|passw|admin|api[_-]?key|(^|_)key($|_)/i;
 const STOP_TIMEOUT_MS = 60_000;
 
+/** Root of the runner-chosen service data dirs: %LOCALAPPDATA%\vbench-svc on Windows (agents clean %TEMP%), else tmp. */
+export function serviceDataRoot() {
+  return process.env.LOCALAPPDATA ? join(process.env.LOCALAPPDATA, "vbench-svc") : join(tmpdir(), "vbench-svc");
+}
+
 /** `$VAR` / `${VAR}` expansion + task-relative resolution (shared by workspace.from and services[].module). */
 export function resolveTaskPath(slug, p, what = "path") {
   const expanded = String(p).replace(/\$\{?([A-Z0-9_]+)\}?/gi, (_, v) => {
@@ -132,8 +137,9 @@ export async function startServices({ cfg, slug, runId, runDir, ws, log = consol
       if (!spec.module) throw new Error(`service ${spec.name}: no module`);
       const modPath = resolveTaskPath(slug, spec.module, `service ${spec.name} module`);
       if (!existsSync(modPath)) throw new Error(`service ${spec.name}: module not found: ${modPath}`);
-      // The runner's default data dir is outside both the workspace and the run dir (the agent never gets a path to it).
-      const dataDir = spec.dataDir ? resolveTaskPath(slug, spec.dataDir, `service ${spec.name} dataDir`) : join(tmpdir(), "vbench-svc", runId, spec.name);
+      // The runner's default data dir is outside the workspace and the run dir. The agent CAN reach it (pathPrepend puts
+      // <dataDir>/bin on its PATH), so a service must keep anything a grader trusts in runner memory (stop()), not only there.
+      const dataDir = spec.dataDir ? resolveTaskPath(slug, spec.dataDir, `service ${spec.name} dataDir`) : join(serviceDataRoot(), runId, spec.name);
       if (isInside(dataDir, ws)) throw new Error(`service ${spec.name}: refusing a data dir inside the agent's workspace (${dataDir})`);
       mkdirSync(dataDir, { recursive: true });
       const mod = await import(pathToFileURL(modPath).href);
@@ -183,12 +189,17 @@ async function stopOne(s, { runDir, reason, log }) {
   s.stopped = true;
   meta.stoppedAt = nowIso();
   const outDir = join(runDir, "service", s.name);
+  const err = (m) => { meta.error = `${meta.error ? meta.error + "; " : ""}${m}`; };
+  // Start from an empty output dir: files planted there earlier must not survive next to the service's real outputs.
+  try { rmSync(outDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch (e) { err(`output dir not cleared: ${e.message}`); }
   for (const [rel, data] of Object.entries(res?.files || {})) {
-    if (rel.includes("..") || isAbsolute(rel)) { meta.error = `${meta.error ? meta.error + "; " : ""}refused output path ${rel}`; continue; }
-    const p = join(outDir, rel);
-    mkdirSync(dirname(p), { recursive: true });
-    writeFileSync(p, data);
-    meta.files[rel.split("\\").join("/")] = sha256(typeof data === "string" ? Buffer.from(data) : data);
+    if (rel.includes("..") || isAbsolute(rel)) { err(`refused output path ${rel}`); continue; }
+    try { // one bad file must not lose the others or hide the run result
+      const p = join(outDir, rel);
+      mkdirSync(dirname(p), { recursive: true });
+      writeFileSync(p, data);
+      meta.files[rel.split("\\").join("/")] = sha256(typeof data === "string" ? Buffer.from(data) : data);
+    } catch (e) { err(`output ${rel} not written: ${e.code || e.message}`); }
   }
   Object.assign(meta, res?.meta || {}, { files: meta.files, stopReason: reason, stoppedAt: meta.stoppedAt, error: meta.error });
   // The runner-chosen data dir is the runner's to clean: stop() has handed over everything worth keeping.

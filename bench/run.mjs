@@ -162,12 +162,7 @@ export async function runOne({ task, harness: harnessId, model, profile: profile
   const inputs = copyInputs(slug, ws);
   if (profile.skill && harnessId === "codex") copyFileSync(profile.skill, join(ws, "AGENTS.md"));
 
-  // bench.json `services` (lib/services.mjs): local apps started before the agent, stopped on every exit path.
-  let services;
-  try { services = await startServices({ cfg, slug, runId, runDir, ws, log }); }
-  catch (e) { if (!keep) cleanup(); throw e; }
   const cmd = harness.command({ model, profile, prompt });
-  if (services.list.length) cmd.env = services.applyEnv(cmd.env || { ...process.env });
   const args = cmd.cwdFlag ? [...cmd.args.slice(0, -1), cmd.cwdFlag, ws, cmd.args.at(-1)] : cmd.args;
   const startedAt = nowIso();
   log(`[run] ${runId} · ${slug} · ${harnessId}/${model} · ${profile.name} · attempt ${attempt}/${of}`);
@@ -181,6 +176,12 @@ export async function runOne({ task, harness: harnessId, model, profile: profile
     warnBeforeMs: warnMin ? warnMin * 60_000 : null,
     warnText: warnMin ? `[benchmark harness] This run has a ${timeoutMin}-minute time limit and about ${warnMin} minutes remain. Finish what you can, make sure the deliverable is in place, and report.` : null,
   } : null;
+  // bench.json `services` (lib/services.mjs): local apps started right before the agent (nothing that can throw sits
+  // between this and the try below, so a started service can't leak), stopped on every exit path.
+  let services;
+  try { services = await startServices({ cfg, slug, runId, runDir, ws, log }); }
+  catch (e) { if (!keep) cleanup(); throw e; }
+  if (services.list.length) cmd.env = services.applyEnv(cmd.env || { ...process.env });
   let proc, serviceMeta = null;
   try {
     proc = await runProcess(cmd.cmd, args, {

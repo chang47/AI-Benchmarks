@@ -152,7 +152,7 @@ console.log(JSON.stringify({ pointsPossible: 1, checks: [{ id: "S1", group: "Ser
   HARNESSES["selftest-missing"] = { id: "selftest-missing", rawFormat: "claude", command: () => ({ cmd: "vbench-no-such-binary-d7", args: [], env: { ...process.env } }), version: async () => "missing" };
   const { runOne } = await import("../run.mjs");
   const { gradeRun } = await import("../grade/grade.mjs");
-  const { prependPath, isInside } = await import("../lib/services.mjs");
+  const { prependPath, isInside, serviceDataRoot } = await import("../lib/services.mjs");
   const { tmpdir } = await import("node:os");
 
   const alive = (pid) => { try { process.kill(pid, 0); return true; } catch { return false; } };
@@ -179,7 +179,7 @@ console.log(JSON.stringify({ pointsPossible: 1, checks: [{ id: "S1", group: "Ser
     conds.normal = meta.status === "ok" && rep.pathKeys.length === 1 && rep.first.endsWith("bin") && rep.url === `http://127.0.0.1:${pid.port}` && rep.ping === true
       && rep.cli === "fxcli ok url" && rep.probe === 403 && !secretInEnv && !secretInArgv && s.port === pid.port && s.stopReason === "finished" && s.exitedEarly === false
       && s.integrityEvents.length === 1 && s.integrityEvents[0].kind === "admin-probe" && filesOk(meta) && !(await leftovers("97a-svc-normal")) && result.pointsEarned === 1
-      && !isInside(join(tmpdir(), "vbench-svc", meta.runId, "fx"), meta.workspace);
+      && !isInside(join(serviceDataRoot(), meta.runId, "fx"), meta.workspace);
     ev.push(`normal: env+PATH (${rep.pathKeys.join("/")} ×1, first=…${rep.first.slice(-20)}), CLI via PATH "${rep.cli}", probe ${rep.probe} → ${s.integrityEvents.length} integrity event, secret in agent env ${secretInEnv} / server argv ${secretInArgv}, ${Object.keys(s.files).length} files hashed, grader S1 ${result.pointsEarned}/1, stop ${s.stopReason}`);
   }
   // 2. time cap: the hanging agent is killed, the service still stopped and collected
@@ -218,7 +218,7 @@ console.log(JSON.stringify({ pointsPossible: 1, checks: [{ id: "S1", group: "Ser
     conds[key] = re.test(err || "") && !left;
     ev.push(`${key}: ${err ? `refused (${err.slice(0, 70)}…)` : "NOT refused"}, leftovers ${left || "none"}`);
   }
-  // 8. PATH merge unit checks (Windows-style Path key, none, two keys)
+  // 8. PATH merge unit checks (Windows-style Path key, no PATH key)
   {
     const a = prependPath({ Path: "C:\\x", Other: "1" }, ["C:\\bin"]), b = prependPath({}, ["/bin2"]);
     const sep = process.platform === "win32" ? ";" : ":";
