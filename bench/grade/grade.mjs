@@ -84,6 +84,7 @@ function graderEnv(slug, cfg, gradeDir, runDir, judge = true) {
   if (!runDir) return env;
   env.VBENCH_RUN_DIR = runDir;
   env.VBENCH_OUTPUT_DIR = join(runDir, "output");
+  env.VBENCH_SERVICE_DIR = join(runDir, "service"); // bench.json services: runs/<id>/service/<name>/ (outputs of stop())
   env.VBENCH_JUDGE_TEXT_MODULE = pathToFileURL(join(ROOT, "bench", "grade", "judge-text.mjs")).href;
   if (cfg.judgeText?.file) env.VBENCH_JUDGE_TEXT_FILE = snapshotText(runDir, cfg.judgeText.file).path || "";
   return env;

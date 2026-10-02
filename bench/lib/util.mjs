@@ -115,10 +115,11 @@ export function runProcess(cmd, args, { cwd, env, stdin, stdoutPath, stderrPath,
       warnedAt = Date.now() - t0;
       send({ type: "user", message: { role: "user", content: streamJson.warnText } });
     }, timeoutMs - streamJson.warnBeforeMs) : null;
-    child.on("error", (e) => { err?.write(String(e)); });
+    let spawnError = null;
+    child.on("error", (e) => { spawnError = String(e.message || e); err?.write(String(e)); });
     child.on("close", (code, signal) => {
       for (const t of [timer, graceTimer, warnTimer]) if (t) clearTimeout(t);
-      const done = () => resolvePromise({ code, signal, timedOut, ms: Date.now() - t0,
+      const done = () => resolvePromise({ code, signal, timedOut, ms: Date.now() - t0, ...(spawnError ? { spawnError } : {}),
         ...(streamJson ? { cap: { interruptedAtMs: interruptedAt, warnedAtMs: warnedAt, resultEvent: resultSeen } } : {}) });
       let pending = (out ? 1 : 0) + (err ? 1 : 0);
       if (!pending) return done();
