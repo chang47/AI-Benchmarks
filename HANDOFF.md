@@ -1,5 +1,33 @@
 # HANDOFF — ai-benchmark ("Vetted Bench")
 
+## ▶ CHECKPOINT 2026-10-02 — read this first
+**Built + verified overnight (Dark Factory: implementer → blind validator on holdouts → adversarial reviewer → fix):**
+tasks 23, 24, 24b, 25a, 25b. Sources + keys live in the PRIVATE repo (branch `worktree-tasks-23-25-build`); installed
+copies in `tasks/23*`, `tasks/24*`, `tasks/25*` stay gitignored until round-1 runs.
+- 23 money plan: validator 87.5%, review fixed (validation cache now hash-keyed, 5 scoring gaps, judge escaping/deadline,
+  identity stripper). Installed with a **pilot-unfrozen** manifest; the real freeze refuses until Josh labels ~10 plans.
+- 24 taxi month v1: frozen. Re-run sandbox now a Windows **AppContainer** (no file access outside the sandbox, no
+  network) after review found submitted code could read the twin key. Memory cap 8 GB (Sonnet's correct script peaked
+  at 4.9 GB under the old 5 GB cap).
+- 24b taxi traps (new, from web research on real TLC quirks): 1:1 reversal cancellation, payment-unknown encodings,
+  vendor-1 `extra`, rate code 99, an unanswerable Q25. Frozen; K8 difficulty gate NOT met (blind Sonnet lost 2–8 of 80).
+- 25a/25b Monday Inbox: validators 91.7% / 97.5%; all blockers fixed (tamper false positives, post-death log edits,
+  PowerShell arg corruption → native `desk.exe`, 25b fairness: guessing never beats following the handbook).
+- Public master: generic `services` runner hook (D7 self-test) + `bench/arms/new-model-medium.json`.
+**Pilot (medium effort, clean-room) — every new task saturates:**
+23: Sonnet 98/96, Opus 94/96 · 24 v1: Sonnet 58/58, Opus 60/60 (Sonnet max 60/60 in 74 + 27 min, ~100× the cost) ·
+25a: Sonnet 50/50 · 25b: Sonnet 56/60, Opus 59/60 · 24b: Sonnet 78/78 (of 80), Opus 80/80.
+**Finding:** frontier models follow explicitly written rules essentially perfectly; the only separator so far is a
+"CANNOT_ANSWER with a tempting proxy" trap (24 Q17). Hardening should add judgment/ambiguity traps, not more rules.
+**Decisions (Josh):** skip max/high effort by default (max only for the effort video). Stay on the laptop (no cloud).
+**Open for Josh:** 23 blind labels + a content-free plan scores ~60 (control K8) + K5b measured 85; `denyWebTools` does
+not stop `curl` (2 of 3 task-23 runs fetched fee pages); 24 Q17 adjudication + K3 soft fails (24, 24b); 25b narrowed
+canary scope + unsent drafts not penalised + R2 "21 (24 incl. contractors)"; agents run unsandboxed during their own
+run (only the contamination scan guards holdouts); local report site shows task-24 questions — never deploy it before
+round 1; 25b reserve traps (built as a plug-in mechanism, not enabled) and a 23b if Josh wants more separation.
+**Gotchas learned:** lid close sleeps the laptop despite keepawake (one run lost 9 h → `runs/_aborted/`); background
+pilot queues should take the lock per run, not per batch (one Sonnet-max run held it 74 min).
+
 ## ▶ CHECKPOINT 2026-10-01 (evening) — read this first
 **Done today (all landed on master):**
 - Round 1 (Sonnet 5.5 medium + max, overnight) and round 2 (Sonnet 5.5 + Opus 5.5 @ high) on tasks 18/20/21/22a.
