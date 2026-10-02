@@ -4,13 +4,14 @@
 import { spawnSync } from "node:child_process";
 import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { basename, dirname, isAbsolute, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { getHarness, modelAlias } from "./harnesses/index.mjs";
 import { scanRaw, webToolsAvailable } from "./lib/contamination.mjs";
 import {
   ROOT, RUNS_DIR, ensureDir, listFiles, loadBenchConfig, nowIso, rand4, readJson, resolveTask,
   runProcess, sha256, sha256File, stamp, taskDir, writeJson,
 } from "./lib/util.mjs";
+import { resolveTaskPath, startServices } from "./lib/services.mjs";
 import { copyTreeExcluding, dirSize, makeShortWorkspace, prepareFromDir, removeWorkspace } from "./lib/workspace.mjs";
 import { parseFile } from "./trajectory/index.mjs";
 
@@ -30,11 +31,7 @@ export function applyTaskToolPolicy(profile, cfg) {
 
 /** `workspace.from`: absolute, or relative to the task dir; `$VAR` / `${VAR}` expand from the environment. */
 export function resolveWorkspaceFrom(slug, from) {
-  const expanded = String(from).replace(/\$\{?([A-Z0-9_]+)\}?/gi, (_, v) => {
-    if (process.env[v] == null) throw new Error(`workspace.from uses $${v}, which is not set`);
-    return process.env[v];
-  });
-  return isAbsolute(expanded) ? expanded : join(taskDir(slug), expanded);
+  return resolveTaskPath(slug, from, "workspace.from");
 }
 
 function makeWorkspace(runId, profile, cfg = {}, slug = "") {
@@ -165,7 +162,12 @@ export async function runOne({ task, harness: harnessId, model, profile: profile
   const inputs = copyInputs(slug, ws);
   if (profile.skill && harnessId === "codex") copyFileSync(profile.skill, join(ws, "AGENTS.md"));
 
+  // bench.json `services` (lib/services.mjs): local apps started before the agent, stopped on every exit path.
+  let services;
+  try { services = await startServices({ cfg, slug, runId, runDir, ws, log }); }
+  catch (e) { if (!keep) cleanup(); throw e; }
   const cmd = harness.command({ model, profile, prompt });
+  if (services.list.length) cmd.env = services.applyEnv(cmd.env || { ...process.env });
   const args = cmd.cwdFlag ? [...cmd.args.slice(0, -1), cmd.cwdFlag, ws, cmd.args.at(-1)] : cmd.args;
   const startedAt = nowIso();
   log(`[run] ${runId} · ${slug} · ${harnessId}/${model} · ${profile.name} · attempt ${attempt}/${of}`);
@@ -179,11 +181,18 @@ export async function runOne({ task, harness: harnessId, model, profile: profile
     warnBeforeMs: warnMin ? warnMin * 60_000 : null,
     warnText: warnMin ? `[benchmark harness] This run has a ${timeoutMin}-minute time limit and about ${warnMin} minutes remain. Finish what you can, make sure the deliverable is in place, and report.` : null,
   } : null;
-  const proc = await runProcess(cmd.cmd, args, {
-    cwd: ws, env: cmd.env, stdin: cmd.promptInArgs || streamJson ? null : prompt, streamJson,
-    stdoutPath: join(runDir, "raw.jsonl"), stderrPath: join(runDir, "stderr.log"),
-    timeoutMs: timeoutMin * 60_000,
-  });
+  let proc, serviceMeta = null;
+  try {
+    proc = await runProcess(cmd.cmd, args, {
+      cwd: ws, env: cmd.env, stdin: cmd.promptInArgs || streamJson ? null : prompt, streamJson,
+      stdoutPath: join(runDir, "raw.jsonl"), stderrPath: join(runDir, "stderr.log"),
+      timeoutMs: timeoutMin * 60_000,
+    });
+  } finally {
+    const reason = !proc ? "crash" : proc.spawnError ? "launch-failure" : proc.timedOut ? "timeout" : proc.code !== 0 ? "agent-error" : "finished";
+    if (services.list.length) serviceMeta = await services.stopAll(reason);
+    if (!proc && !keep) cleanup();
+  }
   const capPolicy = { timeoutMin, mode: streamJson ? "interrupt-then-kill" : "kill", warnMin, ...(proc.cap || {}) };
   const endedAt = nowIso();
 
@@ -221,6 +230,7 @@ export async function runOne({ task, harness: harnessId, model, profile: profile
     artifactSize: { ...artifactSize, exclude: cfg.artifactExclude || null },
     ...(workspacePrep ? { workspacePrep } : {}),
     ...(judgeTextSnapshot ? { judgeTextSnapshot } : {}),
+    ...(serviceMeta ? { services: serviceMeta } : {}),
     webToolsAvailable: webToolsAvailable(harnessId, profile),
     contamination,
     rawBadLines: parsed.badLines?.length || 0,
