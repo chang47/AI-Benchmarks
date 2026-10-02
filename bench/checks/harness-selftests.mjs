@@ -5,6 +5,9 @@
 //   D4 contamination scan over raw.jsonl (read-only; web tools / network commands / benchmark refs; loopback ignored)
 //   D5 profiles: web-tool deny reaches claude / claude-glm / codex / pi; webToolsAvailable; bench.json denyWebTools
 //   D6 end to end: a generated fixture task + a scripted fake agent → run → grade (text judge faked), in a child process
+//   D7 services hook: fixture service + fake agents through the real runner — env/PATH injection, stop on normal end,
+//      cap, crash, launch failure, service death and Ctrl-C (no process/port left), outputs hashed, VBENCH_SERVICE_DIR,
+//      refusals (data dir inside the workspace, secret-looking env names), admin secret never in env/argv
 import { spawnSync } from "node:child_process";
 import {
   chmodSync, existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync,
@@ -183,6 +186,14 @@ function d5(record) {
     + `webToolsAvailable ${JSON.stringify(avail)}; bench.json denyWebTools forces deny ${policyOk}`);
 }
 
+function d7(record, scratch) {
+  const r = spawnSync(process.execPath, [join(ROOT, "bench", "checks", "selftest-services.mjs"), join(scratch, "d7")], { encoding: "utf8", windowsHide: true, timeout: 5 * 60_000 });
+  let s = null;
+  try { s = JSON.parse(r.stdout.trim().split("\n").pop()); } catch { /* crashed */ }
+  if (!s) return record("D7", false, `services worker crashed (exit ${r.status}): ${(r.stderr || r.stdout || "").slice(-600)}`);
+  record("D7", s.ok, s.evidence);
+}
+
 function d6(record, scratch) {
   const r = spawnSync(process.execPath, [join(ROOT, "bench", "checks", "selftest-e2e.mjs"), join(scratch, "d6")], { encoding: "utf8", windowsHide: true, timeout: 5 * 60_000 });
   let s = null;
@@ -201,5 +212,6 @@ export async function harnessSelfTests(record) {
   d4(record, scratch);
   d5(record);
   d6(record, scratch);
+  d7(record, scratch);
   rmSync(scratch, { recursive: true, force: true });
 }

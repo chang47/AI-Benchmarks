@@ -11,6 +11,7 @@
 //   C5 the built site leaks no home paths / username / leak-guard terms
 //   D1-D6 harness capabilities (bench/checks/harness-selftests.mjs): prepared-dir workspace at a short root,
 //      artifactExclude, text judge (faked), contamination scan, web-tool deny per harness, end-to-end fixture task
+//   D7 the bench.json `services` hook (fixture service + fake agents: inject, stop on every exit path, collect, refuse)
 // Flags: --quick (skip B1 for slow browser tasks, skip C4), --no-browser (skip C4)
 import { copyFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
