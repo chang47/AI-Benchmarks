@@ -12,3 +12,7 @@ __pycache__/
 # Task 22 answer key — private until the round-1 runs are done (spec v3 §1 A8). Names every planted bug + fix.
 design/2026-09-27-task22-*
 tasks/22*/
+# Tasks 23-25 (2026-10-01): answer keys stay private until round-1 runs are done (rotation policy, admission bar 5).
+tasks/23*/
+tasks/24*/
+tasks/25*/
