@@ -81,6 +81,16 @@ tool-call counts page==steps==raw, browser render clean at 1440/390, no path lea
   `bench/lib/util.mjs` is imported (hence D6 runs in a child process).
 - Judge seam for tests: `judgeHooks.ask` in `bench/grade/judge.mjs` (null in production).
 
+## Services hook (added 2026-10-01, task 25)
+- `bench.json` `services[]` → `bench/lib/services.mjs` (semantics in README "Services"). Self-test D7
+  (`bench/checks/selftest-services.mjs`): env/PATH injection, stop on normal end / cap / crash / launch failure / service
+  death / Ctrl-C with no process or port left, outputs hashed, refusals.
+- Name injected env vars plainly (`DESK_URL`, `DESK_SESSION`): Codex's shell may filter names containing KEY/SECRET/TOKEN,
+  and the hook refuses such names anyway. Ship a config file next to a service CLI as a fallback.
+- PowerShell may block `.ps1`: ship a `.cmd` + an extensionless sh script for any CLI put on `pathPrepend`.
+- An agent that runs `taskkill /IM node.exe` kills the service (and probably the harness): the module reports
+  `exitedEarly`; graders score from what the service logged before it died.
+
 ## Public showcase
 - Task 18 reference page → https://wonders-of-the-universe.iamjoshchang.workers.dev. Redeploy with
   `npx wrangler deploy --config deploy/wonders/wrangler.jsonc` (Workers static assets; `wrangler pages`
