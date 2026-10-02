@@ -1,5 +1,24 @@
 # HANDOFF — ai-benchmark ("Vetted Bench")
 
+## ▶ CHECKPOINT 2026-10-01 (evening) — read this first
+**Done today (all landed on master):**
+- Round 1 (Sonnet 5.5 medium + max, overnight) and round 2 (Sonnet 5.5 + Opus 5.5 @ high) on tasks 18/20/21/22a.
+  Results + the video's working conclusion: video-studio `content/outlines/sonnet-55-vs-opus-RESULTS.md`.
+  Headline: Sonnet medium matches/beats Opus on well-specified tasks at ~¼–⅓ the cost; on the 22a bug hunt Opus @ high
+  got 69/69 for $8.61 vs $80.92 for Sonnet max; Sonnet high bought nothing over medium.
+- Harness: per-arm effort profiles (`clean-room-{medium,high,max}`), `bench/overnight.mjs` (serial run → grade,
+  usage-limit and dropped-connection retry, `--stop-at`), `bench/keepawake.ps1`, Claude runs interrupted at the cap
+  (stream-json `interrupt`) so capped runs keep their exact cost, token totals include sub-agents, redaction fix.
+- Design docs: `design/2026-10-01-task-rotation-policy.md`, `-benchmark-categories.md`, `-category-task-ideas.md`.
+**In progress (started 2026-10-01 evening):** building three new tasks from APPROVED specs that live in the PRIVATE repo
+(`ai-benchmark-private/{23-money-plan,24-taxi-data,25-monday-inbox}`, decisions in `DECISIONS-2026-10-01.md`):
+23 money plan (C5, Money series), 24 taxi month (C6), 25a/25b Monday Inbox (C4; needs a runner `services` hook).
+Task folders `tasks/23*`, `tasks/24*`, `tasks/25*` are gitignored like 22 (answer keys private until round-1 runs).
+**Open with Josh:** 22a's early spec drafts with the bug list are tracked at public HEAD (`design/.spec-fusion-work/`);
+remove or accept + disclose. 23 cannot freeze until Josh labels ~10 pilot plans blind.
+**Next experiments (not run):** "better spec for Sonnet" on 22a; max + Anthropic's "no reviewer sub-agents" prompt; a
+fresh explicit-medium Opus run; repeats for variance.
+
 ## ▶ CHECKPOINT 2026-09-27 (afternoon) — read this first
 **Focus changed (Josh):** only **Opus 5.5 vs GLM-5.3** from now on — no Haiku / Sonnet. Arms: `bench/arms/glm-vs-opus.json`.
 **Results (committed, `reports/results/20-cannae.md` / `21-inventory.md`):**
