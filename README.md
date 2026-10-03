@@ -123,6 +123,12 @@ no new run after that local time. `keepawake.ps1` holds the laptop awake for the
 `.bench-cache/logs/overnight.log` + `overnight-status.json`. Effort is pinned per arm through a profile
 (`bench/profiles/clean-room-{medium,max}.json`); arms can name a `profile`.
 
+### Adding a task / benchmarking a new model (added 2026-10-02)
+Follow **`design/task-build-playbook.md`**: prototype → 5-minute pilot gate (≥ 10-point spread) → key cross-check →
+grader + controls → blind validator + adversarial reviewer → runs. Default arms `bench/arms/new-model-medium.json`
+(medium only; max is for the effort video). Run one heavy step at a time with `bash bench/heavyq.sh <label> <cmd>` and
+queue agent runs one per lock hold with `bash bench/pilot-queue.sh <task> <n> <harness:model:profile>...`.
+
 ## The meta-experiment
 
 Each task rehearses the vetted-bench loop with one twist: **"what to build" and "what counts as correct" are outsourced** — external authorities and community consensus, never hand-invented. Per task:
