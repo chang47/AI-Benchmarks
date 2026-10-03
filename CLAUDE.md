@@ -5,6 +5,8 @@ grades against the frozen answer key, and renders a static HTML report. Built to
 YouTube channel ("the harness outlives the model") and, later, a shareable eval platform.
 
 ## Read first
+- **Building a task or benchmarking a new model → `design/task-build-playbook.md` first** (pilot gate before the
+  grader, medium-only arms, laptop lock rules, agent gotchas).
 - `README.md` → "The harness" section: commands, harnesses, profiles, what a run writes.
 - `design/2026-09-25-harness-v1-spec.md` — the spec the harness implements (acceptance checks A/B/C).
 - `bench/trajectory/SCHEMA.md` — the normalized Step schema + which metrics each harness reports.
