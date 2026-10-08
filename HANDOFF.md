@@ -1,6 +1,26 @@
 # HANDOFF — ai-benchmark ("Vetted Bench")
 
-## ▶ CHECKPOINT 2026-10-02 — read this first
+## ▶ CHECKPOINT 2026-10-08 — read this first
+**Josh validated the tasks by hand (2026-10-07):** 21 (input data + worked example), 22a (bugged vs clean build side by
+side: the reported bugs reproduce; an UNPLANNED client bug: GM arrow keys stop working until a reload, trigger unknown),
+23 (reference plan accepted; no blind labels, show the grader's label on camera), 24 (data + the 18 metrics), 25 (desk
+world; on camera say the agent works through tools like MCP connectors, the desk view is our window). 18 and 20 were
+already human-reviewed. Archive 01–17: never reviewed; recommendation = leave out of the video.
+**New:**
+- **24c-taxi-report** (private, gitignored): task 24 + the script also writes an offline `report.html` for a manager,
+  regenerated on the hidden month. Pilot: Sonnet 58/60 ×2, Opus 60/60 ×2; all 4 reports regenerate correctly on the twin.
+  Pending Josh: score the report? freeze? (see memory `project_24c_taxi_report`).
+- `bench/replay-desk.mjs`: replays a recorded task-25 run into a fresh desk at N× speed for filming (all four 10-02 25b
+  runs replay byte-identically). Viewer: capped/errored runs no longer read "the agent said it was done".
+  `heavyq.sh`: a lock whose owner process died is now stale immediately (a killed session blocked the queue).
+**Overnight batch 2026-10-08 (medium, clean-room):** 25b +3/+3 (Sonnet missed the mid-run cancellation in 3 of 5 runs,
+Opus 0 of 5); 25a Opus 50, 50; 23 Sonnet 91, Opus 100; Opus explicit-medium: 21 45/45, 20 60/65, 18 80/82, 22a 45/69
+(all 5 reported bugs, 1 of 6 unreported, false "done" in ~4 min; high/max found all 11 → effort is the 22a separator).
+**Open for Josh:** 22a design notes in public history (`design/.spec-fusion-work/`) still describe the planted bugs —
+remove or disclose before round 1; 24c scoring/freeze; low RAM (Chrome ~10 GB) killed a session mid-pilot — keep
+batches detached (WMI launch) and serial.
+
+## CHECKPOINT 2026-10-02
 **Built + verified overnight (Dark Factory: implementer → blind validator on holdouts → adversarial reviewer → fix):**
 tasks 23, 24, 24b, 25a, 25b. Sources + keys live in the PRIVATE repo (branch `worktree-tasks-23-25-build`); installed
 copies in `tasks/23*`, `tasks/24*`, `tasks/25*` stay gitignored until round-1 runs.
