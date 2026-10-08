@@ -78,7 +78,7 @@
       document.getElementById("runs-body").innerHTML = list.map((r) => {
         const tools = Object.values(r.toolCalls || {}).reduce((a, b) => a + b, 0);
         return `<tr><td><a href="runs/${esc(r.id)}.html">${day(r.startedAt)}</a></td><td>${esc(r.task)}</td><td>${esc(HARNESS[r.harness] || r.harness)}</td><td>${esc(r.model)}</td>
-          <td>${resultPill(r)}${r.contamination ? ` <span class="flag contam" title="unscored: web / network use or a benchmark reference in the transcript">contamination</span>` : ""}</td><td>${esc(r.claim || "—")}${r.fakeConvergence ? ` <span class="flag fake">false</span>` : ""}</td>
+          <td>${resultPill(r)}${r.contamination ? ` <span class="flag contam" title="unscored: web / network use or a benchmark reference in the transcript">contamination</span>` : ""}</td><td>${esc(r.status === "timeout" ? "hit time limit" : r.status === "error" ? "run error" : r.claim || "—")}${r.fakeConvergence ? ` <span class="flag fake">false</span>` : ""}</td>
           <td class="num">${dur(r.durationMs)}</td><td class="num">${num(r.outputTokens)}</td><td class="num">${num(r.peakContextTokens)}</td><td class="num">${tools || "—"}</td></tr>`;
       }).join("") || `<tr><td colspan="10" class="empty">No runs match these filters.</td></tr>`;
     };
@@ -110,7 +110,10 @@
     let verdict;
     if (!result) verdict = `<div class="verdict none"><span class="score">${viewOnly ? "Transcript" : "Not graded"}</span>${meta.status && meta.status !== "ok" ? `<span class="said">run status: ${esc(meta.status)}${meta.errorDetail ? ` (${esc(meta.errorDetail)})` : ""}</span>` : ""}</div>`;
     else {
-      const said = result.claim ? { claimed: "The agent said it was done.", hedged: "The agent delivered with caveats.", blocked: "The agent said it could not finish." }[result.claim.label] : "";
+      // A run stopped by the time limit (or an error) never got to claim anything: its last message is mid-work.
+      const said = meta.status === "timeout" ? "Stopped at the time limit before it finished."
+        : meta.status === "error" ? "The run ended with an error."
+        : result.claim ? { claimed: "The agent said it was done.", hedged: "The agent delivered with caveats.", blocked: "The agent said it could not finish." }[result.claim.label] : "";
       const pts = result.pointsPossible != null;
       verdict = `<div class="verdict ${(pts ? result.score >= 0.9 : result.allPass) ? "pass" : "fail"}"><span class="score">${pts ? `${result.pointsEarned}/${result.pointsPossible} points (${Math.round(result.score * 100)}%)` : `${result.passed}/${result.total} checks passed`}</span>
         ${pts && result.groups ? `<span class="said">${Object.entries(result.groups).map(([g, v]) => `${esc(g)} ${v.earned}/${v.possible}`).join(" · ")}</span>` : ""}
