@@ -123,6 +123,9 @@ footer p { margin: 4px 0; }
 .stat { background: var(--sheet); padding: 12px 14px; }
 .stat b { display: block; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; font-variation-settings: "wdth" 92; }
 .stat span { color: var(--ink-2); font-size: 12.5px; }
+.stats.tok { margin-top: -14px; }
+.stats.tok .stat b { font-size: 17px; }
+.scope { margin: -12px 2px 20px; }
 
 /* the gauge: context-window growth over the run (the page's one loud element) */
 .gauge { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r-md); padding: 14px 16px 10px; margin-bottom: 22px; }

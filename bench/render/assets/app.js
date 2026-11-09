@@ -126,12 +126,19 @@
         ${verdict}</header>
       <div class="stats">
         ${stat(dur(x.durationMs), "wall-clock time")}
-        ${stat(num(x.outputTokens), "output tokens")}
+        ${costStat(x, meta.harness)}
+        ${stat(num(x.totalTokens), "total tokens")}
         ${stat(num(x.peakContextTokens), "peak context")}
         ${stat(x.numTurns ?? "—", "model turns")}
         ${stat(Object.values(x.toolCalls || {}).reduce((a, b) => a + b, 0) || "—", `tool calls${x.toolErrors ? `, ${x.toolErrors} errored` : ""}`)}
-        ${stat(x.costUsdEstimate != null ? "$" + x.costUsdEstimate.toFixed(2) : "—", "list-price estimate")}
       </div>
+      <div class="stats tok">
+        ${stat(num(x.inputTokens), "input tokens (uncached)")}
+        ${stat(num(x.cacheCreationTokens), `cache write${x.cacheWrite1hTokens != null ? ` (5m ${num(x.cacheWrite5mTokens)} · 1h ${num(x.cacheWrite1hTokens)})` : ""}`)}
+        ${stat(num(x.cacheReadTokens), "cache read")}
+        ${stat(num(x.outputTokens), "output tokens")}
+      </div>
+      ${scopeLine(x)}
       <section class="gauge" aria-label="Context window over the run" id="gauge"></section>
       <div class="cols"><main>
         <div class="tl-tools"><strong>What the agent did</strong>
@@ -169,7 +176,8 @@
     h += `<section class="panel"><h3>Run details</h3><dl class="kv">
       ${kv("run", meta.runId)}${kv("status", meta.status)}${kv("harness", meta.harnessVersion)}${kv("parser", meta.parserVersion)}
       ${meta.init ? kv("setup", `${meta.init.tools ?? "?"} tools, ${meta.init.skills ?? 0} skills, ${meta.init.mcp ?? 0} MCP servers, plugins: ${(meta.init.plugins || []).join(", ") || "none"}`) : ""}
-      ${kv("input tokens", num(x.inputTokens))}${kv("cache read", num(x.cacheReadTokens))}${kv("cache write", num(x.cacheCreationTokens))}${kv("reasoning", num(x.reasoningTokens))}
+      ${kv("reasoning", num(x.reasoningTokens))}${x.mainThreadOutputTokens != null && x.mainThreadOutputTokens !== x.outputTokens ? kv(x.costSource === "session-cost-state" ? "output in this file's main-thread messages" : "main-thread output", num(x.mainThreadOutputTokens)) : ""}
+      ${priceCheck(x)}${kv("cost note", x.costNote)}
       ${meta.workspacePrep ? kv("workspace", `prepared copy: ${num(meta.workspacePrep.files)} files, ${(meta.workspacePrep.bytes / 1e6).toFixed(1)} MB in ${dur(meta.workspacePrep.copyMs)}`) : ""}
       ${meta.artifactSize ? kv("collected", `${num(meta.artifactSize.files)} files, ${(meta.artifactSize.bytes / 1024).toFixed(1)} KB${meta.artifactSize.exclude ? ` (excluding ${meta.artifactSize.exclude.join(", ")})` : ""}`) : ""}
       ${meta.command ? kv("command", meta.command.join(" ")) : ""}${meta.promptSha256 ? kv("prompt sha256", meta.promptSha256.slice(0, 16) + "…") : ""}
@@ -193,6 +201,37 @@
   const rank = (s) => ({ fail: 0, unclear: 1, skip: 1, pass: 2 }[s] ?? 1);
   const stat = (v, l) => `<div class="stat"><b>${esc(v)}</b><span>${esc(l)}</span></div>`;
   const kv = (k, v) => (v == null || v === "" ? "" : `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`);
+  const usd = (n) => "$" + (n < 0.1 ? n.toFixed(3) : n.toFixed(2));
+  // Headline cost: a reported figure as is; a price-table estimate marked ≈ with the date the prices were read;
+  // a model the table lacks = unknown, named. Never a guess.
+  function costStat(x, harness) {
+    const pt = x.costPriceTable;
+    if (x.costUsdEstimate != null && x.costBasis === "estimated-from-price-table")
+      return stat("≈ " + usd(x.costUsdEstimate), `cost (estimate, list prices ${pt?.pricesRead || "?"})`);
+    if (x.costUsdEstimate != null) return stat(usd(x.costUsdEstimate), `cost (reported by ${HARNESS[harness] || harness})`);
+    if (pt?.unknownModels?.length) return stat("unknown", `cost: no list price for ${pt.unknownModels.join(", ")}`);
+    return stat("—", x.costNote ? "cost: not known (see run details)" : "cost: not reported");
+  }
+  const SCOPE = {
+    "all-agents": "every model call in the run, sub-agents included (the harness's own totals)",
+    "main-thread": "main thread only (the harness gave no per-model totals)",
+    "all-agents-session-cost-state": "Claude Code's own running total for this session: main thread, sub-agents and compaction calls",
+    "all-agents-derived-from-messages": "summed from this file's messages (main thread + sidechain messages in this file; sub-agent transcripts saved in separate files are not included)",
+  };
+  function scopeLine(x) {
+    if (!x.usageScope) return "";
+    const [k, ...rest] = String(x.usageScope).split("; ");
+    return `<p class="sub scope">Tokens${x.costUsdEstimate != null ? " and cost" : ""}: ${esc(SCOPE[k] || k)}${rest.length ? `; ${esc(rest.join("; "))}` : ""}. Input + cache write + cache read + output = total.</p>`;
+  }
+  function priceCheck(x) {
+    const pt = x.costPriceTable;
+    if (!pt) return "";
+    const models = Object.entries(pt.byModel || {}).map(([m, b]) => `${m} ${b.calls} call${b.calls === 1 ? "" : "s"}${b.usd != null ? ` ${usd(b.usd)}` : " (no price)"}`).join(", ");
+    const v = pt.usd != null ? `≈ ${usd(pt.usd)}` : pt.note || `unknown (no list price for ${(pt.unknownModels || []).join(", ")})`;
+    const gap = pt.usd != null && x.costSource === "session-cost-state" && x.costUsdEstimate - pt.usd > 0.005
+      ? ". The reported total is higher: it also counts model calls not saved as messages in this file (compaction; sub-agents saved in separate files)" : "";
+    return kv("price-table check", `${v} over ${pt.scope} (${models}; list prices read ${pt.pricesRead})${gap}`);
+  }
   const KIND = { user: "prompt", "assistant-text": "said", thinking: "thinking", "tool-call": "tool", "tool-result": "result", system: "system", final: "finished" };
 
   function drawTimeline(steps) {
