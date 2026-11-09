@@ -22,6 +22,10 @@ YouTube channel ("the harness outlives the model") and, later, a shareable eval 
 - **Anti-fabrication.** Every number in a doc, caption or report comes from a run's `meta.json` /
   `result.json`. A metric a harness doesn't report stays `null` — never estimate it.
 - **Subscriptions only** (Claude Max, Codex $20, GLM, pi auth). No API keys. `$` = estimate, labelled.
+- **Cost (2026-11-08, Josh's ask):** a reported cost always wins (headless `result` event; an interactive session file's
+  `cost-state` event). Only when none exists is cost estimated from `bench/trajectory/prices.json`, labelled
+  `estimated-from-price-table` / "≈ … (estimate, list prices <date>)". Prices are read live from Anthropic's pricing page,
+  each row with its source + read date; a model not in the table = unknown, never a guess. Tokens are never estimated.
 - **Validate UI by looking.** After touching `bench/render/`, run `npm run check` (C4 screenshots to
   `.bench-cache/shots/`) and actually open the PNGs.
 

@@ -37,6 +37,9 @@ export function parseEvents(events, format = detectFormat(events), { cwd } = {})
   const p = PARSERS[format];
   if (!p) throw new Error(`unrecognized transcript format (not Claude Code / Codex / pi JSONL)`);
   const r = p.fn(events);
+  const x = r.metrics;
+  if (x.totalTokens == null && x.inputTokens != null && x.outputTokens != null) // input + cache write + cache read + output
+    x.totalTokens = x.inputTokens + (x.cacheCreationTokens || 0) + (x.cacheReadTokens || 0) + x.outputTokens;
   relativize(r.steps, cwd || r.info.init?.cwd || events.find((e) => e.type === "session")?.cwd);
   return { format, parserVersion: p.id, schemaVersion: PARSER_SCHEMA_VERSION, ...r };
 }

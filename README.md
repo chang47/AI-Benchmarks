@@ -72,6 +72,19 @@ npm run check                                 # the regression gate (see below)
 
 No harness blocks the network from the **shell** (`curl`, `npm install`) — every harness runs with approvals/sandbox bypassed. That is what the contamination scan is for. `meta.webToolsAvailable` records what the harness + effective profile offered (`true` / `false` / `"partial"` / `null` = unknown).
 
+**Viewing a transcript** (`bench view <file.jsonl> [--out page.html]`, also every run page of the report): the header shows
+wall clock, **cost**, total tokens, peak context, model turns and tool calls, then **input (uncached), cache write (5-minute /
+1-hour split when logged), cache read and output** tokens, and one line saying what the totals cover. Cost (updated 2026-11-08):
+
+- **`$X (reported by Claude Code)`** — a headless run's `result` event (`total_cost_usd`), or, for an interactive session
+  file, its last `cost-state` event: Claude Code's own running total (main thread, sub-agents saved in separate files,
+  compaction calls). A `cost-state` that counts fewer tokens than the file's own messages is stale and not used.
+- **`≈ $X (estimate, list prices <date>)`** — no reported cost: each model call priced by its own model from
+  [`bench/trajectory/prices.json`](./bench/trajectory/prices.json) (Anthropic list prices, source URL + read date per model).
+  A model not in the table = cost **unknown**, with the model named; a headless run killed by the time limit = no estimate
+  (its output counts are partial). Run details also show the price-table figure next to a reported one as a cross-check.
+- All dollar figures are API-list-price equivalents, not money spent (every run uses a subscription).
+
 **A run** writes `runs/<id>/`: `raw.jsonl` (the harness's stdout, untouched — source of truth), `steps.json` (normalized, re-derivable with `bench reparse`), `meta.json` (model, profile, command, metrics), `output/` (the artifact), then `result.json` after grading. Raw + steps are gitignored; meta/result/output are small and committed.
 
 **Grading** re-hashes the answer key against its `FREEZE_MANIFEST.json` (refuses on mismatch), runs the task's frozen grader **unmodified** in a sandbox that mirrors the task layout, and normalizes the checks. Items a script can't decide go to a local **AI judge** (`claude -p`, clean, blind to the model, prompt hash recorded, tagged "AI judge" in the report). The judge also classifies the agent's final message (claimed / hedged / blocked) → **fake convergence** = claimed done but failed the key.

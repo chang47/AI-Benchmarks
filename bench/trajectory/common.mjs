@@ -66,6 +66,7 @@ export function emptyMetrics() {
     inputTokens: null, outputTokens: null, cacheReadTokens: null, cacheCreationTokens: null,
     reasoningTokens: null, peakContextTokens: null, toolCalls: {}, toolErrors: 0,
     costUsdEstimate: null, costBasis: null, usageScope: null, mainThreadOutputTokens: null,
+    totalTokens: null, cacheWrite5mTokens: null, cacheWrite1hTokens: null, costSource: null, costNote: null, costPriceTable: null,
   };
 }
 
